@@ -39,34 +39,32 @@ import android.util.Log;
  */
 public class Metadata {
 
-    // Class TAG
+    /* Debug Tag */
     private final String TAG = "MetadataClass";
 
-    // Metadata JSON Object
+    /* Metadata JSON object */
     private JSONObject mJSONObject;
 
     /**
-     * Constructor
+     * Empty Constructor
      */
-
     public Metadata() {
         mJSONObject = new JSONObject();
     }
 
     /**
      * Constructor that takes in a already formatted JSON String
+     * 
      * @param _JSONString Formatted JSON String
      */
-
     public Metadata(String _JSONString) {
         mJSONObject = null;
         try {
             mJSONObject = new JSONObject(_JSONString);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Problems creating LisaMetadata with a previous valid JSON declaration");
+            Log.d(TAG, "Problems creating Metadata with a previous valid JSON declaration");
             Log.d(TAG, "Got: " + _JSONString);
-            Log.d(TAG, "Error was: " + e.toString());
+            Log.d(TAG, "Error: " + e.toString());
             mJSONObject = new JSONObject(); // Creates an empty JSON Object
             e.printStackTrace();
         }
@@ -74,10 +72,10 @@ public class Metadata {
 
     /**
      * Constructor for (key, value)
+     * 
      * @param key String with the key
      * @param value String with the value
      */
-
     public Metadata(String key, String value) {
         mJSONObject = new JSONObject();
         insert(key, value);
@@ -88,10 +86,10 @@ public class Metadata {
      * pass arrays with the correct sizes. They are corresponding, meaning
      * key[0] goes with value[0].
      * Read it as: metadata[key(i)] = value(i)
-     * @param key Array of keys
+     * 
+     * @param key   Array of keys
      * @param value Array of values
      */
-
     public Metadata(String[] key, String[] value) {
         mJSONObject = new JSONObject();
 
@@ -115,12 +113,12 @@ public class Metadata {
 
     /**
      * Inserts a (key,value) to the JSON Object
-     * @param key String with key
-     * @param value Object with value
-     * @return true  if value was inserted
-     *         false if value was not inserted
+     * 
+     * @param key    String with key
+     * @param value  Object with value
+     * @return       true  if value was inserted
+     *               false if value was not inserted
      */
-
     public boolean insert(String key, Object value) {
         if (key == null) {
             Log.d(TAG, "Tried to use a null key on insert()");
@@ -132,7 +130,6 @@ public class Metadata {
             mJSONObject.accumulate(key, value);
         }
         catch (JSONException e) {
-            // TODO Auto-generated catch block
             Log.d(TAG, "Failed to insert JSON Object, (" + key + ", " + value +")");
             Log.d(TAG, "Error: " + e.toString());
             e.printStackTrace();
@@ -154,7 +151,6 @@ public class Metadata {
      * @return Value if it exists
      *         null  if things go wrong
      */
-
     public String get(String key) {
         if (key == null) {
             Log.d(TAG, "Tried to use a null key on get()");
@@ -170,7 +166,6 @@ public class Metadata {
             //return jsonString;
         }
         catch (JSONException e) {
-            // TODO Auto-generated catch block
             Log.d(TAG, "Failed to retrieve JSON Object, (" + key + ")");
             Log.d(TAG, "Error:" + e.toString());
             e.printStackTrace();
@@ -181,9 +176,8 @@ public class Metadata {
 
     /**
      * Converts JSON Object to a FORMATTED string
-     * @return formatted string
+     * @return Formatted string
      */
-
     public String convertToString() {
         try {
             return mJSONObject.toString(4);
@@ -200,6 +194,7 @@ public class Metadata {
     /**
      * Creates a JSON string with the key "meta"
      * set to the JSON string representation of the metadata.
+     * 
      * @return The JSON string
      */
     public String convertToMetadataString() {
@@ -208,7 +203,6 @@ public class Metadata {
             meta.put("meta", mJSONObject);
             return meta.toString(4);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             Log.d(TAG, "Failed to get convert JSON Object to string.");
             Log.d(TAG, e.toString());
             e.printStackTrace();
@@ -219,7 +213,6 @@ public class Metadata {
     /**
      * Cleans the JSONObject
      */
-
     public void clear() {
         Iterator<?> it = mJSONObject.keys();
         while (it.hasNext()) {
