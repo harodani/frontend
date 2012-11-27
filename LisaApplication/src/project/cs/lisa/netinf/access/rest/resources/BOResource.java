@@ -110,10 +110,10 @@ public class BOResource extends LisaServerResource {
     @Override
     protected void doInit() {
         super.doInit();
-        
-        mFilepath = UProperties.INSTANCE.getPropertyWithName("metadata.filepath");
-        mContentType = SailDefinedLabelName.CONTENT_TYPE.getLabelName();
-        
+
+        mFilepath = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
+        mContentType = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.content_type");
+
         mHashValue = getQuery().getFirstValue("hash", true);
         mHashAlgorithm = getQuery().getFirstValue("hashAlg", true);
 
@@ -200,7 +200,7 @@ public class BOResource extends LisaServerResource {
 
         // Set saving filename to the same filename as in metadata
         String hash = io.getIdentifier().getIdentifierLabel(SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-        String filePath = Environment.getExternalStorageDirectory() 
+        String filePath = Environment.getExternalStorageDirectory()
                 + UProperties.INSTANCE.getPropertyWithName("sharing.folder")
                 + hash;
         Log.d(TAG, "Filepath is: " + filePath);
