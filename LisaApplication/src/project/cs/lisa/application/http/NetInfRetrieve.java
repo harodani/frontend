@@ -28,6 +28,7 @@ package project.cs.lisa.application.http;
 
 import java.io.IOException;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
 import android.util.Log;
@@ -51,11 +52,7 @@ public class NetInfRetrieve extends NetInfRequest {
 	public NetInfRetrieve(String host, String port,
 			String hashAlg, String hash) {
 
-		super(host, port, hashAlg, hash);
-
-		// TODO make this beautiful
-		setPathPrefix("retrieve");
-
+		super(host, port, "retrieve", hashAlg, hash);
 	}
 
     /**
@@ -65,20 +62,17 @@ public class NetInfRetrieve extends NetInfRequest {
      *                  or null if the request failed
      */
     @Override
-    protected String doInBackground(Void... voids) {
+    protected NetInfResponse doInBackground(Void... voids) {
         Log.d(TAG, "doInBackground()");
 
         try {
-            // Execute HTTP request
             HttpGet get = new HttpGet(getUri());
-            return execute(get);
-        } catch (NullEntityException e) {
-            Log.e(TAG, "NullEntityException");
-            return null;
+            HttpResponse httpResponse = execute(get);
+            return new NetInfRetrieveResponse(httpResponse);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
+            return new NetInfRetrieveResponse();
         }
+
     }
 
 }

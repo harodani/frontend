@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -13,11 +12,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 
-import project.cs.lisa.application.MainNetInfActivity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,8 +24,7 @@ import android.util.Log;
  * @author Thiago Costa Porto
  *
  */
-
-public abstract class NetInfRequest extends AsyncTask<Void, Void, String> {
+public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse> {
 
     /** Debug Log Tag. **/
     private static final String TAG = "NetInfRequest";
@@ -60,28 +54,13 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, String> {
     /** HTTP Client. **/
     private HttpClient mClient;
 
-    /** Activity **/
-    private MainNetInfActivity mActivity;
-
-    /**
-     * Create a new asynchronous NetInf message sent using HTTP GET.
-     * @param host         Target host of the message
-     * @param port         Target port
-     * @param hashAlg      Hash algorithm used
-     * @param hash         Hash
-     */
-
-    public NetInfRequest(String host, String port,
-            String hashAlg, String hash) {
+    public NetInfRequest(String host, String port, String pathPrefix) {
 
         Log.d(TAG, "NetInfRequest()");
 
         mHost = host;
         mPort = port;
-        mPathPrefix = "";
-
-        addQuery("hashAlg", hashAlg);
-        addQuery("hash", hash);
+        mPathPrefix = pathPrefix;
 
         // HTTP client with a timeout
         HttpParams httpParams = new BasicHttpParams();
@@ -90,18 +69,21 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, String> {
         mClient = new DefaultHttpClient(httpParams);
     }
 
-    public NetInfRequest(MainNetInfActivity activity, String host, String port) {
-        Log.d(TAG, "NetInfRequest() for searching");
-        mActivity = activity;
-        mHost = host;
-        mPort = port;
-        mPathPrefix = "";
+    /**
+     * Create a new asynchronous NetInf message sent using HTTP GET.
+     * @param host         Target host of the message
+     * @param port         Target port
+     * @param hashAlg      Hash algorithm used
+     * @param hash         Hash
+     */
+    public NetInfRequest(String host, String port, String pathPrefix,
+            String hashAlg, String hash) {
+        this(host, port, pathPrefix);
 
-        // HTTP client with a timeout
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT);
-        mClient = new DefaultHttpClient(httpParams);
+        Log.d(TAG, "NetInfRequest()");
+
+        addQuery("hashAlg", hashAlg);
+        addQuery("hash", hash);
     }
 
     /**
@@ -111,56 +93,25 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, String> {
      *                  or null if the request failed.
      */
     @Override
-    protected abstract String doInBackground(Void... voids);
-
-    /**
-     * Executes a HttpUriRequest and tries to read the content of the response as JSON.
-     * @param request               The HttpUriRequest to execute
-     * @return                      The read JSON string or null if unable to read as JSON
-     * @throws NullEntityException  In case the response doesn't contain an entity
-     * @throws IOException          In case the there was another error getting the response
-     */
-    protected String execute(HttpUriRequest request) throws NullEntityException, IOException {
-        Log.d(TAG, "execute()");
-        Log.d(TAG, "uri = " + request.getURI());
-        Log.d(TAG, "class = " + request.getClass().toString());
-        Log.d(TAG, "method = " + request.getMethod().toString());
-
-        // TODO improve, maybe throw more exceptions instead of all try:s?
-
-        // Execute the HTTP request
-        HttpResponse response = mClient.execute(request);
-
-        // Get entity
-        HttpEntity entity = response.getEntity();
-        // If no entity in response
-        if (entity == null) {
-            Log.d(TAG, "entity = null");
-            throw new NullEntityException();
-        }
-
-        String jsonResponse = EntityUtils.toString(entity);
-        Log.d(TAG, "jsonResponse = " + jsonResponse);
-
-        // TODO validate that actual JSON is returned.
-        try {
-            Object obj = JSONValue.parseWithException(jsonResponse);
-        } catch (ParseException e) {
-            Log.e(TAG, e.toString());
-            return null;
-        }
-
-        return jsonResponse;
-    }
+    protected abstract NetInfResponse doInBackground(Void... voids);
 
     /**
      * Handles the response to the request sent to the NetInf node.
      * @param jsonResponse     The JSON response.
      */
     @Override
-    protected void onPostExecute(String jsonResponse) {
+    protected void onPostExecute(NetInfResponse response) {
         Log.d(TAG, "onPostExecute()");
-        Log.d(TAG, "jsonString = " + jsonResponse);
+    }
+
+    protected HttpResponse execute(HttpUriRequest request) throws IOException {
+        Log.d(TAG, "execute()");
+        Log.d(TAG, "uri = " + request.getURI());
+        Log.d(TAG, "class = " + request.getClass().toString());
+        Log.d(TAG, "method = " + request.getMethod().toString());
+
+        // Execute the HTTP request
+        return mClient.execute(request);
     }
 
     /**
@@ -219,18 +170,4 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, String> {
         return uri.toString();
     }
 
-    /**
-     * Sets the HTTP path prefix for the HTTP GET request send to the local NetInf node.
-     * Should be set before do in background is called.
-     * At time of writing should be either "ni" or "bo".
-     * "ni" for a NetInf PUBLISH request
-     * "bo" for a NetInf GET request
-     *  // TODO straighten this interface out
-     * @param pathPrefix    "ni" or "bo"
-     */
-    protected void setPathPrefix(String pathPrefix) {
-        Log.d(TAG, "setPathPrefix()");
-        Log.d(TAG, "pathPrefix = " + pathPrefix);
-        mPathPrefix = pathPrefix;
-    }
 }

@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -66,14 +67,9 @@ public class NetInfPublish extends NetInfRequest {
     public NetInfPublish(String host, String port,
             String hashAlg, String hash, Set<Locator> locators) {
 
-        super(host, port, hashAlg, hash);
+        super(host, port, "publish", hashAlg, hash);
         Log.d(TAG, "NetInfPublish()");
-
         mLocators = locators;
-
-        // TODO make this beautiful
-        setPathPrefix("publish");
-
     }
 
     /**
@@ -83,12 +79,12 @@ public class NetInfPublish extends NetInfRequest {
      *                  or null if the request failed.
      */
     @Override
-    protected String doInBackground(Void... voids) {
+    protected NetInfResponse doInBackground(Void... voids) {
         Log.d(TAG, "doInBackground()");
 
         // Don't publish without locators
         if (mLocators == null || mLocators.size() == 0) {
-            return null;
+            return new NetInfPublishResponse();
         }
 
         // Add locators
@@ -97,8 +93,7 @@ public class NetInfPublish extends NetInfRequest {
         }
 
         try {
-            // TODO break into several methods
-            // FullPut or not?
+            // FullPut uses HTTP POST, non-FullPut uses HTTP PUT
             HttpUriRequest request;
             if (mFile != null) {
                 request = new HttpPost(getUri());
@@ -106,13 +101,10 @@ public class NetInfPublish extends NetInfRequest {
                 request = new HttpPut(getUri());
             }
             // Execute HTTP request
-            return execute(request);
-        } catch (NullEntityException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
+            HttpResponse httpResponse = execute(request);
+            return new NetInfPublishResponse(httpResponse);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
+            return new NetInfPublishResponse();
         }
     }
 
