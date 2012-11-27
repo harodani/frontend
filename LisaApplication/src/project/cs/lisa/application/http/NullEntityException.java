@@ -24,29 +24,36 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.netinf.node.resolution;
-
-import java.util.List;
-
-import netinf.node.resolution.ResolutionService;
-import project.cs.lisa.netinf.node.search.SearchResult;
+package project.cs.lisa.application.http;
 
 /**
- * The ResolutionSearchService provides all functionalities of a
- * ResolutionService and an additional search service.
- * 
- * @author Kim-Anh Tran
- *
+ * Thrown when the entity of a HTTP response is null.
+ * @author Linus Sunde
+ * @author Paolo Boschini
  */
-public interface ResolutionSearchService extends ResolutionService {
+public class NullEntityException extends Exception {
+    /**
+     * Constructs a NullEntityException.
+     */
+    public NullEntityException() {
+        super();
+    }
 
-	/**
-	 * Returns a list of search results corresponding to the
-	 * specified keywords. If no fitting object has been found, it returns
-	 * an empty list.
-	 * 
-	 * @param keywords	The keywords to search for an information object.
-	 * @return			The list of search results.
-	 */
-	List<SearchResult> search(List<String> keywords);
+    /**
+     * Constructs a NullEntityException with the specified detail message.
+     * @param message   the detail message.
+     */
+    public NullEntityException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructs a new NullEntityException with the specified detail message and cause.
+     * @param message   the detail message
+     * @param cause     the cause
+     */
+    public NullEntityException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
+

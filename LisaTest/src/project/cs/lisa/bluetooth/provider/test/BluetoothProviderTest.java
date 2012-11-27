@@ -1,6 +1,6 @@
 package project.cs.lisa.bluetooth.provider.test;
 
-import project.cs.lisa.bluetooth.provider.BluetoothProvider;
+import project.cs.lisa.netinf.provider.bluetooth.BluetoothProvider;
 import android.test.AndroidTestCase;
 
 public class BluetoothProviderTest extends AndroidTestCase {

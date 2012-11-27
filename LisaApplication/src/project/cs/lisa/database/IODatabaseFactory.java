@@ -24,29 +24,24 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.netinf.node.resolution;
+package project.cs.lisa.database;
 
-import java.util.List;
-
-import netinf.node.resolution.ResolutionService;
-import project.cs.lisa.netinf.node.search.SearchResult;
+import android.content.Context;
 
 /**
- * The ResolutionSearchService provides all functionalities of a
- * ResolutionService and an additional search service.
+ * The IODatabaseFactory is used for assisted injection of
+ * the IODatabse.
  * 
  * @author Kim-Anh Tran
  *
  */
-public interface ResolutionSearchService extends ResolutionService {
-
+public interface IODatabaseFactory {
+	
 	/**
-	 * Returns a list of search results corresponding to the
-	 * specified keywords. If no fitting object has been found, it returns
-	 * an empty list.
+	 * Returns an IODatabase.
 	 * 
-	 * @param keywords	The keywords to search for an information object.
-	 * @return			The list of search results.
+	 * @param context	The Application context
+	 * @return			The IODatabase
 	 */
-	List<SearchResult> search(List<String> keywords);
+	IODatabase create(Context context);
 }
