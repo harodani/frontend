@@ -34,11 +34,12 @@ import java.util.Set;
 import project.cs.lisa.R;
 import project.cs.lisa.application.dialogs.ListDialog;
 import project.cs.lisa.application.dialogs.OkButtonDialog;
-import project.cs.lisa.bluetooth.BluetoothServer;
+import project.cs.lisa.application.html.transfer.FetchWebPageTask;
+import project.cs.lisa.application.wifi.WifiHandler;
 import project.cs.lisa.netinf.node.StarterNodeThread;
+import project.cs.lisa.netinf.server.bluetooth.BluetoothServer;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.util.UProperties;
-import project.cs.lisa.wifi.WifiHandler;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
@@ -98,7 +99,10 @@ public class MainNetInfActivity extends Activity {
 
     /** Bluetooth server for serving bluetooth devices. */
     private BluetoothServer mBluetoothServer;
-
+    
+    /** The menu. */
+    private Menu menu;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -232,6 +236,7 @@ public class MainNetInfActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu()");
         getMenuInflater().inflate(R.menu.activity_main, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -358,6 +363,10 @@ public class MainNetInfActivity extends Activity {
         TextView tv = (TextView) findViewById(R.id.ProgressBarText);
         tv.setVisibility(TextView.VISIBLE);
         tv.setText(text);
+    }
+    
+    public Menu getMenu() {
+        return menu;
     }
 
     // ========= IMPORTANT: LEGACY CODE FOR PUBLISHING A PICTURE =========

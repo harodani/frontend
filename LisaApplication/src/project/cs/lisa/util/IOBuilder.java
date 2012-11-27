@@ -32,9 +32,9 @@ import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.IdentifierLabel;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
-import project.cs.lisa.metadata.Metadata;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
+import project.cs.lisa.netinf.node.metadata.Metadata;
 
 /**
  * A Builder that makes it easier to create information objects.
@@ -44,6 +44,9 @@ import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
  */
 public class IOBuilder {
 
+    /** All bluetooth locators have the following indicator in their address. */
+    private static final String BLUETOOTH_LOCATOR_PREFIX = "nimacbt://";
+    
 	/**
 	 * The label for identifying content types.
 	 */
@@ -171,7 +174,7 @@ public class IOBuilder {
 	    addAttribute(
 	            DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString(),
 	            SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI(),
-	            bluetoothMac);
+	            BLUETOOTH_LOCATOR_PREFIX + bluetoothMac);
 	    return this;
 	}
 

@@ -69,9 +69,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import project.cs.lisa.exceptions.InvalidResponseException;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
+import project.cs.lisa.netinf.node.exceptions.InvalidResponseException;
 import android.os.Environment;
 import android.util.Log;
 
@@ -341,13 +341,13 @@ implements ResolutionService {
 
             String loc = (String) locator;
             Log.d(TAG, "loc = " + loc);
-            String locWithoutScheme = loc.split("://")[1];
-            Log.d(TAG, "locWithoutScheme = " + locWithoutScheme);
+//            String locWithoutScheme = loc.split("://")[1];
+//            Log.d(TAG, "locWithoutScheme = " + locWithoutScheme);
 
             Attribute newLocator = mDatamodelFactory.createAttribute();
             newLocator.setAttributePurpose(DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString());
             newLocator.setIdentification(SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI());
-            newLocator.setValue(locWithoutScheme);
+            newLocator.setValue(locator);
 
             io.addAttribute(newLocator);
         }
@@ -498,11 +498,11 @@ implements ResolutionService {
             return io;
 
         } catch (InvalidResponseException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "get() failed, InvalidResponseException, returning null");
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "get() failed, UnsupportedEncodingException, returning null");
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "get() failed, IOException, returning null");
         }
         Log.e(TAG, "get() failed. Returning null");
         return null;
@@ -568,7 +568,7 @@ implements ResolutionService {
         entity.addPart("msgid", msgid);
 
         if (bluetoothMac != null) {
-            StringBody l = new StringBody("nimacbt://" + bluetoothMac);
+            StringBody l = new StringBody(bluetoothMac);
             entity.addPart("loc1", l);
         }
 

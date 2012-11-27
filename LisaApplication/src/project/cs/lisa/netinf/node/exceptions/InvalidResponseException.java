@@ -24,29 +24,28 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.netinf.node.resolution;
-
-import java.util.List;
-
-import netinf.node.resolution.ResolutionService;
-import project.cs.lisa.netinf.node.search.SearchResult;
+package project.cs.lisa.netinf.node.exceptions;
 
 /**
- * The ResolutionSearchService provides all functionalities of a
- * ResolutionService and an additional search service.
- * 
- * @author Kim-Anh Tran
+ * Thrown when the response to a NetInf message can't be parsed.
+ * @author Linus Sunde
  *
  */
-public interface ResolutionSearchService extends ResolutionService {
+public class InvalidResponseException extends Exception {
+    /**
+     * Constructs a InvalidResponseException with the specified detail message.
+     * @param message   the detail message.
+     */
+    public InvalidResponseException(String message) {
+        super(message);
+    }
 
-	/**
-	 * Returns a list of search results corresponding to the
-	 * specified keywords. If no fitting object has been found, it returns
-	 * an empty list.
-	 * 
-	 * @param keywords	The keywords to search for an information object.
-	 * @return			The list of search results.
-	 */
-	List<SearchResult> search(List<String> keywords);
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * @param message   the detail message
+     * @param cause     the cause
+     */
+    public InvalidResponseException(String message, Throwable cause) {
+        super(message, cause);
+    }   
 }
