@@ -11,9 +11,8 @@ import org.apache.http.client.methods.HttpGet;
 
 import project.cs.lisa.application.MainApplication;
 import project.cs.lisa.application.MainNetInfActivity;
-import project.cs.lisa.exceptions.NullEntityException;
 import project.cs.lisa.netinf.node.resolution.LocalResolutionService;
-import project.cs.lisa.search.SearchResult;
+import project.cs.lisa.netinf.node.search.SearchResult;
 import android.util.Log;
 
 import com.google.inject.Injector;

@@ -34,11 +34,11 @@ import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.identity.ResolutionServiceIdentityObject;
 import project.cs.lisa.application.MainApplication;
-import project.cs.lisa.exceptions.DatabaseException;
+import project.cs.lisa.database.DatabaseException;
+import project.cs.lisa.database.IODatabase;
+import project.cs.lisa.database.IODatabaseFactory;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.lisa.search.SearchResult;
-import project.cs.lisa.util.database.IODatabase;
-import project.cs.lisa.util.database.IODatabaseFactory;
+import project.cs.lisa.netinf.node.search.SearchResult;
 import android.util.Log;
 
 import com.google.inject.Inject;

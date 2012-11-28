@@ -69,9 +69,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import project.cs.lisa.exceptions.InvalidResponseException;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
+import project.cs.lisa.netinf.node.exceptions.InvalidResponseException;
 import android.os.Environment;
 import android.util.Log;
 
