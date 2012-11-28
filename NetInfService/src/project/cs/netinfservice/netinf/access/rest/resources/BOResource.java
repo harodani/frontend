@@ -63,7 +63,7 @@ import netinf.common.exceptions.NetInfCheckedException;
 import org.apache.commons.io.FileUtils;
 import org.restlet.resource.Get;
 
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.metadata.Metadata;
@@ -86,190 +86,192 @@ import android.util.Log;
  */
 public class BOResource extends LisaServerResource {
 
-    /** Debugging Tag. */
-    private static final String TAG = "BOResource";
+	/** Debugging Tag. */
+	private static final String TAG = "BOResource";
 
-    /** HashMap Key: Filepath. */
-    private static String mFilepath;
+	/** HashMap Key: Filepath. */
+	private static String sFilepath;
 
-    /** HashMap Key: Content type. */
-    private static String mContentType;
+	/** HashMap Key: Content type. */
+	private static String sContentType;
 
-    /** The hash value of the requested BO. */
-    private String mHashValue;
+	/** The hash value of the requested BO. */
+	private String mHashValue;
 
-    /** The hash algorithm used to generate the hash value. */
-    private String mHashAlgorithm;
+	/** The hash algorithm used to generate the hash value. */
+	private String mHashAlgorithm;
 
-    /** The directory containing the published files. */
-    private String mSharedFolder;
+	/** The directory containing the published files. */
+	private String mSharedFolder;
 
-    /**
-     * Initializes the context of a BOResource.
-     */
-    @Override
-    protected void doInit() {
-        super.doInit();
-        
-        mFilepath = UProperties.INSTANCE.getPropertyWithName("metadata.filepath");
-        mContentType = SailDefinedLabelName.CONTENT_TYPE.getLabelName();
-        
-        mHashValue = getQuery().getFirstValue("hash", true);
-        mHashAlgorithm = getQuery().getFirstValue("hashAlg", true);
+	/**
+	 * Initializes the context of a BOResource.
+	 */
+	@Override
+	protected void doInit() {
+		super.doInit();
+
+		sFilepath = UProperties.INSTANCE.getPropertyWithName("metadata.filepath");
+		sContentType = SailDefinedLabelName.CONTENT_TYPE.getLabelName();
+
+		mHashValue = getQuery().getFirstValue("hash", true);
+		mHashAlgorithm = getQuery().getFirstValue("hashAlg", true);
 
 		String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
 		mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
-        createSharedFolder();
-    }
+		createSharedFolder();
+	}
 
-    /**
-     * Responds to an HTTP get request. Returns a String representing the meta-data
-     * that describes the retrieved file.
-     *
-     * @return The Map that contains the information about the file: First key:
-     *         the file path Second key: the content type of the file.
-     *         If the object couldn't be retrieved the function returns null.
-     */
-    @Get
-    public String retrieveBO() {
-        Log.d(TAG, "Trying to retrieve the BO.");
+	/**
+	 * Responds to an HTTP get request. Returns a String representing the meta-data
+	 * that describes the retrieved file.
+	 *
+	 * @return The Map that contains the information about the file: First key:
+	 *         the file path Second key: the content type of the file.
+	 *         If the object couldn't be retrieved the function returns null.
+	 */
+	@Get
+	public String retrieveBO() {
+		Log.d(TAG, "Trying to retrieve the BO.");
 
-        byte[] fileData = null;
+		byte[] fileData = null;
 
-        // Retrieve a data object from a node (could be an NRS)
-        InformationObject io = retrieveDO();
+		// Retrieve a data object from a node (could be an NRS)
+		InformationObject io = retrieveDO();
 
-        // If the NetInf GET got the file data we are done!
-        Attribute filepathAttribute =
-                io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
-        if (filepathAttribute != null) {
-            Log.d(TAG, "The NetInf GET contained the file");
-            String contentType = io.getIdentifier().getIdentifierLabel(
-                    SailDefinedLabelName.CONTENT_TYPE.getLabelName())
-                    .getLabelValue();
-            Metadata metadata = new Metadata();
-            metadata.insert(mContentType, contentType);
+		// Retrieve the data corresponding to the hash from another device.
+		if (io == null) {
+			Log.e(TAG, "InformationObject is null. Nothing was done here.");
+			return null;
+		}
 
-            String filePath = filepathAttribute.getValueRaw();
-            filePath = filePath.substring(filePath.indexOf(":") + 1);
-            metadata.insert(mFilepath, filePath);
-            return metadata.convertToString();
-        }
-        Log.d(TAG, "The NetInf GET didn't contain the file");
+		// If the NetInf GET got the file data we are done!
+		Attribute filepathAttribute =
+				io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
+		if (filepathAttribute != null) {
+			Log.d(TAG, "The NetInf GET contained the file");
+			String contentType = io.getIdentifier().getIdentifierLabel(
+					SailDefinedLabelName.CONTENT_TYPE.getLabelName())
+					.getLabelValue();
+			Metadata metadata = new Metadata();
+			metadata.insert(sContentType, contentType);
 
-        // Retrieve the data corresponding to the hash from another device.
-        if (io != null) {
-            TransferDispatcher tsDispatcher = TransferDispatcher.INSTANCE;
+			String filePath = filepathAttribute.getValueRaw();
+			filePath = filePath.substring(filePath.indexOf(":") + 1);
+			metadata.insert(sFilepath, filePath);
+			return metadata.convertToString();
+		}
+		Log.d(TAG, "The NetInf GET didn't contain the file");
 
-            try {
-                fileData = tsDispatcher.getByteArray(io);
-            } catch (IOException e) {
-                Log.e(TAG, "Couldn't retrieve the requested data.");
-                return null;
-            }
+		TransferDispatcher tsDispatcher = TransferDispatcher.INSTANCE;
 
-            if (fileData != null) {
-                String metaDataString = saveBO(io, fileData);
-                return metaDataString;
+		try {
+			fileData = tsDispatcher.getByteArray(io);
+		} catch (IOException e) {
+			Log.e(TAG, "Couldn't retrieve the requested data.");
+			return null;
+		}
 
-            } else {
-                Log.e(TAG, "No file data to write.");
-                return null;
-            }
+		if (fileData != null) {
+			String metaDataString = saveBO(io, fileData);
+			return metaDataString;
 
-        } else {
-            Log.e(TAG, "InformationObject is null. Nothing was done here.");
-            return null;
-        }
-    }
+		} else {
+			Log.e(TAG, "No file data to write.");
+			return null;
+		}
 
-    /**
-     * Saves the file data corresponding to the specified io and
-     * returns a String representation of the related meta-data.
-     *
-     * @param io		The Information Object describing the file data
-     * @param fileData	The file data corresponding to the io
-     * @return			Returns a String representation of the meta data.
-     */
-    private String saveBO(InformationObject io, byte[] fileData) {
+	}
 
-        // Store the content type of the requested BO
-        String contentType = io.getIdentifier().getIdentifierLabel(
-                SailDefinedLabelName.CONTENT_TYPE.getLabelName())
-                .getLabelValue();
+	/**
+	 * Saves the file data corresponding to the specified io and
+	 * returns a String representation of the related meta-data.
+	 *
+	 * @param io		The Information Object describing the file data
+	 * @param fileData	The file data corresponding to the io
+	 * @return			Returns a String representation of the meta data.
+	 */
+	private String saveBO(InformationObject io, byte[] fileData) {
 
-        // Set saving filename to the same filename as in metadata
-        String hash = io.getIdentifier().getIdentifierLabel(SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-        String filePath = Environment.getExternalStorageDirectory() 
-                + UProperties.INSTANCE.getPropertyWithName("sharing.folder")
-                + hash;
-        Log.d(TAG, "Filepath is: " + filePath);
+		// Store the content type of the requested BO
+		String contentType = io.getIdentifier().getIdentifierLabel(
+				SailDefinedLabelName.CONTENT_TYPE.getLabelName())
+				.getLabelValue();
 
-        // Write it to file
-        try {
-            FileUtils.writeByteArrayToFile(new File(filePath), fileData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        makeFileVisibleToPhone(filePath, contentType);
+		// Set saving filename to the same filename as in metadata
+		String hash = io.getIdentifier().getIdentifierLabel(
+				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+		String filePath = Environment.getExternalStorageDirectory() 
+				+ UProperties.INSTANCE.getPropertyWithName("sharing.folder")
+				+ hash;
+		Log.d(TAG, "Filepath is: " + filePath);
 
-        // Make a new metadata to pass along the content_type and filepath
-        Metadata metadata = new Metadata();
-        metadata.insert(mContentType, contentType);
-        metadata.insert(mFilepath, filePath);
+		// Write it to file
+		try {
+			FileUtils.writeByteArrayToFile(new File(filePath), fileData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		makeFileVisibleToPhone(filePath, contentType);
 
-        return metadata.convertToString();
+		// Make a new metadata to pass along the content_type and filepath
+		Metadata metadata = new Metadata();
+		metadata.insert(sContentType, contentType);
+		metadata.insert(sFilepath, filePath);
 
-    }
+		return metadata.convertToString();
 
-    /**
-     * Returns an IO (i.e. DO) containing the list of locators that own the
-     * requested BO.
-     *
-     * @return The IO that contains the locator list.
-     */
-    private InformationObject retrieveDO() {
-        Log.d(TAG, "Retrieve the IO from a resolution service (Remote or local).");
+	}
 
-        Identifier identifier = createIdentifier(mHashAlgorithm, mHashValue);
-        InformationObject io = null;
+	/**
+	 * Returns an IO (i.e. DO) containing the list of locators that own the
+	 * requested BO.
+	 *
+	 * @return The IO that contains the locator list.
+	 */
+	private InformationObject retrieveDO() {
+		Log.d(TAG, "Retrieve the IO from a resolution service (Remote or local).");
 
-        try {
-            io = getNodeConnection().getIO(identifier);
-        } catch (NetInfCheckedException e) {
-            Log.e(TAG, "Failed retrieving the IO from the NRS. Hash value: "
-                    + mHashValue);
-        }
+		Identifier identifier = createIdentifier(mHashAlgorithm, mHashValue);
+		InformationObject io = null;
 
-        return io;
-    }
+		try {
+			io = getNodeConnection().getIO(identifier);
+		} catch (NetInfCheckedException e) {
+			Log.e(TAG, "Failed retrieving the IO from the NRS. Hash value: "
+					+ mHashValue);
+		}
 
-    /**
-     * Creates the folder that contains the files to be shared with other phones.
-     */
-    private void createSharedFolder() {
-        File folder = new File(mSharedFolder);
+		return io;
+	}
 
-        if (!folder.exists()) {
-            Log.d(TAG, "Creating shared folder " + mSharedFolder);
-            boolean created = folder.mkdir();
+	/**
+	 * Creates the folder that contains the files to be shared with other phones.
+	 */
+	private void createSharedFolder() {
+		File folder = new File(mSharedFolder);
 
-            if (!created) {
-                Log.e(TAG, "Failed creating the shared folder. Set shared folder to DCIM/");
-                mSharedFolder = Environment.getExternalStorageDirectory() + "/DCIM/";
-            }
-        }
-    }
+		if (!folder.exists()) {
+			Log.d(TAG, "Creating shared folder " + mSharedFolder);
+			boolean created = folder.mkdir();
 
-    /**
-     * Makes the file specified by file path visible to the user.
-     *
-     * @param filePath		The file path pointing to the file.
-     * @param contentType	The content type of the file.
-     */
-    private void makeFileVisibleToPhone(String filePath, String contentType) {
-        String[] paths = {filePath};
-        String[] mediaType = {contentType};
-        MediaScannerConnection.scanFile(MainApplication.getAppContext(), paths, mediaType, null);
-    }
+			if (!created) {
+				Log.e(TAG, "Failed creating the shared folder. Set shared folder to DCIM/");
+				mSharedFolder = Environment.getExternalStorageDirectory() + "/DCIM/";
+			}
+		}
+	}
+
+	/**
+	 * Makes the file specified by file path visible to the user.
+	 *
+	 * @param filePath		The file path pointing to the file.
+	 * @param contentType	The content type of the file.
+	 */
+	private void makeFileVisibleToPhone(String filePath, String contentType) {
+		String[] paths = {filePath};
+		String[] mediaType = {contentType};
+		MediaScannerConnection.scanFile(
+				MainNetInfApplication.getAppContext(), paths, mediaType, null);
+	}
 }

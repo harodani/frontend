@@ -29,7 +29,7 @@ package project.cs.netinfservice.netinf.provider.bluetooth;
 import java.util.ArrayList;
 import java.util.List;
 
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -76,7 +76,7 @@ public enum BluetoothDiscovery {
         setUpBroadcastReceiver();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-        MainApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
+        MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }

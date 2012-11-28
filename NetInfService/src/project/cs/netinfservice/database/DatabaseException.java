@@ -61,16 +61,15 @@ public class DatabaseException extends Exception {
 	 */
 	public DatabaseException(String detailMessage) {
 		super(detailMessage);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * Constructor for raising a DatabaseException with a previous raised exception.
+	 * 
 	 * @param throwable another exception raised by the program
 	 */
 	public DatabaseException(Throwable throwable) {
 		super(throwable);
-		// TODO Auto-generated constructor stub
 	}
 
 	

@@ -159,6 +159,7 @@ public class IOResource extends LisaServerResource {
         return publish();
     }
 
+
     private String publish() {
         return publish(new IOBuilder(mDatamodelFactory));
     }

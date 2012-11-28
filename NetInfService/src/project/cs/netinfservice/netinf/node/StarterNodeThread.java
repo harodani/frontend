@@ -30,7 +30,7 @@ import netinf.node.access.AccessServer;
 import netinf.node.api.NetInfNode;
 import netinf.node.resolution.ResolutionController;
 import netinf.node.resolution.ResolutionService;
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.application.MainNetInfActivity;
 import android.content.Intent;
 import android.util.Log;
@@ -40,23 +40,13 @@ public class StarterNodeThread extends Thread {
 	public static final String TAG = "StarterNodeThread";
 	
 	private NetInfNode mNode;
-	private MainApplication mApplication;
-	
-	public StarterNodeThread(MainApplication application) {
-		mApplication = application;
-	}
-	
+
 	@Override
 	public void run() {
-		mNode = mApplication.getInjector().getInstance(NetInfNode.class);
+		mNode = MainNetInfApplication.getInjector().getInstance(NetInfNode.class);
 		
 		startResolution();	// Start resolution services
 		startAPIAccess();	// Start REST API service
-//		startN2NAccess();	// Start Node2Node services
-		
-		Intent intent = new Intent();
-		intent.setAction(MainNetInfActivity.NODE_STARTED_MESSAGE);
-		mApplication.sendBroadcast(intent);
 	}
 
 	/**
@@ -70,7 +60,7 @@ public class StarterNodeThread extends Thread {
 		if (resolutionController != null) {
 	        // Plug in Resolution Services
 			Log.d(TAG, "getting resolution services...");
-	        ResolutionService[] resolutionServices = mApplication.getInjector().getInstance(ResolutionService[].class);
+	        ResolutionService[] resolutionServices = MainNetInfApplication.getInjector().getInstance(ResolutionService[].class);
 	
 	        if (resolutionServices.length == 0) {
 	           Log.d(TAG, "(NODE ) I have no active resolution services");
@@ -90,10 +80,7 @@ public class StarterNodeThread extends Thread {
 	 */
 	private void startAPIAccess() {
 		Log.d(TAG, "startAPIAccess()");
-		AccessServer accessServer = mApplication.getInjector().getInstance(AccessServer.class);
+		AccessServer accessServer = MainNetInfApplication.getInjector().getInstance(AccessServer.class);
 		accessServer.start();
 	}
-	
-	
-	
 }

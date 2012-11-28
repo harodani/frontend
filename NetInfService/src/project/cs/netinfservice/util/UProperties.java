@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import android.content.res.AssetManager;
 import android.util.Log;
 
@@ -87,7 +87,7 @@ public enum UProperties {
         Log.d(TAG, "loadProperties()");
         mProperties = new Properties();
         try {
-            AssetManager assets = MainApplication.getAppContext().getResources().getAssets();
+            AssetManager assets = MainNetInfApplication.getAppContext().getResources().getAssets();
             InputStream is = assets.open(property);
             mProperties.load(is);
         } catch (IOException e) {

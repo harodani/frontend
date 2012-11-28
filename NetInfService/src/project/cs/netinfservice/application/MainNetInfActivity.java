@@ -26,20 +26,17 @@
  */
 package project.cs.netinfservice.application;
 
-import java.io.IOException;
-
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
+import android.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.netinfservice.R;
 
 /**
  * Main activity that acts as a starting point for the application.
- * It provides functions for the user interaction and for setting up
- * the application.
+ * It provides functions setting up the NetInf services.
  *
  * @author Paolo Boschini
  * @author Linus Sunde
@@ -62,17 +59,12 @@ public class MainNetInfActivity extends Activity {
     /** Bluetooth server for serving bluetooth devices. */
     private BluetoothServer mBluetoothServer;
     
-    /** Global MainApplication. */
-    private MainApplication mApplication;
-   
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_main);
 
-        mApplication = (MainApplication) getApplication();
         setupNode();
         /*
          * Check: Where should we start the Bluetooth Server if we don't
@@ -80,10 +72,7 @@ public class MainNetInfActivity extends Activity {
          * setupBluetoothServer();
          */
         
-        
-        
         // Set up some feedback depending on the connection: colors 
-
     }
    
 
@@ -93,13 +82,13 @@ public class MainNetInfActivity extends Activity {
     private void setupNode() {
         Log.d(TAG, "setupNode()");
         
-        mStarterNodeThread = new StarterNodeThread(mApplication);
+        mStarterNodeThread = new StarterNodeThread();
         mStarterNodeThread.start();
     }
 
     /**
      * Initiates and starts the Bluetooth Server.
-     */
+     *
     private void setupBluetoothServer() {
         Log.d(TAG, "setupBluetoothServer()");
 
@@ -119,5 +108,5 @@ public class MainNetInfActivity extends Activity {
             Log.e(TAG, "BluetoothServer couldn't be initialized.");
         }
     }
-
+    /**/
 }

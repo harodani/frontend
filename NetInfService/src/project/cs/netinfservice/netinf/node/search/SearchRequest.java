@@ -29,7 +29,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.restlet.resource.Get;
 
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.netinf.access.rest.resources.LisaServerResource;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
@@ -185,7 +185,7 @@ public class SearchRequest extends LisaServerResource {
         
         /* DATABASE SEARCH */
         // Injector
-        Injector injector = MainApplication.getStaticInjector();
+        Injector injector = MainNetInfApplication.getInjector();
         
         // Get LRS instance
         LocalResolutionService lrs = injector.getInstance(LocalResolutionService.class);

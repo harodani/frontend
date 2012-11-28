@@ -33,7 +33,7 @@ import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.identity.ResolutionServiceIdentityObject;
-import project.cs.netinfservice.application.MainApplication;
+import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
@@ -77,7 +77,7 @@ public class LocalResolutionService
 	public LocalResolutionService(IODatabaseFactory databaseFactory,
 			DatamodelFactory datamodelFactory) {
 		mDatabaseFactory = databaseFactory;
-		mDatabase = mDatabaseFactory.create(MainApplication.getAppContext());
+		mDatabase = mDatabaseFactory.create(MainNetInfApplication.getAppContext());
 		mDatamodelFactory = datamodelFactory;
 	}
 
