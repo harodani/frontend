@@ -26,9 +26,9 @@
  */
 package project.cs.netinfservice.application;
 
+import project.cs.netinfservice.R;
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
-import android.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
