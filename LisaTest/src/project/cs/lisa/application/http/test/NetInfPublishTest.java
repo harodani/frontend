@@ -12,7 +12,7 @@ import org.restlet.resource.ServerResource;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.mock.MockServer;
-import project.cs.lisa.netinf.node.metadata.Metadata;
+import project.cs.netinfservice.netinf.node.metadata.Metadata;
 import android.test.InstrumentationTestCase;
 
 public class NetInfPublishTest extends InstrumentationTestCase {

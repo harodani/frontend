@@ -49,8 +49,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
     /** Creates a new task downloading a web page. */
     public FetchWebPageTask() {
-        super();
-
         mFilepath = UProperties.INSTANCE.getPropertyWithName("metadata.filepath");
         mContentType = SailDefinedLabelName.CONTENT_TYPE.getLabelName();
 

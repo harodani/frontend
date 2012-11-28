@@ -34,7 +34,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import project.cs.lisa.netinf.node.metadata.Metadata;
 import android.util.Log;
 
 /**
@@ -123,17 +122,6 @@ public class NetInfPublish extends NetInfRequest {
     public void setContentType(String contentType) {
         Log.d(TAG, "setContentType()");
         addQuery("ct", contentType);
-    }
-
-    /**
-     * Sets the metadata to be sent in the NetInf PUBLISH message.
-     * @param metadata      The JSON string containing the metadata.
-     */
-    public void setMetadata(Metadata metadata) {
-        Log.d(TAG, "setMetadata()");
-        String meta = metadata.convertToMetadataString();
-        Log.d(TAG, "meta = " + meta);
-        addQuery("meta", meta);
     }
 
     /**

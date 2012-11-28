@@ -30,7 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import project.cs.lisa.application.MainApplication;
+import project.cs.lisa.application.MainNetInfActivity;
+
 import android.content.res.AssetManager;
 import android.util.Log;
 
@@ -87,7 +88,7 @@ public enum UProperties {
         Log.d(TAG, "loadProperties()");
         mProperties = new Properties();
         try {
-            AssetManager assets = MainApplication.getAppContext().getResources().getAssets();
+            AssetManager assets = MainNetInfActivity.getActivity().getAssets();
             InputStream is = assets.open(property);
             mProperties.load(is);
         } catch (IOException e) {
