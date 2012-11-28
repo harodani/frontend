@@ -34,7 +34,7 @@ import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.netinf.node.metadata.Metadata;
+import project.cs.netinfservice.util.metadata.Metadata;
 
 /**
  * A Builder that makes it easier to create information objects.

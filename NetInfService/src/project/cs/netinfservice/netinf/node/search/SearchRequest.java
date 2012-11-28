@@ -11,8 +11,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
-import netinf.common.datamodel.DatamodelFactory;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,17 +32,15 @@ import project.cs.netinfservice.netinf.access.rest.resources.LisaServerResource;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.util.UProperties;
-
 import android.util.Log;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 
 public class SearchRequest extends LisaServerResource {
+
     /** Debug Tag. */
-    private final String TAG = "SearchRequest"; 
-    
+    private static final String TAG = "SearchRequest";
+
     /** NRS IP address. **/
     private String mHost;
     
@@ -52,19 +48,19 @@ public class SearchRequest extends LisaServerResource {
     private String mPort;
     
     /** HTTP connection timeout. **/
-    private static final int TIMEOUT = 3000;
-    
+    private static final int TIMEOUT = 10000;
+
     /** HTTP Client **/
     private HttpClient mClient;
-    
-    /** Keywords string **/
+
+    /** Keywords string. **/
     private String mTokens;
     
     // TODO: Verify if Ext should be JSON
-    /** Ext string **/
+    /** Ext string. **/
     private String mExt;
-    
-    /** Message ID string **/
+
+    /** Message ID string. **/
     private String mMsgId;
 
     // TODO: Remove search into a better place.
@@ -93,6 +89,7 @@ public class SearchRequest extends LisaServerResource {
      * @param ext      Extensions
      * @return         HTTP Post with host, port and URI
      * @throws UnsupportedEncodingException
+     *      In case UTF-8 is not supported
      */
     private HttpPost createSearch(String msgId, String tokens, String ext)
             throws UnsupportedEncodingException {
@@ -180,7 +177,7 @@ public class SearchRequest extends LisaServerResource {
         
         // Search request requires three fields: tokens (keywords), message-id and ext.
         mTokens = getQuery().getFirstValue("tokens", true);
-        mMsgId = getQuery().getFirstValue("msgId", true);
+        mMsgId = newMsgId();//getQuery().getFirstValue("msgId", true);
         mExt = getQuery().getFirstValue("ext", true);
         
         /* DATABASE SEARCH */
@@ -328,4 +325,48 @@ public class SearchRequest extends LisaServerResource {
             return "";
         }
     }
+
+    /**
+     * Creates a new message id that is probably unique in the server.
+     * @return String with the created message id
+     */
+    private String newMsgId() {
+        // TODO: Validate TelephoneManager as a viable option for serial number.
+        // TODO: Right now, this code FAILS tests because there is no TM on emulator.
+        // Initiates a new Telephony Manager to extract deviceId and serial number.
+//        final TelephonyManager tm = (TelephonyManager) mActivity.getBaseContext()
+//                .getSystemService(Context.TELEPHONY_SERVICE);
+
+        // Telephony Manager Device ID
+//        final String tmDevice;
+
+        // Telephony Manager Serial Number
+//        final String tmSerial;
+
+        // Android ID
+//        final String androidId;
+
+        // Fetches IDs
+//        tmDevice = "" + tm.getDeviceId();
+//        tmSerial = "" + tm.getSimSerialNumber();
+//        androidId = "" + android.provider.Settings.Secure.getString(
+//                mActivity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        // Gets device UUID
+//        UUID deviceUuid = new UUID(androidId.hashCode(),
+//                ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
+
+        // UUID to String
+//        String deviceId = deviceUuid.toString();
+
+        // Random number
+        int randomNumber = new Random(System.currentTimeMillis()).nextInt();
+
+        // Bulks all of it together
+        String msgId = /*deviceId + */String.valueOf(randomNumber);
+
+        // Returns created message id
+        return msgId;
+    }
+
 }

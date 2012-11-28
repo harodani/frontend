@@ -38,12 +38,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.netinf.node.metadata.Metadata;
-import project.cs.netinfservice.netinf.node.metadata.MetadataParser;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.netinf.node.search.SearchResultImpl;
 import project.cs.netinfservice.util.IOBuilder;
 import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfservice.util.metadata.MetadataParser;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

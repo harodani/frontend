@@ -66,9 +66,9 @@ import org.restlet.resource.Get;
 import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.netinf.node.metadata.Metadata;
 import project.cs.netinfservice.netinf.transferdispatcher.TransferDispatcher;
 import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfservice.util.metadata.Metadata;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.util.Log;
@@ -111,8 +111,8 @@ public class BOResource extends LisaServerResource {
 	protected void doInit() {
 		super.doInit();
 
-		sFilepath = UProperties.INSTANCE.getPropertyWithName("metadata.filepath");
-		sContentType = SailDefinedLabelName.CONTENT_TYPE.getLabelName();
+        sFilepath = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
+        sContentType = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.content_type");
 
 		mHashValue = getQuery().getFirstValue("hash", true);
 		mHashAlgorithm = getQuery().getFirstValue("hashAlg", true);
