@@ -23,7 +23,7 @@
     
 
     <application
-        android:name=".application.MainApplication"
+        android:name=".application.MainNetInfApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
