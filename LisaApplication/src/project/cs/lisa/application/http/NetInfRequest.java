@@ -123,6 +123,12 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
         Log.d(TAG, "addQuery()");
         Log.d(TAG, "key = " + key);
         Log.d(TAG, "value = " + value);
+        if (key == null) {
+            throw new IllegalArgumentException("addQuery called with null key");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("addQuery called with null value");
+        }
         mQueryVariables.put(key, value);
     }
 

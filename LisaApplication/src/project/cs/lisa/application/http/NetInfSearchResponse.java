@@ -38,7 +38,7 @@ public class NetInfSearchResponse extends NetInfResponse {
 
         // No entity in response
         if (response.getEntity() == null) {
-            setStatus(NetInfStatus.NO_JSON);
+            setStatus(NetInfStatus.NO_CONTENT);
             return;
         }
 
@@ -47,12 +47,12 @@ public class NetInfSearchResponse extends NetInfResponse {
         try {
             jsonString = EntityUtils.toString(response.getEntity());
         } catch (IOException e) {
-            setStatus(NetInfStatus.NO_JSON);
+            setStatus(NetInfStatus.NO_CONTENT);
             return;
         }
         Object obj = JSONValue.parse(jsonString);
         if (!(obj instanceof JSONObject)) {
-            setStatus(NetInfStatus.INVALID_JSON);
+            setStatus(NetInfStatus.INVALID_CONTENT);
             return;
         }
         JSONObject json = (JSONObject) obj;

@@ -155,16 +155,16 @@ public class IOResource extends LisaServerResource {
      * @throws NetInfCheckedException
      */
     @Put
-    public String putIO() throws NetInfCheckedException {
+    public void putIO() throws NetInfCheckedException {
         Log.d(TAG, "putIO()");
-        return publish();
+        publish();
     }
 
-    private String publish() throws NetInfCheckedException {
-        return publish(new IOBuilder(mDatamodelFactory));
+    private void publish() throws NetInfCheckedException {
+        publish(new IOBuilder(mDatamodelFactory));
     }
 
-    private String publish(IOBuilder builder) throws NetInfCheckedException {
+    private void publish(IOBuilder builder) throws NetInfCheckedException {
 
         builder.setHash(mHash).setHashAlgorithm(mHashAlg);
 
@@ -183,18 +183,19 @@ public class IOResource extends LisaServerResource {
         builder.setMetaData(mMeta);
 
         //Putting the IO
-//        try {
-            Log.d(TAG, "calling putIO()");
-            mNodeConnection.putIO(builder.build());
-//        } catch (NetInfCheckedException e) {
-//            Log.e(TAG, e.getMessage());
-//            return "{\"status\":\"failed\"}";
-//        } catch (NetInfUncheckedException e) {
-//            Log.e(TAG, e.getMessage());
-//            return "{\"status\":\"failed\"}";
-//        }
+        //        try {
+        Log.d(TAG, "calling putIO()");
+        mNodeConnection.putIO(builder.build());
+        //        } catch (NetInfCheckedException e) {
+        //            Log.e(TAG, e.getMessage());
+        //            return "{\"status\":\"failed\"}";
+        //        } catch (NetInfUncheckedException e) {
+        //            Log.e(TAG, e.getMessage());
+        //            return "{\"status\":\"failed\"}";
+        //        }
+
+        //        setStatus(Status.SUCCESS_NO_CONTENT);
         Log.d(TAG, "Publish succeeded.");
-        return "{\"status\":\"ok\"}";
 
     }
 

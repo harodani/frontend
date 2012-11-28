@@ -1,14 +1,13 @@
 package project.cs.lisa.application.http;
 
-import java.io.IOException;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+
+import android.util.Log;
 
 public class NetInfPublishResponse extends NetInfResponse {
+
+    private static final String TAG = "NetInfPublishResponse";
 
     public NetInfPublishResponse() {
         super();
@@ -20,29 +19,11 @@ public class NetInfPublishResponse extends NetInfResponse {
 
         int statusCode = response.getStatusLine().getStatusCode();
 
+        Log.d(TAG, "new NetInfPublishResponse, statusCode = " + statusCode);
+
         // Request did not succeed
         if (statusCode != HttpStatus.SC_OK) {
             setStatus(NetInfStatus.FAILED);
-            return;
-        }
-
-        // No entity in response
-        if (response.getEntity() == null) {
-            setStatus(NetInfStatus.NO_JSON);
-            return;
-        }
-
-        // Validate that actual JSON is returned
-        String jsonString;
-        try {
-            jsonString = EntityUtils.toString(response.getEntity());
-        } catch (IOException e) {
-            setStatus(NetInfStatus.NO_JSON);
-            return;
-        }
-        Object obj = JSONValue.parse(jsonString);
-        if (!(obj instanceof JSONObject)) {
-            setStatus(NetInfStatus.INVALID_JSON);
             return;
         }
 

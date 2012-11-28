@@ -10,8 +10,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.lisa.util.UProperties;
+import android.util.Log;
 
 public class NetInfRetrieveResponse extends NetInfResponse {
+
+    private static final String TAG = "NetInfRetrieveResponse";
 
     private static String mFilePathKey =
             UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
@@ -31,6 +34,8 @@ public class NetInfRetrieveResponse extends NetInfResponse {
 
         int statusCode = response.getStatusLine().getStatusCode();
 
+        Log.d(TAG, "new NetInfRetrieveResponse, statusCode = " + statusCode);
+
         // Request did not succeed
         if (statusCode != HttpStatus.SC_OK) {
             setStatus(NetInfStatus.FAILED);
@@ -39,7 +44,7 @@ public class NetInfRetrieveResponse extends NetInfResponse {
 
         // No entity in response
         if (response.getEntity() == null) {
-            setStatus(NetInfStatus.NO_JSON);
+            setStatus(NetInfStatus.NO_CONTENT);
             return;
         }
 
@@ -48,12 +53,12 @@ public class NetInfRetrieveResponse extends NetInfResponse {
         try {
             jsonString = EntityUtils.toString(response.getEntity());
         } catch (IOException e) {
-            setStatus(NetInfStatus.NO_JSON);
+            setStatus(NetInfStatus.INVALID_CONTENT);
             return;
         }
         Object obj = JSONValue.parse(jsonString);
         if (!(obj instanceof JSONObject)) {
-            setStatus(NetInfStatus.INVALID_JSON);
+            setStatus(NetInfStatus.INVALID_CONTENT);
             return;
         }
         JSONObject json = (JSONObject) obj;
@@ -65,13 +70,13 @@ public class NetInfRetrieveResponse extends NetInfResponse {
         }
         mFile = new File((String) json.get(mFilePathKey));
         if (!mFile.exists()) {
-            setStatus(NetInfStatus.NO_FILE);
+            setStatus(NetInfStatus.FILE_DOES_NOT_EXIST);
             return;
         }
 
         // Check for content type
         if (!json.containsKey(mContentTypeKey)) {
-            setStatus(NetInfStatus.INVALID_JSON);
+            setStatus(NetInfStatus.NO_CONTENT_TYPE);
             return;
         }
         mContentType = (String) json.get(mContentTypeKey);
