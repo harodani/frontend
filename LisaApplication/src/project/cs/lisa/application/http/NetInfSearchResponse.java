@@ -11,19 +11,31 @@ import org.json.simple.JSONValue;
 
 import project.cs.lisa.util.UProperties;
 
+/**
+ * Represents a response to a NetInfSearch.
+ * @author Linus Sunde
+ */
 public class NetInfSearchResponse extends NetInfResponse {
 
-    private static final String mResultsKey =
+    /** Search results JSON Key used by the RESTful API. */
+    private static final String RESULTS_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.search.results");
-    private static final String mTimestampKey =
-            UProperties.INSTANCE.getPropertyWithName("restlet.search.timestamp");
 
-    JSONArray mSearchResults;
+    /** Search Results. */
+    private JSONArray mSearchResults;
 
+    /**
+     * Creates a new response for a unsent search.
+     */
     public NetInfSearchResponse() {
         super();
     }
 
+    /**
+     * Creates a new response given the HTTP response to a sent search.
+     * @param response
+     *      The HTTP response
+     */
     public NetInfSearchResponse(HttpResponse response) {
 
         // TODO Remove duplicate code from NetInfResponse subclasses
@@ -58,11 +70,11 @@ public class NetInfSearchResponse extends NetInfResponse {
         JSONObject json = (JSONObject) obj;
 
         // Check for search results
-        if (!json.containsKey(mResultsKey)) {
+        if (!json.containsKey(RESULTS_KEY)) {
             setStatus(NetInfStatus.NO_SEARCH_RESULTS);
             return;
         }
-        Object resultsObj = json.get(mResultsKey);
+        Object resultsObj = json.get(RESULTS_KEY);
         if (!(resultsObj instanceof JSONArray)) {
             setStatus(NetInfStatus.INVALID_SEARCH_RESULTS);
             return;
@@ -73,7 +85,17 @@ public class NetInfSearchResponse extends NetInfResponse {
         setStatus(NetInfStatus.OK);
     }
 
-    public JSONArray getSearchResults() {
+    /**
+     * Gets the content type of the retrieved file.
+     * @return
+     *      The content type of the retrieved file
+     * @throws RequestFailedException
+     *      In case the method is called on a failed request
+     */
+    public JSONArray getSearchResults() throws RequestFailedException {
+        if (getStatus() != NetInfStatus.OK) {
+            throw new RequestFailedException("getSearchResults() called on failed search");
+        }
         return mSearchResults;
     }
 }

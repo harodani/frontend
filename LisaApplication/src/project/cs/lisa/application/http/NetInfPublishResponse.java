@@ -5,14 +5,27 @@ import org.apache.http.HttpStatus;
 
 import android.util.Log;
 
+/**
+ * Represents a response to a NetInfPublish.
+ * @author Linus Sunde
+ */
 public class NetInfPublishResponse extends NetInfResponse {
 
+    /** Log Tag. */
     private static final String TAG = "NetInfPublishResponse";
 
+    /**
+     * Creates a new response for a unsent publish.
+     */
     public NetInfPublishResponse() {
         super();
     }
 
+    /**
+     * Creates a new response given the HTTP response to a sent publish.
+     * @param response
+     *      The HTTP response
+     */
     public NetInfPublishResponse(HttpResponse response) {
 
         // TODO Remove duplicate code from NetInfResponse subclasses

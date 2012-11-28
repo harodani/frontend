@@ -12,22 +12,39 @@ import org.json.simple.JSONValue;
 import project.cs.lisa.util.UProperties;
 import android.util.Log;
 
+/**
+ * Represents a response to a NetInfPublish.
+ * @author Linus Sunde
+ */
 public class NetInfRetrieveResponse extends NetInfResponse {
 
+    /** Log Tag. */
     private static final String TAG = "NetInfRetrieveResponse";
 
-    private static String mFilePathKey =
+    /** File path JSON Key used by the RESTful API. */
+    private static final String FILE_PATH_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
-    private static String mContentTypeKey =
+    /** Content type JSON Key used by the RESTful API. */
+    private static final String CONTENT_TYPE_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.content_type");
 
+    /** The retrieved file. */
     private File mFile;
+    /** The content type of the retrieved file. */
     private String mContentType;
 
+    /**
+     * Creates a new response for a unsent retrieve.
+     */
     public NetInfRetrieveResponse() {
         super();
     }
 
+    /**
+     * Creates a new response given the HTTP response to a sent retrieve.
+     * @param response
+     *      The HTTP response
+     */
     public NetInfRetrieveResponse(HttpResponse response) {
 
         // TODO Remove duplicate code from NetInfResponse subclasses
@@ -64,32 +81,52 @@ public class NetInfRetrieveResponse extends NetInfResponse {
         JSONObject json = (JSONObject) obj;
 
         // Check for file path
-        if (!json.containsKey(mFilePathKey)) {
+        if (!json.containsKey(FILE_PATH_KEY)) {
             setStatus(NetInfStatus.NO_FILE_PATH);
             return;
         }
-        mFile = new File((String) json.get(mFilePathKey));
+        mFile = new File((String) json.get(FILE_PATH_KEY));
         if (!mFile.exists()) {
             setStatus(NetInfStatus.FILE_DOES_NOT_EXIST);
             return;
         }
 
         // Check for content type
-        if (!json.containsKey(mContentTypeKey)) {
+        if (!json.containsKey(CONTENT_TYPE_KEY)) {
             setStatus(NetInfStatus.NO_CONTENT_TYPE);
             return;
         }
-        mContentType = (String) json.get(mContentTypeKey);
+        mContentType = (String) json.get(CONTENT_TYPE_KEY);
 
         // Everything hopefully OK
         setStatus(NetInfStatus.OK);
     }
 
-    public File getFile() {
+    /**
+     * Gets the retrieved file.
+     * @return
+     *      The retrieved file
+     * @throws RequestFailedException
+     *      In case the method is called on a failed request
+     */
+    public File getFile() throws RequestFailedException {
+        if (getStatus() != NetInfStatus.OK) {
+            throw new RequestFailedException("getFile() called on failed search");
+        }
         return mFile;
     }
 
-    public String getContentType() {
+    /**
+     * Gets the content type of the retrieved file.
+     * @return
+     *      The content type of the retrieved file
+     * @throws RequestFailedException
+     *      In case the method is called on a failed request
+     */
+    public String getContentType() throws RequestFailedException {
+        if (getStatus() != NetInfStatus.OK) {
+            throw new RequestFailedException("getContentType() called on failed search");
+        }
         return mContentType;
     }
 }

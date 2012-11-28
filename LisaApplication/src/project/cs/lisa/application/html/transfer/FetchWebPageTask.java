@@ -17,7 +17,7 @@ import project.cs.lisa.application.http.NetInfRetrieve;
 import project.cs.lisa.application.http.NetInfRetrieveResponse;
 import project.cs.lisa.application.http.NetInfSearch;
 import project.cs.lisa.application.http.NetInfSearchResponse;
-import project.cs.lisa.application.http.NetInfStatus;
+import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.netinf.node.metadata.Metadata;
 import project.cs.lisa.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
@@ -116,16 +116,16 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 NetInfSearchResponse search = (NetInfSearchResponse) response;
 
-                // If the search failed for any reason, use uplink
-                if (search.getStatus() != NetInfStatus.OK) {
+                try {
+                    // Assume search succeeded, select a hash from the results and retrieve it
+                    String hash = selectHash(search);
+                    retrieveDisplay(url, hash).execute();
+                } catch (RequestFailedException e) {
+                    // If the search failed for any reason, use uplink
                     Log.d(TAG, "Downloading web page because search failed: " + search.getStatus());
                     downloadAndDisplay(url).execute(url);
-                    return;
                 }
 
-                // Search succeeded, select a hash from the results and retrieve it
-                String hash = selectHash(search);
-                retrieveDisplay(url, hash).execute();
             }
         };
     }
@@ -148,19 +148,19 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 NetInfRetrieveResponse retrieve = (NetInfRetrieveResponse) response;
 
-                // If retrieved failed for any reason, use uplink
-                if (retrieve.getStatus() != NetInfStatus.OK) {
+                try {
+                    // Assume retrieve succedded, display page and publish
+                    displayWebpage(retrieve.getFile());
+                    try {
+                        publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                    } catch (IOException e) {
+                        MainNetInfActivity.showToast(e.getMessage());
+                    }
+                } catch (RequestFailedException e) {
+                    // If the retrieve failed for any reason, use uplink
                     downloadAndDisplay(url).execute(url);
-                    return;
                 }
 
-                // Retrieve succeeded, display page and publish
-                displayWebpage(retrieve.getFile());
-                try {
-                    publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
-                } catch (IOException e) {
-                    MainNetInfActivity.showToast(e.getMessage());
-                }
             }
         };
     }
@@ -227,8 +227,10 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      *      The response to a NetInf search request
      * @return
      *      The selected hash
+     * @throws RequestFailedException
+     *      In case the seach failed
      */
-    private String selectHash(NetInfSearchResponse search) {
+    private String selectHash(NetInfSearchResponse search) throws RequestFailedException {
         JSONObject firstResult = (JSONObject) search.getSearchResults().get(0);
         String address = (String) firstResult.get("ni");
         return address.split(";")[1];

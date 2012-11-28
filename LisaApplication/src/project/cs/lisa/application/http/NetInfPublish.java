@@ -39,30 +39,35 @@ import project.cs.lisa.netinf.node.metadata.Metadata;
 import android.util.Log;
 
 /**
- * Used to send NetInf GET requests to the OpenNetInf RESTful API.
+ * Used to send NetInf Publish requests to the OpenNetInf RESTful API.
  * @author Linus Sunde
  */
 public class NetInfPublish extends NetInfRequest {
 
-    /** Debug tag. **/
+    /** Log Tag. */
     public static final String TAG = "NetInfPublish";
 
-    /** Encoding. **/
+    /** Encoding. */
     public static final String ENCODING = "UTF-8";
 
-    /** Locators. **/
+    /** Locators. */
     private Set<Locator> mLocators;
 
-    /** File. **/
+    /** File. */
     private File mFile;
 
     /**
      * Creates a new asynchronous NetInf PUBLISH.
-     * @param host         Target host of the message
-     * @param port         Target port
-     * @param hashAlg      Hash algorithm used
-     * @param hash         Hash
-     * @param locators     Set of locators to publish
+     * @param host
+     *      Target host for the publish
+     * @param port
+     *      Target port
+     * @param hashAlg
+     *      Hash algorithm
+     * @param hash
+     *      Hash
+     * @param locators
+     *      Set of locators to publish
      */
     public NetInfPublish(String host, String port,
             String hashAlg, String hash, Set<Locator> locators) {
@@ -74,9 +79,10 @@ public class NetInfPublish extends NetInfRequest {
 
     /**
      * Sends the NetInf PUBLISH request to the local node using HTTP.
-     * @param   voids   Nothing.
-     * @return          JSON response to the NetInf request sent as HTTP
-     *                  or null if the request failed.
+     * @param voids
+     *      Nothing.
+     * @return
+     *      A NetInfPublishResponse containing the status of the publish
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
@@ -110,16 +116,21 @@ public class NetInfPublish extends NetInfRequest {
 
     /**
      * Sets the content type to be sent in the NetInf PUBLISH message.
-     * @param contentType       The content type.
+     * @param contentType
+     *      The content type.
      */
     public void setContentType(String contentType) {
+        if (contentType == null) {
+            throw new IllegalArgumentException("setContentType called with null");
+        }
         Log.d(TAG, "setContentType()");
         addQuery("ct", contentType);
     }
 
     /**
      * Sets the metadata to be sent in the NetInf PUBLISH message.
-     * @param metadata      The JSON string containing the metadata.
+     * @param metadata
+     *      The Metadata object containing the metadata
      */
     public void setMetadata(Metadata metadata) {
         Log.d(TAG, "setMetadata()");

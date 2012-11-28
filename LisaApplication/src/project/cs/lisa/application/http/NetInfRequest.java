@@ -26,26 +26,27 @@ import android.util.Log;
  */
 public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse> {
 
-    /** Debug Log Tag. **/
+    /** Debug Log Tag. */
     private static final String TAG = "NetInfRequest";
 
-    // TODO inject from properties
-    /** HTTP Scheme. **/
+    // TODO inject from properties?
+    /** HTTP Scheme. */
     private static final String HTTP = "http://";
 
-    // TODO inject from properties
-    /** HTTP Timeout. **/
+    // TODO inject from properties?
+    // TODO handle timeout
+    /** HTTP Timeout. */
     private static final int TIMEOUT = 6000000;
 
-    // TODO inject from properties
-    /** Target Host. **/
+    // TODO inject from properties?
+    /** Target Host. */
     private String mHost;
 
-    // TODO inject from properties
-    /** Target Port. **/
+    // TODO inject from properties?
+    /** Target Port. */
     private String mPort;
 
-    /** Path Prefix. **/
+    /** Path Prefix. */
     private String mPathPrefix;
 
     /** The rest of the URI. **/
@@ -54,7 +55,16 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     /** HTTP Client. **/
     private HttpClient mClient;
 
-    public NetInfRequest(String host, String port, String pathPrefix) {
+    /**
+     * Create a new asynchronous request to send using HTTP.
+     * @param host
+     *      The host
+     * @param port
+     *      The port
+     * @param pathPrefix
+     *      The start of the path
+     */
+    protected NetInfRequest(String host, String port, String pathPrefix) {
 
         Log.d(TAG, "NetInfRequest()");
 
@@ -70,11 +80,15 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     }
 
     /**
-     * Create a new asynchronous NetInf message sent using HTTP GET.
-     * @param host         Target host of the message
-     * @param port         Target port
-     * @param hashAlg      Hash algorithm used
-     * @param hash         Hash
+     * Create a new asynchronous request to send using HTTP.
+     * @param host
+     *      Target host of the message
+     * @param port
+     *      Target port
+     * @param hashAlg
+     *      Hash algorithm used
+     * @param hash
+     *      Hash
      */
     public NetInfRequest(String host, String port, String pathPrefix,
             String hashAlg, String hash) {
@@ -87,23 +101,32 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     }
 
     /**
-     * Sends the NetInf request to the local node using HTTP.
-     * @param   voids   Nothing.
-     * @return          JSON response to the NetInf request sent as HTTP
-     *                  or null if the request failed.
+     * Sends the request to the local node using HTTP.
+     * @param voids
+     *      Nothing.
+     * @return
+     *      The response to the request
      */
     @Override
     protected abstract NetInfResponse doInBackground(Void... voids);
 
     /**
-     * Handles the response to the request sent to the NetInf node.
-     * @param jsonResponse     The JSON response.
+     * Called on the UI thread after the response has been received.
+     * @param response
+     *      The response
      */
     @Override
-    protected void onPostExecute(NetInfResponse response) {
-        Log.d(TAG, "onPostExecute()");
-    }
+    protected void onPostExecute(NetInfResponse response) { }
 
+    /**
+     * Executes a HTTP request to the local nodes Restlet API.
+     * @param request
+     *      The HTTP request
+     * @return
+     *      The response to the HTTP request
+     * @throws IOException
+     *      In case the HTTP request failed
+     */
     protected HttpResponse execute(HttpUriRequest request) throws IOException {
         Log.d(TAG, "execute()");
         Log.d(TAG, "uri = " + request.getURI());
@@ -116,8 +139,10 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
 
     /**
      * Adds a key-value pair to the query part of the HTTP URI.
-     * @param key   The query key
-     * @param value The value of the query key
+     * @param key
+     *      The query key
+     * @param value
+     *      The value of the query key
      */
     protected void addQuery(String key, String value) {
         Log.d(TAG, "addQuery()");

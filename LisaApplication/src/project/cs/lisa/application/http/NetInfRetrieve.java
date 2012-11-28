@@ -39,15 +39,19 @@ import android.util.Log;
  */
 public class NetInfRetrieve extends NetInfRequest {
 
-	/** Debug tag. **/
+	/** Log Tag. **/
 	public static final String TAG = "NetInfRetrieve";
 
 	/**
 	 * Creates a new asynchronous NetInf GET.
-	 * @param host         Target host of the message
-	 * @param port         Target port
-	 * @param hashAlg      Hash algorithm used
-	 * @param hash         Hash
+	 * @param host
+	 *     Target host for the retrieve
+	 * @param port
+	 *     Target port
+	 * @param hashAlg
+	 *     Hash algorithm used
+	 * @param hash
+	 *     Hash
 	 */
 	public NetInfRetrieve(String host, String port,
 			String hashAlg, String hash) {
@@ -56,10 +60,11 @@ public class NetInfRetrieve extends NetInfRequest {
 	}
 
     /**
-     * Asks the NetInf node to retrieve a file using HTTP.
-     * @param   voids   Nothing.
-     * @return          JSON response from the NetInf node
-     *                  or null if the request failed
+     * Sends the NetInf GET request to the local node using HTTP.
+     * @paramn voids
+     *      Nothing
+     * @return
+     *      A NetInfRetrieveResponse containing the status of the retrieve
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
