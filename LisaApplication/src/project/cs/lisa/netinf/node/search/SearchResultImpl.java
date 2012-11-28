@@ -24,29 +24,43 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.netinf.node.resolution;
+package project.cs.lisa.netinf.node.search;
 
-import java.util.List;
-
-import netinf.node.resolution.ResolutionService;
-import project.cs.lisa.netinf.node.search.SearchResult;
+import project.cs.lisa.netinf.node.metadata.Metadata;
 
 /**
- * The ResolutionSearchService provides all functionalities of a
- * ResolutionService and an additional search service.
+ * A search result implementation that encodes one search result entity.
  * 
  * @author Kim-Anh Tran
  *
  */
-public interface ResolutionSearchService extends ResolutionService {
-
+public class SearchResultImpl implements SearchResult {
+	
+	/** The hash of the found entity. */
+	private String mHash;
+	
+	/** The metadata associated with that hash. */
+	private Metadata mMetadata;
+	
 	/**
-	 * Returns a list of search results corresponding to the
-	 * specified keywords. If no fitting object has been found, it returns
-	 * an empty list.
+	 * Creates a search object entity.
 	 * 
-	 * @param keywords	The keywords to search for an information object.
-	 * @return			The list of search results.
+	 * @param hash		The hash corresponding to this search result
+	 * @param metadata	The meta data corresponding to this search result
 	 */
-	List<SearchResult> search(List<String> keywords);
+	public SearchResultImpl(String hash, Metadata metadata) {
+		mHash = hash;
+		mMetadata = metadata;
+	}
+
+	@Override
+	public Metadata getMetaData() {
+		return mMetadata;
+	}
+
+	@Override
+	public String getHash() {
+		return mHash;
+	}
+
 }

@@ -30,7 +30,6 @@ import java.io.IOException;
 
 import org.apache.http.client.methods.HttpGet;
 
-import project.cs.lisa.exceptions.NullEntityException;
 import android.util.Log;
 
 /**

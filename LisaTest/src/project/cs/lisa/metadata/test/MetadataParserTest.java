@@ -9,7 +9,7 @@ import junit.framework.Assert;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import project.cs.lisa.metadata.MetadataParser;
+import project.cs.lisa.netinf.node.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 
 /**

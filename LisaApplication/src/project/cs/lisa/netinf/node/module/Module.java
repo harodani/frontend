@@ -45,12 +45,12 @@ import netinf.node.transfer.impl.TransferControllerImpl;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import project.cs.lisa.netinf.node.access.rest.RESTAccessServer;
+import project.cs.lisa.database.IODatabase;
+import project.cs.lisa.database.IODatabaseFactory;
+import project.cs.lisa.netinf.access.rest.RESTAccessServer;
 import project.cs.lisa.netinf.node.resolution.LocalResolutionService;
 import project.cs.lisa.netinf.node.resolution.NameResolutionService;
 import project.cs.lisa.util.UProperties;
-import project.cs.lisa.util.database.IODatabase;
-import project.cs.lisa.util.database.IODatabaseFactory;
 import android.util.Log;
 
 import com.google.inject.AbstractModule;

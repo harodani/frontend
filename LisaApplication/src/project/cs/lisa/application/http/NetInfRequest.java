@@ -18,7 +18,6 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
 import project.cs.lisa.application.MainNetInfActivity;
-import project.cs.lisa.exceptions.NullEntityException;
 import android.os.AsyncTask;
 import android.util.Log;
 

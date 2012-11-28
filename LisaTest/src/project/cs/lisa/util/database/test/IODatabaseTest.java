@@ -15,14 +15,14 @@ import netinf.common.datamodel.impl.DatamodelFactoryImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import project.cs.lisa.exceptions.DatabaseException;
-import project.cs.lisa.metadata.Metadata;
-import project.cs.lisa.metadata.MetadataParser;
+import project.cs.lisa.database.DatabaseException;
+import project.cs.lisa.database.IODatabase;
 import project.cs.lisa.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.lisa.search.SearchResult;
+import project.cs.lisa.netinf.node.metadata.Metadata;
+import project.cs.lisa.netinf.node.metadata.MetadataParser;
+import project.cs.lisa.netinf.node.search.SearchResult;
 import project.cs.lisa.util.IOBuilder;
 import project.cs.lisa.util.UProperties;
-import project.cs.lisa.util.database.IODatabase;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 

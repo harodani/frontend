@@ -34,8 +34,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import project.cs.lisa.exceptions.NullEntityException;
-import project.cs.lisa.metadata.Metadata;
+import project.cs.lisa.netinf.node.metadata.Metadata;
 import android.util.Log;
 
 /**
