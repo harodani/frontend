@@ -34,8 +34,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.restlet.data.Metadata;
 
+import project.cs.lisa.util.metadata.Metadata;
 import android.util.Log;
 
 /**
@@ -114,6 +114,19 @@ public class NetInfPublish extends NetInfRequest {
         }
     }
 
+
+    /**
+     * Sets the metadata to be sent in the NetInf PUBLISH message.
+     * @param metadata
+     *      The Metadata object containing the metadata
+     */
+    public void setMetadata(Metadata metadata) {
+        Log.d(TAG, "setMetadata()");
+        String meta = metadata.convertToMetadataString();
+        Log.d(TAG, "meta = " + meta);
+        addQuery("meta", meta);
+    }
+    
     /**
      * Sets the content type to be sent in the NetInf PUBLISH message.
      * @param contentType
