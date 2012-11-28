@@ -88,9 +88,6 @@ public class MainNetInfActivity extends Activity {
     /** Activity context. */
     private static MainNetInfActivity sMainNetInfActivity;
 
-    /** Global MainApplication. */
-    private MainApplication mApplication;
-
     /** Toast for this activity. */
     private static Toast sToast;
 
@@ -110,7 +107,6 @@ public class MainNetInfActivity extends Activity {
         setContentView(R.layout.activity_main);
 //        setContentView(R.layout.activity_main_sprint2);
 
-        mApplication = (MainApplication) getApplication();
         sMainNetInfActivity = this;
         sToast = new Toast(this);
 
@@ -268,16 +264,6 @@ public class MainNetInfActivity extends Activity {
                 }
             }
         }, new IntentFilter(NODE_STARTED_MESSAGE));
-    }
-
-    /**
-     * Initialize and run the StarterNodeThread.
-     */
-    private void setupNode() {
-        Log.d(TAG, "setupNode()");
-        // Start NetInfNode
-        mStarterNodeThread = new StarterNodeThread(mApplication);
-        mStarterNodeThread.start();
     }
 
     /**

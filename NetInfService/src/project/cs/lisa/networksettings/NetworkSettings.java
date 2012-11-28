@@ -17,7 +17,7 @@ package project.cs.lisa.networksettings;
 
 import java.util.ListIterator;
 
-import project.cs.lisa.R;
+import android.R;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -32,12 +32,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * Wifi connection settings activity
