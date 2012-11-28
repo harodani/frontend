@@ -52,7 +52,7 @@ public class SearchRequest extends LisaServerResource {
     private String mPort;
     
     /** HTTP connection timeout. **/
-    private static final int TIMEOUT = 3000;
+    private static final int TIMEOUT = 10000;
     
     /** HTTP Client **/
     private HttpClient mClient;
