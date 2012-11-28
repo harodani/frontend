@@ -28,6 +28,7 @@ package project.cs.lisa.application.http;
 
 import java.io.IOException;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
 import android.util.Log;
@@ -38,47 +39,45 @@ import android.util.Log;
  */
 public class NetInfRetrieve extends NetInfRequest {
 
-	/** Debug tag. **/
+	/** Log Tag. **/
 	public static final String TAG = "NetInfRetrieve";
 
 	/**
 	 * Creates a new asynchronous NetInf GET.
-	 * @param host         Target host of the message
-	 * @param port         Target port
-	 * @param hashAlg      Hash algorithm used
-	 * @param hash         Hash
+	 * @param host
+	 *     Target host for the retrieve
+	 * @param port
+	 *     Target port
+	 * @param hashAlg
+	 *     Hash algorithm used
+	 * @param hash
+	 *     Hash
 	 */
 	public NetInfRetrieve(String host, String port,
 			String hashAlg, String hash) {
 
-		super(host, port, hashAlg, hash);
-
-		// TODO make this beautiful
-		setPathPrefix("retrieve");
-
+		super(host, port, "retrieve", hashAlg, hash);
 	}
 
     /**
-     * Asks the NetInf node to retrieve a file using HTTP.
-     * @param   voids   Nothing.
-     * @return          JSON response from the NetInf node
-     *                  or null if the request failed
+     * Sends the NetInf GET request to the local node using HTTP.
+     * @paramn voids
+     *      Nothing
+     * @return
+     *      A NetInfRetrieveResponse containing the status of the retrieve
      */
     @Override
-    protected String doInBackground(Void... voids) {
+    protected NetInfResponse doInBackground(Void... voids) {
         Log.d(TAG, "doInBackground()");
 
         try {
-            // Execute HTTP request
             HttpGet get = new HttpGet(getUri());
-            return execute(get);
-        } catch (NullEntityException e) {
-            Log.e(TAG, "NullEntityException");
-            return null;
+            HttpResponse httpResponse = execute(get);
+            return new NetInfRetrieveResponse(httpResponse);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
+            return new NetInfRetrieveResponse();
         }
+
     }
 
 }

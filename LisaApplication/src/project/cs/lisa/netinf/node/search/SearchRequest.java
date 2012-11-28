@@ -11,8 +11,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
-import netinf.common.datamodel.DatamodelFactory;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,37 +32,35 @@ import project.cs.lisa.netinf.access.rest.resources.LisaServerResource;
 import project.cs.lisa.netinf.node.exceptions.InvalidResponseException;
 import project.cs.lisa.netinf.node.resolution.LocalResolutionService;
 import project.cs.lisa.util.UProperties;
-
 import android.util.Log;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 
 public class SearchRequest extends LisaServerResource {
+
     /** Debug Tag. */
-    private final String TAG = "SearchRequest"; 
-    
+    private static final String TAG = "SearchRequest";
+
     /** NRS IP address. **/
     private String mHost;
-    
+
     /** NRS port. **/
     private String mPort;
-    
+
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = 10000;
-    
+
     /** HTTP Client **/
     private HttpClient mClient;
-    
-    /** Keywords string **/
+
+    /** Keywords string. **/
     private String mTokens;
-    
+
     // TODO: Verify if Ext should be JSON
-    /** Ext string **/
+    /** Ext string. **/
     private String mExt;
-    
-    /** Message ID string **/
+
+    /** Message ID string. **/
     private String mMsgId;
 
     // TODO: Remove search into a better place.
@@ -93,21 +89,22 @@ public class SearchRequest extends LisaServerResource {
      * @param ext      Extensions
      * @return         HTTP Post with host, port and URI
      * @throws UnsupportedEncodingException
+     *      In case UTF-8 is not supported
      */
     private HttpPost createSearch(String msgId, String tokens, String ext)
             throws UnsupportedEncodingException {
-        Log.d(TAG, "createSearch()");      
+        Log.d(TAG, "createSearch()");
         Log.d(TAG, "Creating search to send to " + mHost + ":" + mPort);
-        
+
         // POST
         HttpPost post = new HttpPost(mHost + ":" + mPort + "/netinfproto/search");
 
         // URI
         String completeUri = "?msgid=" + msgId  + "&tokens=" + tokens + "&ext=" + ext;
-        
+
         // Logs URI
         Log.d(TAG, "createSearch() URI:\n" + completeUri);
-        
+
         // Encode the URL
         String encodeUrl = null;
         encodeUrl = URLEncoder.encode(completeUri, "UTF-8");
@@ -115,16 +112,16 @@ public class SearchRequest extends LisaServerResource {
         // create new entity
         HttpEntity newEntity =
                 new InputStreamEntity(fromString(encodeUrl), encodeUrl.getBytes().length);
-        
+
         // Add header
         post.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        
+
         // set post entity
         post.setEntity(newEntity);
 
         return post;
     }
-    
+
     // TODO: Fix handleResponse return results
     /**
      * Handles the HTTP response from the server
@@ -135,17 +132,17 @@ public class SearchRequest extends LisaServerResource {
     private String handleResponse(HttpResponse response)
             throws InvalidResponseException {
         Log.d(TAG, "handleResponse() [search]");
-        
+
         // HTTP Status Response from the HTTP request response
         int statusCode = response.getStatusLine().getStatusCode();
         Log.d(TAG, "statusCode = " + statusCode);
-        
+
         // Return object
         JSONObject json = null;
-        
+
         // Temp string
         String jsonString = null;
-        
+
         switch (statusCode) {
             // Status Code OK: 200
             case HttpStatus.SC_OK:
@@ -177,31 +174,31 @@ public class SearchRequest extends LisaServerResource {
     @Get
     public String search() {
         Log.d(TAG, "search()");
-        
+
         // Search request requires three fields: tokens (keywords), message-id and ext.
         mTokens = getQuery().getFirstValue("tokens", true);
-        mMsgId = getQuery().getFirstValue("msgId", true);
+        mMsgId = newMsgId();//getQuery().getFirstValue("msgId", true);
         mExt = getQuery().getFirstValue("ext", true);
-        
+
         /* DATABASE SEARCH */
         // Injector
         Injector injector = MainApplication.getStaticInjector();
-        
+
         // Get LRS instance
         LocalResolutionService lrs = injector.getInstance(LocalResolutionService.class);
-        
+
         // Populate list of urls
         List<String> listUrls = new ArrayList<String>();
         listUrls.add(mTokens);
-        
+
         List<SearchResult> listResults = lrs.search(listUrls);
 
         Log.d(TAG, "The url list:");
-        for(SearchResult result : listResults) {
+        for (SearchResult result : listResults) {
             Log.d(TAG, result.getMetaData().convertToMetadataString());
-        	
+
         }
-        
+
         if (!listResults.isEmpty()) {
             JSONObject json = new JSONObject();
             json.put("status", 200);
@@ -218,7 +215,7 @@ public class SearchRequest extends LisaServerResource {
         }
 
         /* SERVER SEARCH */
-        
+
         try {
             // Create NetInf SEARCH request
             Log.d(TAG, "Creating HTTP POST");
@@ -239,7 +236,7 @@ public class SearchRequest extends LisaServerResource {
             Log.d(TAG, "Handling HTTP POST Response");
             String json = handleResponse(response);
             Log.d(TAG, "search() succeeded. Returning JSON Object");
-            
+
             // Returns JSON Object
             return json;
         } catch (InvalidResponseException e) {
@@ -252,11 +249,11 @@ public class SearchRequest extends LisaServerResource {
             Log.d(TAG, "IOException");
             e.printStackTrace();
         }
-        
+
         Log.e(TAG, "search() failed. Returning null");
         return null;
     }
- 
+
     /**
      * Converts a string to a type ByteArrayInputStream.
      *
@@ -328,4 +325,48 @@ public class SearchRequest extends LisaServerResource {
             return "";
         }
     }
+
+    /**
+     * Creates a new message id that is probably unique in the server.
+     * @return String with the created message id
+     */
+    private String newMsgId() {
+        // TODO: Validate TelephoneManager as a viable option for serial number.
+        // TODO: Right now, this code FAILS tests because there is no TM on emulator.
+        // Initiates a new Telephony Manager to extract deviceId and serial number.
+//        final TelephonyManager tm = (TelephonyManager) mActivity.getBaseContext()
+//                .getSystemService(Context.TELEPHONY_SERVICE);
+
+        // Telephony Manager Device ID
+//        final String tmDevice;
+
+        // Telephony Manager Serial Number
+//        final String tmSerial;
+
+        // Android ID
+//        final String androidId;
+
+        // Fetches IDs
+//        tmDevice = "" + tm.getDeviceId();
+//        tmSerial = "" + tm.getSimSerialNumber();
+//        androidId = "" + android.provider.Settings.Secure.getString(
+//                mActivity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        // Gets device UUID
+//        UUID deviceUuid = new UUID(androidId.hashCode(),
+//                ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
+
+        // UUID to String
+//        String deviceId = deviceUuid.toString();
+
+        // Random number
+        int randomNumber = new Random(System.currentTimeMillis()).nextInt();
+
+        // Bulks all of it together
+        String msgId = /*deviceId + */String.valueOf(randomNumber);
+
+        // Returns created message id
+        return msgId;
+    }
+
 }

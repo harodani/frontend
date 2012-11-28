@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Uppsala University
  *
  * Project CS course, Fall 2012
@@ -27,32 +27,34 @@
 package project.cs.lisa.application.http;
 
 /**
- * Thrown when the entity of a HTTP response is null.
+ * Thrown when trying trying to get information from response to a failed request.
  * @author Linus Sunde
- * @author Paolo Boschini
  */
-public class NullEntityException extends Exception {
+public class RequestFailedException extends Exception {
     /**
      * Constructs a NullEntityException.
      */
-    public NullEntityException() {
+    public RequestFailedException() {
         super();
     }
 
     /**
-     * Constructs a NullEntityException with the specified detail message.
-     * @param message   the detail message.
+     * Constructs a ResponseFailedException with the specified detail message.
+     * @param message
+     *      the detail message.
      */
-    public NullEntityException(String message) {
+    public RequestFailedException(String message) {
         super(message);
     }
 
     /**
-     * Constructs a new NullEntityException with the specified detail message and cause.
-     * @param message   the detail message
-     * @param cause     the cause
+     * Constructs a new ResponseFailedException with the specified detail message and cause.
+     * @param message
+     *      the detail message
+     * @param cause
+     *      the cause
      */
-    public NullEntityException(String message, Throwable cause) {
+    public RequestFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -11,6 +11,9 @@ import org.restlet.resource.ServerResource;
 
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
+import project.cs.lisa.application.http.NetInfPublishResponse;
+import project.cs.lisa.application.http.NetInfResponse;
+import project.cs.lisa.application.http.NetInfStatus;
 import project.cs.lisa.mock.MockServer;
 import project.cs.lisa.netinf.node.metadata.Metadata;
 import android.test.InstrumentationTestCase;
@@ -34,7 +37,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
     public static class MockServerResource extends ServerResource {
         @Put
-        public String mockGet() {
+        public void mockGet() {
 
             assertNotNull("Hash not in URI query", getQuery().getFirstValue("hash"));
             assertNotNull("Hash algorithm not in URI query", getQuery().getFirstValue("hashAlg"));
@@ -49,18 +52,9 @@ public class NetInfPublishTest extends InstrumentationTestCase {
                 assertTrue("Meta should be JSON", metaObj instanceof JSONObject);
                 JSONObject meta = (JSONObject) metaObj;
                 assertTrue("Meta should have contained a specific key", meta.containsKey(mMetaKey));
-                assertEquals("Meta contained wrong data for the specific key", meta.get(mMetaKey), mMetaValue);
+                assertEquals("Meta contained wrong data for the specific key", mMetaValue, meta.get(mMetaKey));
             }
 
-            if (getQuery().getFirstValue("hash").equals(mHash)) {
-                JSONObject json = new JSONObject();
-                json.put("status", "ok");
-                return json.toJSONString();
-            } else {
-                JSONObject json = new JSONObject();
-                json.put("status", "failed");
-                return json.toJSONString();
-            }
         }
     }
 
@@ -86,6 +80,9 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         assertTrue("Server should be stopped", mMockServer.isStopped());
     }
 
+    public void testMockServerSetup() {
+    }
+
     public void testPublishWithoutLocator() throws Throwable {
 
         // Signal used to wait for ASyncTask
@@ -95,8 +92,12 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNull("Should not have received a response", jsonResponse);
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a publish response", response instanceof NetInfPublishResponse);
+                assertFalse("Publish should not have succeeded",
+                        ((NetInfPublishResponse) response).getStatus() == NetInfStatus.OK);
+
                 // Signal done
                 signal.countDown();
             }
@@ -127,13 +128,12 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNotNull("Should have received a response", jsonResponse);
-                Object obj = JSONValue.parse(jsonResponse);
-                assertTrue("Should have received JSON as response", obj instanceof JSONObject);
-                JSONObject json = (JSONObject) obj;
-                assertTrue("JSON response should have contained status",json.containsKey("status"));
-                assertEquals("JSON response value of status wrong", json.get("status"), "ok");
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a publish response", response instanceof NetInfPublishResponse);
+                assertEquals("Publish should have been executed successfully",
+                        NetInfStatus.OK, ((NetInfPublishResponse) response).getStatus());
+
                 // Signal done
                 signal.countDown();
             }
@@ -166,13 +166,12 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNotNull("Should have received a response", jsonResponse);
-                Object obj = JSONValue.parse(jsonResponse);
-                assertTrue("Should have received JSON as response", obj instanceof JSONObject);
-                JSONObject json = (JSONObject) obj;
-                assertTrue("JSON response should have contained status",json.containsKey("status"));
-                assertEquals("JSON response value of status wrong", json.get("status"), "ok");
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a publish response", response instanceof NetInfPublishResponse);
+                assertEquals("Publish should have been executed successfully",
+                        NetInfStatus.OK, ((NetInfPublishResponse) response).getStatus());
+
                 // Signal done
                 signal.countDown();
             }
@@ -204,8 +203,11 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.WRONG_PORT), mHashAlg, mHash, locators) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNull("Should not have received a response", jsonResponse);
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a publish response", response instanceof NetInfPublishResponse);
+                assertFalse("Publish should not have succeeded",
+                        ((NetInfPublishResponse) response).getStatus() == NetInfStatus.OK);
                 // Signal done
                 signal.countDown();
             }
@@ -237,13 +239,11 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNotNull("Should have received a response", jsonResponse);
-                Object obj = JSONValue.parse(jsonResponse);
-                assertTrue("Should have received JSON as response", obj instanceof JSONObject);
-                JSONObject json = (JSONObject) obj;
-                assertTrue("JSON response should have contained status",json.containsKey("status"));
-                assertEquals("JSON response value of status wrong", json.get("status"), "ok");
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a publish response", response instanceof NetInfPublishResponse);
+                assertEquals("Publish should have been executed successfully",
+                        NetInfStatus.OK, ((NetInfPublishResponse) response).getStatus());
                 // Signal done
                 signal.countDown();
             }

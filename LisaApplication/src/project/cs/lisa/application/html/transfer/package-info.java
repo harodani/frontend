@@ -1,4 +1,4 @@
 /**
- * Provides the classes that download websites form the up-link
+ * Provides the classes that download web sites form the up-link
  */
 package project.cs.lisa.application.html.transfer;
