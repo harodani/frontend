@@ -124,6 +124,8 @@ implements ResolutionService {
         HttpConnectionParams.setSoTimeout(params, TIMEOUT);
         mClient = new DefaultHttpClient(params);
 
+        
+        
         mHost = host;
         mPort = port;
         mDatamodelFactory = datamodelFactory;
