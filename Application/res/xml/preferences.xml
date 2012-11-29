@@ -26,5 +26,12 @@
        	    android:title="@string/settings_share"
        	    android:defaultValue="true"/>     	
     </PreferenceCategory>
-   
+   <PreferenceCategory 
+        android:title="Fake Preferece"
+        android:key="pref_key_sharing">
+       	<Preference android:title="test" >
+    	<intent android:action="android.intent.action.VIEW"
+            android:data="http://www.example.com" />
+		</Preference>
+    </PreferenceCategory>
 </PreferenceScreen>
