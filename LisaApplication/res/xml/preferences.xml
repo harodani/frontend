@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:key="pref_sync"
-        android:title="@string/pref_sync"
-        android:summary="@string/pref_sync_summ"
-        android:defaultValue="true" />
-    <ListPreference
-        android:dependency="pref_sync"
-        android:key="pref_syncConnectionType"
-        android:title="@string/pref_syncConnectionType"
-        android:dialogTitle="@string/pref_syncConnectionType"
-        android:entries="@array/pref_syncConnectionTypes_entries"
-        android:entryValues="@array/pref_syncConnectionTypes_values"
-        android:defaultValue="@string/pref_syncConnectionTypes_default" />
+    <PreferenceCategory 
+        android:title="@string/settings_nrs"
+        android:key="pref_key_nrs" >
+        <EditTextPreference 
+            android:key="pref_key_nrs_ip"
+            android:summary="130.238.15.227"
+            android:title="@string/settings_nrs_ip"
+            android:defaultValue="130.238.15.227" />
+        <EditTextPreference 
+            android:key="pref_key_nrs_port"
+            android:summary="9999"
+            android:title="@string/settings_nrs_port"
+            android:defaultValue="9999" />
+    </PreferenceCategory>
+    <PreferenceCategory 
+        android:title="@string/settings_sharing"
+        android:key="pref_key_sharing">
+       	<SwitchPreference
+       	    android:key="pref_key_fullput"
+       	    android:title="@string/settings_fullput"
+       	    android:defaultValue="true"/>
+       	 <SwitchPreference
+       	    android:key="pref_key_share"
+       	    android:title="@string/settings_share"
+       	    android:defaultValue="true"/>     	
+    </PreferenceCategory>
+   
 </PreferenceScreen>
