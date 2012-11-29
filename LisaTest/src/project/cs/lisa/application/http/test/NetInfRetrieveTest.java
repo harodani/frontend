@@ -12,6 +12,7 @@ import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfRetrieve;
 import project.cs.lisa.application.http.NetInfRetrieveResponse;
 import project.cs.lisa.application.http.NetInfStatus;
+import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.mock.MockServer;
 import android.test.InstrumentationTestCase;
 
@@ -70,7 +71,7 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
         assertTrue("Server should be stopped", mMockServer.isStopped());
     }
 
-    public void testRetrieveExistent() throws Throwable {
+    public void testRetrieveFileWritingFailed() throws Throwable {
 
         // Signal used to wait for ASyncTask
         final CountDownLatch signal = new CountDownLatch(1);
@@ -79,19 +80,18 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
         final NetInfRetrieve retrieve = new NetInfRetrieve(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
-                System.out.println("1");
                 assertNotNull("Should always receive a response", response);
-                System.out.println("2");
                 assertTrue("Response should be a retrieve response", response instanceof NetInfRetrieveResponse);
-                System.out.println("3");
                 NetInfRetrieveResponse retrieveResponse = (NetInfRetrieveResponse) response;
                 System.out.println(retrieveResponse.getStatus());
                 assertEquals("Retrieve should have succeeded, but the file doesn't exist",
                         NetInfStatus.FILE_DOES_NOT_EXIST, retrieveResponse.getStatus());
-                System.out.println("4");
-                assertEquals("Response contained wrong file path",
-                        mFilePath, retrieveResponse.getFile().getAbsolutePath());
-                System.out.println("5");
+                try {
+                    retrieveResponse.getFile().getAbsolutePath();
+                    fail("Should have thrown RequestFailedException since file shouldn't exist");
+                } catch (RequestFailedException e) {
+                    // Should throw exception since the file doesn't exist
+                }
 
                 // Signal done
                 signal.countDown();

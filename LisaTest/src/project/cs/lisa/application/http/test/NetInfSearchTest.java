@@ -12,6 +12,7 @@ import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfSearch;
 import project.cs.lisa.application.http.NetInfSearchResponse;
 import project.cs.lisa.application.http.NetInfStatus;
+import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.mock.MockServer;
 import android.test.InstrumentationTestCase;
 
@@ -108,7 +109,11 @@ public class NetInfSearchTest extends InstrumentationTestCase {
                 NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
                 assertEquals("Search should have succeeded",
                         searchResponse.getStatus(), NetInfStatus.OK);
-                assertEquals("Search should have returned bacon", (String) searchResponse.getSearchResults().get(0), "bacon");
+                try {
+                    assertEquals("Search should have returned bacon", (String) searchResponse.getSearchResults().get(0), "bacon");
+                } catch (RequestFailedException e) {
+                    fail("The response should have contained search results");
+                }
                 // Signal done
                 signal.countDown();
             }
