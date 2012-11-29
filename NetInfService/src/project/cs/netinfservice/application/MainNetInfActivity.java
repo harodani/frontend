@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 
 /**
@@ -62,12 +63,12 @@ public class MainNetInfActivity extends Activity {
 
     /** Bluetooth server for serving bluetooth devices. */
     private BluetoothServer mBluetoothServer;
-    
-	/** A broadcast receiver for intercepting Bluetooth activity. */
-	private BroadcastReceiver mBroadcastReceiver;
 
-	/** The filter for choosing what actions the broadcast receiver will catch. */
-	private IntentFilter mIntentFilter;
+    /** A broadcast receiver for intercepting Bluetooth activity. */
+    private BroadcastReceiver mBroadcastReceiver;
+
+    /** The filter for choosing what actions the broadcast receiver will catch. */
+    private IntentFilter mIntentFilter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,61 +76,90 @@ public class MainNetInfActivity extends Activity {
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_main);
 
-		// Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
-		setUpBroadcastReceiver();
-		mIntentFilter = new IntentFilter();
-		mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-		MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
+        // Turn on the Bluetooth server if Bluetooth is enabled
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            showToast("No Bluetooh adapter available.");
+            /* TODO: Disable Bluetooth services: Server, Provider, change Share option regarding fullput,
+             * do not add device as locator.
+             */
+        } else {
+            if (mBluetoothAdapter.isEnabled()) {
+                try {
+                    mBluetoothServer = new BluetoothServer();
+                    mBluetoothServer.start();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
+
+        // Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
+        setUpBroadcastReceiver();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
 
         setupNode();
-        
+
         /*
          * Set up some notification depending on the connection: colors.
          * Ask Paolo, he knows.
          */
-        
+
     }
-   
+
     /**
      * Initialize and run the StarterNodeThread.
      */
     private void setupNode() {
         Log.d(TAG, "setupNode()");
-        
+
         mStarterNodeThread = new StarterNodeThread();
         mStarterNodeThread.start();
     }
 
-	/**
-	 * Sets up a broadcast receiver for intercepting Bluetooth states.
-	 */
+    /**
+     * Sets up a broadcast receiver for intercepting Bluetooth states.
+     */
     private void setUpBroadcastReceiver() {
-		mBroadcastReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				final String action = intent.getAction();
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
 
-				if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-					final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
-							BluetoothAdapter.ERROR);
-					switch (state) {
-					case BluetoothAdapter.STATE_ON:
-		                try {
-							mBluetoothServer = new BluetoothServer();
-							mBluetoothServer.start();
-						} catch (IOException e) {
-							Log.e(TAG, e.getMessage());
-						}
-						break;
-					case BluetoothAdapter.STATE_OFF:
-						mBluetoothServer.cancel();
-						break;
-					default:
-						// We don't care of any other states.
-						break;
-					}
-				}
-			}
-		};
-	}
+                if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                    final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                            BluetoothAdapter.ERROR);
+                    switch (state) {
+                    case BluetoothAdapter.STATE_ON:
+                        try {
+                            mBluetoothServer = new BluetoothServer();
+                            mBluetoothServer.start();
+                        } catch (IOException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                        break;
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(TAG, "Bluetooth adapter is turned off.");
+                        if (mBluetoothServer != null && mBluetoothServer.isAlive()) {
+                            mBluetoothServer.cancel();
+                        }
+                        break;
+                    default:
+                        // We don't care of any other states.
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Show a toast.
+     * @param text      The text to show in the toast.
+     */
+    public void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
 }
