@@ -3,7 +3,7 @@ package project.cs.lisa.bluetooth.test;
 import java.io.IOException;
 
 import junit.framework.Assert;
-import project.cs.lisa.netinf.server.bluetooth.BluetoothServer;
+import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import android.bluetooth.BluetoothAdapter;
 import android.test.AndroidTestCase;
 
