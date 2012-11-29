@@ -26,10 +26,17 @@
  */
 package project.cs.netinfservice.application;
 
+import java.io.IOException;
+
 import project.cs.netinfservice.R;
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -47,9 +54,6 @@ public class MainNetInfActivity extends Activity {
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
 
-    /** Represents the number of attempts to initialize a BluetoothServer. */
-    private static final int NUMBER_OF_ATTEMPTS = 2;
-
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
 
@@ -59,23 +63,33 @@ public class MainNetInfActivity extends Activity {
     /** Bluetooth server for serving bluetooth devices. */
     private BluetoothServer mBluetoothServer;
     
+	/** A broadcast receiver for intercepting Bluetooth activity. */
+	private BroadcastReceiver mBroadcastReceiver;
+
+	/** The filter for choosing what actions the broadcast receiver will catch. */
+	private IntentFilter mIntentFilter;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_main);
 
+		// Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
+		setUpBroadcastReceiver();
+		mIntentFilter = new IntentFilter();
+		mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
+
         setupNode();
+        
         /*
-         * Check: Where should we start the Bluetooth Server if we don't
-         * ask for the share option within this application?
-         * setupBluetoothServer();
+         * Set up some notification depending on the connection: colors.
+         * Ask Paolo, he knows.
          */
         
-        // Set up some feedback depending on the connection: colors 
     }
    
-
     /**
      * Initialize and run the StarterNodeThread.
      */
@@ -86,27 +100,36 @@ public class MainNetInfActivity extends Activity {
         mStarterNodeThread.start();
     }
 
-    /**
-     * Initiates and starts the Bluetooth Server.
-     *
-    private void setupBluetoothServer() {
-        Log.d(TAG, "setupBluetoothServer()");
+	/**
+	 * Sets up a broadcast receiver for intercepting Bluetooth states.
+	 */
+    private void setUpBroadcastReceiver() {
+		mBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				final String action = intent.getAction();
 
-        // Tries to initialize the Bluetooth Server several times, if unsuccessful.
-        int attempts = NUMBER_OF_ATTEMPTS;
-        do {
-            try {
-                mBluetoothServer = new BluetoothServer();
-                mBluetoothServer.start();
-            } catch (IOException e) {
-                --attempts;
-                mBluetoothServer = null;
-            }
-        } while (mBluetoothServer == null && attempts > 0);
-
-        if (mBluetoothServer == null) {
-            Log.e(TAG, "BluetoothServer couldn't be initialized.");
-        }
-    }
-    /**/
+				if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+					final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+							BluetoothAdapter.ERROR);
+					switch (state) {
+					case BluetoothAdapter.STATE_ON:
+		                try {
+							mBluetoothServer = new BluetoothServer();
+							mBluetoothServer.start();
+						} catch (IOException e) {
+							Log.e(TAG, e.getMessage());
+						}
+						break;
+					case BluetoothAdapter.STATE_OFF:
+						mBluetoothServer.cancel();
+						break;
+					default:
+						// We don't care of any other states.
+						break;
+					}
+				}
+			}
+		};
+	}
 }

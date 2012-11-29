@@ -35,10 +35,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 
+import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Environment;
 import android.util.Log;
 
@@ -66,10 +71,14 @@ public class BluetoothServer extends Thread {
 	/** The buffer for reading in the hash out of a file request message. */
 	private static final int BUFFER_SIZE = 1024;
 
-	/** Represents the number of attempts to create the Bluetooth server socket. */
+	/** 
+	 * Represents the number of attempts to create the Bluetooth server socket. 
+	 */
 	private static final int NUMBER_OF_ATTEMPTS = 2;
 
-	/** Flag determining how long to listen for incoming pairing requests. */
+	/** Flag determining how long to listen for incoming pairing 
+	 * requests. 
+	 */
 	private boolean mServerListens;
 
 	/** The Bluetooth Server Socket that is created as soon as a connection is established. */
@@ -86,6 +95,7 @@ public class BluetoothServer extends Thread {
 
 	/** The directory containing the published files. */
 	private String mSharedFolder;
+
 	/**
 	 * Creates a new BluetoothServer that waits for incoming
 	 * bluetooth requests and handles file requests.
@@ -94,6 +104,7 @@ public class BluetoothServer extends Thread {
 	 * 						Server couldn't be initialized.
 	 */
 	public BluetoothServer() throws IOException {
+
 		String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
 		mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
 		createSharedFolder();
@@ -131,11 +142,11 @@ public class BluetoothServer extends Thread {
 
 	@Override
 	public void run() {
-        Log.d(TAG, "Trying to start listening...");
+		Log.d(TAG, "Trying to start listening...");
 		BluetoothSocket socket = null;
 
 		while (mServerListens) {
-	        Log.d(TAG, "Start Listening..");
+			Log.d(TAG, "Start Listening..");
 			try {
 				// Accept an incoming pairing request
 				socket = mBtServerSocket.accept();
