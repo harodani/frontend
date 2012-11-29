@@ -10,8 +10,8 @@
         android:checkable="true"
         android:orderInCategory="2" />
             
-    <item android:id="@+id/menu_server_settings"
-        android:title="@string/menu_server_settings"
+    <item android:id="@+id/menu_settings"
+        android:title="@string/menu_settings"
         android:orderInCategory="3" />
     
     <item android:id="@+id/menu_help"

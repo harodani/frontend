@@ -218,6 +218,9 @@ public class MainNetInfActivity extends Activity {
         case R.id.menu_publish_file:
             item.setChecked(item.isChecked() ? false : true);
             break;
+        case R.id.menu_settings:
+        	Intent settingsIntent = new Intent(this,SettingsActivity.class);
+        	startActivity(settingsIntent);
         default:
             break;
         }
