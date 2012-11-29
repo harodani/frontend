@@ -451,6 +451,7 @@ public class IODatabase
 		if (cursor != null && cursor.getCount() != 0) {
 			cursor.moveToFirst();
 		} else {
+		    db.close();
 			throw new DatabaseException("The given key does not correspond to any IO : " + key);
 		}
 		db.close();
