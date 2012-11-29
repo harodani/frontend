@@ -106,7 +106,6 @@ public class MainNetInfActivity extends Activity {
          * Set up some notification depending on the connection: colors.
          * Ask Paolo, he knows.
          */
-
     }
 
     /**

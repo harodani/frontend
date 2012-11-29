@@ -86,6 +86,10 @@ public class MainNetInfActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initializing the browser.");
+        
+        Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
+        startActivity(LaunchIntent);
+        
         setContentView(R.layout.activity_main);
 
         sMainNetInfActivity = this;
@@ -104,7 +108,7 @@ public class MainNetInfActivity extends Activity {
         editText.setText(UProperties.INSTANCE.getPropertyWithName("default.webpage"));
 
 //        showDialog(new ShareDialog());
-
+        
 
     }
 
