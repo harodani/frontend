@@ -3,7 +3,7 @@ package project.cs.lisa.application.dialogs;
 import java.util.Set;
 
 import project.cs.lisa.R;
-import project.cs.lisa.application.wifi.WifiHandler;
+import project.cs.lisa.networksettings.WifiHandler;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;

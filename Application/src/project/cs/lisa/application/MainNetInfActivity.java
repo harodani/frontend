@@ -33,9 +33,10 @@ import java.util.Set;
 import project.cs.lisa.R;
 import project.cs.lisa.application.dialogs.ListDialog;
 import project.cs.lisa.application.dialogs.OkButtonDialog;
+import project.cs.lisa.application.html.NetInfWebViewClient;
 import project.cs.lisa.application.html.transfer.FetchWebPageTask;
-import project.cs.lisa.application.wifi.WifiHandler;
 import project.cs.lisa.networksettings.BTHandler;
+import project.cs.lisa.networksettings.WifiHandler;
 import project.cs.lisa.util.UProperties;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,18 +44,23 @@ import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
 
 /**
  * Main activity that acts as a starting point for the application.
@@ -69,85 +75,163 @@ public class MainNetInfActivity extends Activity {
 
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
-    
+
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
 
     /** Activity context. */
     private static MainNetInfActivity sMainNetInfActivity;
 
+    /** Broadcast receiver. */
+    private BroadcastReceiver mBroadcastReceiver;
+
+    /** Intent for Broadcast receiver. */
+    private IntentFilter mIntentFilter;
+
     /** Toast for this activity. */
     private static Toast sToast;
 
     /** The menu. */
-    private Menu menu;
-    
+    private Menu mMenu;
+
+    /** The main web view. */
+    private WebView mWebView;
+
+    /** The URL search bar. */
+    private EditText mEditText;
+
+    /** Icon imageview for the url search bar. */
+    private ImageView img;
+
+    /** Spinning progress bar, shown when loading a page. */
+    private ProgressBar mSpinningBar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initializing the browser.");
-        
+
         Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
         startActivity(LaunchIntent);
-        
+
         setContentView(R.layout.activity_main);
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
 
-//        setupWifi();
+        //        setupWifi();
         setupBluetoothAvailability();
         /*
          * TODO: Make sure that nothing happens when Netinf node doesn't start. 
          * Find a way to communicate between this activity and the netinf activity.
          */  
+
+        // Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
         setupBroadcastReceiver();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(NODE_STARTED_MESSAGE);
+        mIntentFilter.addAction(NetInfWebViewClient.URL_WAS_UPDATED);
+        registerReceiver(mBroadcastReceiver, mIntentFilter);
+
 
         // Get the input address
-        EditText editText = (EditText) findViewById(R.id.url);
-        editText.setText(UProperties.INSTANCE.getPropertyWithName("default.webpage"));
+        mEditText = (EditText) findViewById(R.id.url);
+        mEditText.setText(UProperties.INSTANCE.getPropertyWithName("default.webpage"));
+        mEditText.setOnKeyListener(new OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // START THE SEARCH AND LOAD THE PAGE
+                    return true;
+                }
+                return false;
+            }
+        });
 
-//        showDialog(new ShareDialog());
-        
 
+        img = (ImageView) findViewById(R.id.imageView);
+        img.setImageResource(R.drawable.refresh);
+        img.setTag(R.drawable.refresh);
+        img.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                int tag = (Integer)img.getTag();
+                switch (tag) {
+                case R.drawable.refresh:
+                    img.setImageResource(R.drawable.cancel);
+                    img.setTag(R.drawable.cancel);
+                    // loadPage();
+                    break;
+                case R.drawable.cancel:
+                    img.setImageResource(R.drawable.refresh);
+                    img.setTag(R.drawable.refresh);
+                    mSpinningBar.setVisibility(View.INVISIBLE);
+                    mWebView.stopLoading();
+                default:
+                    break;
+                }
+            }
+        });
+
+        mWebView = (WebView) findViewById(R.id.webView);
+        //        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.getSettings().setAppCacheEnabled(true);
+        mWebView.setWebViewClient(new NetInfWebViewClient());
+
+        mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
+        mSpinningBar.setVisibility(View.INVISIBLE);
+
+        //        showDialog(new ShareDialog());
+
+
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
+                mEditText.setText(intent.getStringExtra("url"));
+            }
+        }
+    };
+
+    private class WifiDialogListener implements DialogInterface.OnClickListener {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Log.d(TAG, "doPositiveClickWifiInfoMessage()");
+
+            // This is run when OK is clicked
+            // Create a WifiHandler
+            WifiHandler wifiHandler = new WifiHandler() {
+                @Override
+                public void onDiscoveryDone(Set<String> wifis) {
+
+                    // This is run when the WIFI discovery is done
+                    // Create a ListDialog that shows the networks
+                    ListDialog listDialog = new ListDialog(wifis) {
+                        @Override
+                        public void onConfirm(String wifi) {
+
+                            // This is run when the ListDialog is confirmed
+                            connectToSelectedNetwork(wifi);
+                        }
+                    };
+                    showDialog(listDialog);
+                }
+            };
+            // Start WifiHandler discovery
+            wifiHandler.startDiscovery();
+        }
     }
 
     /**
      * Set up the WiFi connection.
      */
     private void setupWifi() {
-        // Create OK dialog
         showDialog(new OkButtonDialog(
                 "Wifi Information",
                 getString(R.string.dialog_wifi_msg),
-                new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "doPositiveClickWifiInfoMessage()");
-
-                // This is run when OK is clicked
-                // Create a WifiHandler
-                WifiHandler wifiHandler = new WifiHandler() {
-                    @Override
-                    public void onDiscoveryDone(Set<String> wifis) {
-
-                        // This is run when the WIFI discovery is done
-                        // Create a ListDialog that shows the networks
-                        ListDialog listDialog = new ListDialog(wifis) {
-                            @Override
-                            public void onConfirm(String wifi) {
-
-                                // This is run when the ListDialog is confirmed
-                                connectToSelectedNetwork(wifi);
-                            }
-                        };
-                        showDialog(listDialog);
-                    }
-                };
-                // Start WifiHandler discovery
-                wifiHandler.startDiscovery();
-            }
-        }));
+                new WifiDialogListener()));
     }
 
     /**
@@ -212,7 +296,7 @@ public class MainNetInfActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu()");
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        this.menu = menu;
+        this.mMenu = menu;
         return true;
     }
 
@@ -223,34 +307,36 @@ public class MainNetInfActivity extends Activity {
             item.setChecked(item.isChecked() ? false : true);
             break;
         case R.id.menu_settings:
-        	Intent settingsIntent = new Intent(this,SettingsActivity.class);
-        	startActivity(settingsIntent);
+            Intent settingsIntent = new Intent(this,SettingsActivity.class);
+            startActivity(settingsIntent);
         default:
             break;
         }
         return true;
     }
-    
+
     /**
      * Receives messages from the StarterNodeThread when the node is starter.
      * Right now it does not do anything. Just log
      */
     private void setupBroadcastReceiver() {
-        Log.d(TAG, "setupBroadcastReceiver()");
-        registerReceiver(new BroadcastReceiver() {
+        mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                switch (getResultCode()) {
-                default:
-                    Log.d(TAG, intent.getAction());
-                    break;
+                String action = intent.getAction();
+                if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
+                    String newUrl = (String) intent.getExtras().get("url");
+                    mEditText.setText(newUrl);
+
+                } else if (action.equals(NODE_STARTED_MESSAGE)) {
+                    Log.d(TAG, "The NetInf node was started.");
                 }
             }
-        }, new IntentFilter(NODE_STARTED_MESSAGE));
+        };
     }
 
     /**
-     * Function to forceably initialize Bluetooth and enable discoverability option.
+     * Function to frceably initialize Bluetooth and enable discoverability option.
      */
     private void setupBluetoothAvailability() {
         BTHandler bt = new BTHandler();
@@ -283,8 +369,8 @@ public class MainNetInfActivity extends Activity {
         Log.d(TAG, "cancelToast()");
         sToast.cancel();
     }
-    
+
     public Menu getMenu() {
-        return menu;
+        return mMenu;
     }
 }

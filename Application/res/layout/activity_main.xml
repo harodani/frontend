@@ -9,25 +9,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/goButton"
+        android:layout_toLeftOf="@+id/imageView"
         android:ems="10"
         android:inputType="textUri" />
-    
-        <!--
-            android:inputType="textWebEditText"
-         -->
-    <Button
-        android:id="@+id/goButton"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/url"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:onClick="goButtonClicked"
-        android:text="@string/go" />
 
-    <ProgressBar
+<!--  LET'S USE THIS FOR CREATING 4 HORIZONTAL INDICATORS
+    
+     <ProgressBar
         android:id="@+id/progressBar"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="wrap_content"
@@ -40,6 +28,7 @@
         android:minHeight="5dip"
         android:progress="30"
         android:progressDrawable="@drawable/blue_progress" />
+ -->
 
     <WebView
         android:id="@+id/webView"
@@ -47,6 +36,21 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/progressBar" />
+        android:layout_below="@+id/imageView" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentRight="true"
+        android:contentDescription="icon" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>
