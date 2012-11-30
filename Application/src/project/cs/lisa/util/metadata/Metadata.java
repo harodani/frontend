@@ -26,10 +26,8 @@
  */
 package project.cs.lisa.util.metadata;
 
-import java.util.Iterator;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import android.util.Log;
 
@@ -39,45 +37,45 @@ import android.util.Log;
  */
 public class Metadata {
 
-    // Class TAG
+    /* Debug Tag */
     private final String TAG = "MetadataClass";
 
-    // Metadata JSON Object
+    /* Metadata JSON object */
     private JSONObject mJSONObject;
 
     /**
-     * Constructor
+     * Empty Constructor
      */
-
     public Metadata() {
         mJSONObject = new JSONObject();
     }
 
     /**
      * Constructor that takes in a already formatted JSON String
+     * 
      * @param _JSONString Formatted JSON String
      */
-
     public Metadata(String _JSONString) {
-        mJSONObject = null;
-        try {
-            mJSONObject = new JSONObject(_JSONString);
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Problems creating LisaMetadata with a previous valid JSON declaration");
-            Log.d(TAG, "Got: " + _JSONString);
-            Log.d(TAG, "Error was: " + e.toString());
-            mJSONObject = new JSONObject(); // Creates an empty JSON Object
-            e.printStackTrace();
+        Log.d(TAG, "Metadata received:\n" + _JSONString);
+
+        mJSONObject = new JSONObject();
+        mJSONObject = (JSONObject) JSONValue.parse(_JSONString);
+
+        // TODO: Maybe raise a 'malformed json string exception'
+        if (mJSONObject != null) {
+            Log.d(TAG, "Metadata created:\n" + mJSONObject);
+            Log.d(TAG, "" + mJSONObject.keySet().toString());
+        } else {
+            Log.d(TAG, "Invalid JSON String received. new object was created, but its NULL.");
         }
     }
 
     /**
      * Constructor for (key, value)
+     * 
      * @param key String with the key
      * @param value String with the value
      */
-
     public Metadata(String key, String value) {
         mJSONObject = new JSONObject();
         insert(key, value);
@@ -88,10 +86,10 @@ public class Metadata {
      * pass arrays with the correct sizes. They are corresponding, meaning
      * key[0] goes with value[0].
      * Read it as: metadata[key(i)] = value(i)
-     * @param key Array of keys
+     * 
+     * @param key   Array of keys
      * @param value Array of values
      */
-
     public Metadata(String[] key, String[] value) {
         mJSONObject = new JSONObject();
 
@@ -115,35 +113,21 @@ public class Metadata {
 
     /**
      * Inserts a (key,value) to the JSON Object
-     * @param key String with key
-     * @param value Object with value
-     * @return true  if value was inserted
-     *         false if value was not inserted
+     * 
+     * @param key    String with key
+     * @param value  Object with value
+     * @return       true  if value was inserted
+     *               false if value was not inserted
      */
-
+    @SuppressWarnings("unchecked")
     public boolean insert(String key, Object value) {
         if (key == null) {
             Log.d(TAG, "Tried to use a null key on insert()");
             return false;
         }
 
-        try {
-//            mJSONObject.accumulate(URLEncoder.encode(key, "UTF-8"), URLEncoder.encode(value, "UTF-8"));
-            mJSONObject.accumulate(key, value);
-        }
-        catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Failed to insert JSON Object, (" + key + ", " + value +")");
-            Log.d(TAG, "Error: " + e.toString());
-            e.printStackTrace();
-            return false;
-        }
-//        catch (UnsupportedEncodingException e) {
-//            Log.d(TAG, "Failed to encode (" + value + ")");
-//            Log.d(TAG, "Error: " + e.toString());
-//            e.printStackTrace();
-//            return false;
-//        }
+        // actual insert
+        mJSONObject.put(key, value);
 
         return true;
     }
@@ -154,7 +138,6 @@ public class Metadata {
      * @return Value if it exists
      *         null  if things go wrong
      */
-
     public String get(String key) {
         if (key == null) {
             Log.d(TAG, "Tried to use a null key on get()");
@@ -164,75 +147,41 @@ public class Metadata {
         if (mJSONObject == null)
             return null;
 
-        try {
-        	return mJSONObject.get(key).toString();
-        	//jsonString.replaceAll("\\","");
-            //return jsonString;
-        }
-        catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Failed to retrieve JSON Object, (" + key + ")");
-            Log.d(TAG, "Error:" + e.toString());
-            e.printStackTrace();
-        }
-
-        return null;
+        return mJSONObject.get(key).toString();
     }
 
+    // TODO: Beautify printing of JSON String.
     /**
      * Converts JSON Object to a FORMATTED string
-     * @return formatted string
+     * @return Formatted string
      */
-
     public String convertToString() {
-        try {
-            return mJSONObject.toString(4);
-        }
-        catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Failed to get convert JSON Object to string.");
-            Log.d(TAG, e.toString());
-            e.printStackTrace();
-            return null;
-        }
+        return mJSONObject.toString();
     }
 
     /**
      * Creates a JSON string with the key "meta"
      * set to the JSON string representation of the metadata.
+     * 
      * @return The JSON string
      */
+    @SuppressWarnings("unchecked")
     public String convertToMetadataString() {
-        try {
-            JSONObject meta = new JSONObject();
-            meta.put("meta", mJSONObject);
-            return meta.toString(4);
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            Log.d(TAG, "Failed to get convert JSON Object to string.");
-            Log.d(TAG, e.toString());
-            e.printStackTrace();
-            return null;
-        }
+        JSONObject meta = new JSONObject();
+        // TODO: check if this still works under json.simple
+        meta.put("meta", mJSONObject);
+
+        return meta.toString();
     }
 
     /**
      * Cleans the JSONObject
      */
-
     public void clear() {
-        Iterator<?> it = mJSONObject.keys();
-        while (it.hasNext()) {
-            it.next();
-            it.remove();
-        }
+        mJSONObject.clear();
     }
-
-    // TODO: Either keep this or fix the server code.
-    public String remove_brackets(String str) {
-        // TODO Auto-generated method stub
-        Log.d(TAG, "str " + str);
-        Log.d(TAG, "return: " + str.substring(str.indexOf("\"")+1, str.indexOf("\"", str.length()-6)));
-        return str.substring(str.indexOf("\"")+1, str.indexOf("\"", str.length()-6));
+    
+    public JSONObject getJSONObject() {
+        return mJSONObject;
     }
 }
