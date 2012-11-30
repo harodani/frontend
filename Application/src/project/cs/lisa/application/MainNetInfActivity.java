@@ -185,16 +185,6 @@ public class MainNetInfActivity extends Activity {
 
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
-                mEditText.setText(intent.getStringExtra("url"));
-            }
-        }
-    };
-
     private class WifiDialogListener implements DialogInterface.OnClickListener {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -324,10 +314,14 @@ public class MainNetInfActivity extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
-                    String newUrl = (String) intent.getExtras().get("url");
+                    String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
                     mEditText.setText(newUrl);
-
+                    
+                } else if (action.equals(NetInfWebViewClient.FINISHED_LOADING_PAGE)) {
+                    mSpinningBar.setVisibility(View.INVISIBLE);
+                    
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
                 }
