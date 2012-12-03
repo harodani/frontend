@@ -47,6 +47,16 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
     /** Hash Algorithm. */
     private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
 
+    /** Web view to disply the web page. */
+    private WebView mWebView;
+    
+    /**
+     * Default constructor.
+     */
+    public FetchWebPageTask(WebView webView) {
+        mWebView = webView;
+    }
+
     /**
      * Retrieves and displays a web page.
      * @param urls
@@ -66,38 +76,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         Log.d(TAG, "Searching and retrieving " + urls[0].toString());
         searchRetrieveDisplay(urls[0]).execute();
         return null;
-    }
-
-    /**
-     * Creates a new task that downloads and displays a URL.
-     * @param url
-     *      The URL to download
-     * @return
-     *      The created task
-     */
-    private DownloadWebObject downloadAndDisplay(final URL url) {
-        return new DownloadWebObject() {
-            @Override
-            protected void onPostExecute(WebObject webObject) {
-
-                if (webObject == null) {
-                    MainNetInfActivity.showToast("Download failed. Check internet connection.");
-                    return;
-                }
-
-                File file = webObject.getFile();
-                String hash = webObject.getHash();
-                String contentType = webObject.getContentType();
-
-                displayWebpage(file);
-                try {
-                    publish(file, url, hash, contentType).execute();
-                } catch (IOException e) {
-                    Log.e(TAG, "Could not publish file.");
-                    e.printStackTrace();
-                }
-            }
-        };
     }
 
     /**
@@ -161,6 +139,38 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     downloadAndDisplay(url).execute(url);
                 }
 
+            }
+        };
+    }
+
+    /**
+     * Creates a new task that downloads and displays a URL.
+     * @param url
+     *      The URL to download
+     * @return
+     *      The created task
+     */
+    private DownloadWebObject downloadAndDisplay(final URL url) {
+        return new DownloadWebObject() {
+            @Override
+            protected void onPostExecute(WebObject webObject) {
+
+                if (webObject == null) {
+                    MainNetInfActivity.showToast("Download failed. Check internet connection.");
+                    return;
+                }
+
+                File file = webObject.getFile();
+                String hash = webObject.getHash();
+                String contentType = webObject.getContentType();
+
+                displayWebpage(file);
+                try {
+                    publish(file, url, hash, contentType).execute();
+                } catch (IOException e) {
+                    Log.e(TAG, "Could not publish file.");
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -249,8 +259,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         }
         try {
             String result = FileUtils.readFileToString(webPage);
-            WebView webView = (WebView) MainNetInfActivity.getActivity().findViewById(R.id.webView);
-            webView.loadDataWithBaseURL(result, result, "text/html", null, null);
+            mWebView.loadDataWithBaseURL(result, result, "text/html", null, null);
         } catch (IOException e) {
             MainNetInfActivity.showToast("Could not load web page.");
         }

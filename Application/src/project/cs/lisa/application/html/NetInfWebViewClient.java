@@ -4,8 +4,14 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONObject;
 
 import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.http.NetInfResponse;
+import project.cs.lisa.application.http.NetInfSearch;
+import project.cs.lisa.application.http.NetInfSearchResponse;
+import project.cs.lisa.application.http.RequestFailedException;
+import project.cs.lisa.util.UProperties;
 import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
@@ -26,6 +32,12 @@ public class NetInfWebViewClient extends WebViewClient {
 
     /** The url extra field for the intent for URL updates. */
     public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
+
+    /** NetInf Restlet Address. */
+    private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
+
+    /** NetInf Restlet Port. */
+    private static final String PORT = UProperties.INSTANCE.getPropertyWithName("access.http.port");
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -62,6 +74,14 @@ public class NetInfWebViewClient extends WebViewClient {
         } else if (url.startsWith("http")) {
             WebResourceResponse resource = null;
             try {
+                // 1. search
+                // 2. retrieve
+                // 3. publish
+                
+                String hash = search(url);
+                String filePath = retrieve(hash);
+                publish();
+                
                 resource = new WebResourceResponse("image/jpg", "base64",
                         FileUtils.openInputStream(new File(Environment.getExternalStorageDirectory() + "/cat.jpg")));
             } catch (IOException e) {
@@ -75,4 +95,44 @@ public class NetInfWebViewClient extends WebViewClient {
             return super.shouldInterceptRequest(view, url);
         }
     }
+    
+    private String search(String url) {
+        
+        String hash = null;
+        NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty") {
+            @Override
+            public void onPostExecute(NetInfResponse response) {
+                NetInfSearchResponse search = (NetInfSearchResponse) response;
+                
+                try {
+                    // Assume search succeeded, select a hash from the results and retrieve it
+                    hash = selectHash(search);
+                } catch (RequestFailedException e) {
+                    // If the search failed for any reason, use uplink
+                    Log.e(TAG, "Downloading web page because search failed: " + search.getStatus());
+                }
+                
+            }
+        };
+        
+        search.execute();
+        return hash;
+
+    }
+    
+    /**
+     * Selects an appropriate hash to download from a search result.
+     * @param search
+     *      The response to a NetInf search request
+     * @return
+     *      The selected hash
+     * @throws RequestFailedException
+     *      In case the seach failed
+     */
+    private String selectHash(NetInfSearchResponse search) throws RequestFailedException {
+        JSONObject firstResult = (JSONObject) search.getSearchResults().get(0);
+        String address = (String) firstResult.get("ni");
+        return address.split(";")[1];
+    }
+
 }

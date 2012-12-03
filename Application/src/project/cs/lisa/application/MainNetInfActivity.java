@@ -141,7 +141,7 @@ public class MainNetInfActivity extends Activity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // START THE SEARCH AND LOAD THE PAGE
+                    startFetchingWebPage();
                     return true;
                 }
                 return false;
@@ -159,7 +159,7 @@ public class MainNetInfActivity extends Activity {
                 case R.drawable.refresh:
                     img.setImageResource(R.drawable.cancel);
                     img.setTag(R.drawable.cancel);
-                    // loadPage();
+                    startFetchingWebPage();
                     break;
                 case R.drawable.cancel:
                     img.setImageResource(R.drawable.refresh);
@@ -235,9 +235,10 @@ public class MainNetInfActivity extends Activity {
 
     /**
      * Try to fetch the requested web page.
+     * Called when the user opens a web page.
      * @param v The view that triggered this method
      */
-    public final void goButtonClicked(final View v) {
+    public final void startFetchingWebPage() {
 
         // get the web page address
         EditText editText = (EditText) findViewById(R.id.url);
@@ -254,8 +255,7 @@ public class MainNetInfActivity extends Activity {
         InputMethodManager imm =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        WebView webView = (WebView) findViewById(R.id.webView);
-        webView.requestFocus();
+        mWebView.requestFocus();
 
         if (!addressIsValid(url.toString())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -267,7 +267,7 @@ public class MainNetInfActivity extends Activity {
 
         } else {
             // start downloading the web page
-            FetchWebPageTask task = new FetchWebPageTask();
+            FetchWebPageTask task = new FetchWebPageTask(mWebView);
             task.execute(url);
         }
     }
