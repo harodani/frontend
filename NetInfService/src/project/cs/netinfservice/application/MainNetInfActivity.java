@@ -28,7 +28,6 @@ package project.cs.netinfservice.application;
 
 import java.io.IOException;
 
-import project.cs.netinfservice.R;
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import android.app.Activity;
@@ -38,8 +37,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -59,10 +59,10 @@ public class MainNetInfActivity extends Activity {
 
     /** Preference file. */
     private static final String PREF_FILE = "NetInfServicePrefsFile";
-    
+
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
-    
+
     /** Thread for staring a NetInf node. */
     private StarterNodeThread mStarterNodeThread;
 
@@ -74,24 +74,79 @@ public class MainNetInfActivity extends Activity {
 
     /** The filter for choosing what actions the broadcast receiver will catch. */
     private IntentFilter mIntentFilter;
-    
-    /** Activity */
+
+    /** Activity. */
     private static MainNetInfActivity sMainNetInfActivity;
-    
+
+
+    private OnSharedPreferenceChangeListener mListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(
+                SharedPreferences sharedPreferences, String key) {
+            if (key.equals("pref_key_bluetooth")) {
+                if (sharedPreferences.getBoolean(key, false)) {
+                    startBluetoothServer();
+                } else {
+                    stopBluetoothServer();
+                }
+            }
+        }
+    };
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
-        
-        createPreferenceFile();
-        
-        setContentView(R.layout.activity_main);
+
+        sMainNetInfActivity = this;
+
+        PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .registerOnSharedPreferenceChangeListener(mListener);
 
         // Turn on the Bluetooth server if Bluetooth is enabled
+        startBluetoothServer();
+
+        // Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
+        setUpBroadcastReceiver();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
+
+        setupNode();
+
+        // Display the settings fragment as the main content.
+        // setContentView(R.layout.activity_main);
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new SettingsFragment())
+                .commit();
+
+        /*
+         * Set up some notification depending on the connection: colors.
+         * Ask Paolo, he knows.
+         */
+    }
+
+    /**
+     * Stops the Bluetooth server.
+     */
+    private void stopBluetoothServer() {
+        Log.d(TAG, "Stopping Bluetooth server");
+        if (mBluetoothServer != null && mBluetoothServer.isAlive()) {
+            mBluetoothServer.cancel();
+        }
+    }
+
+    /**
+     * Starts the Bluetooth server.
+     */
+    private void startBluetoothServer() {
+        Log.d(TAG, "Starting Bluetooth server");
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             showToast("No Bluetooh adapter available.");
-            /* TODO: Disable Bluetooth services: Server, Provider, change Share option regarding fullput,
+            /* TODO: Disable Bluetooth services:
+             * Server, Provider, change Share option regarding fullput,
              * do not add device as locator.
              */
         } else {
@@ -104,30 +159,9 @@ public class MainNetInfActivity extends Activity {
                 }
             }
         }
-
-        // Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
-        setUpBroadcastReceiver();
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
-
-        sMainNetInfActivity = this;
-        
-        setupNode();
-
-        /*
-         * Set up some notification depending on the connection: colors.
-         * Ask Paolo, he knows.
-         */
     }
 
-    private void createPreferenceFile() {
-    	SharedPreferences prefs = getSharedPreferences(PREF_FILE, MODE_WORLD_WRITEABLE);
-    	Editor editor = prefs.edit();
-    	editor.commit();
-	}
-
-	/**
+    /**
      * Initialize and run the StarterNodeThread.
      */
     private void setupNode() {
@@ -151,18 +185,10 @@ public class MainNetInfActivity extends Activity {
                             BluetoothAdapter.ERROR);
                     switch (state) {
                     case BluetoothAdapter.STATE_ON:
-                        try {
-                            mBluetoothServer = new BluetoothServer();
-                            mBluetoothServer.start();
-                        } catch (IOException e) {
-                            Log.e(TAG, e.getMessage());
-                        }
+                        startBluetoothServer();
                         break;
                     case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "Bluetooth adapter is turned off.");
-                        if (mBluetoothServer != null && mBluetoothServer.isAlive()) {
-                            mBluetoothServer.cancel();
-                        }
+                        stopBluetoothServer();
                         break;
                     default:
                         // We don't care of any other states.
@@ -180,12 +206,12 @@ public class MainNetInfActivity extends Activity {
     public void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
-    
+
     /**
      * Return an instance of this activity.
      * @return the activity
      */
     public static MainNetInfActivity getActivity() {
-    	return sMainNetInfActivity;
+        return sMainNetInfActivity;
     }
 }

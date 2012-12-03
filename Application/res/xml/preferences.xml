@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory 
-        android:title="@string/settings_sharing"
-        android:key="pref_key_sharing">
-       	<SwitchPreference
-       	    android:key="pref_key_fullput"
-       	    android:title="@string/settings_fullput"
-       	    android:summaryOn="@string/fullput_summary_on"
-       	    android:summaryOff="@string/fullput_summary_off"       	    
-       	    android:defaultValue="true"/>
-       	 <SwitchPreference
-       	    android:key="pref_key_share"
-       	    android:title="@string/settings_share"
-       	    android:summaryOn="@string/sharing_summary_on"
-       	    android:summaryOff="@string/sharing_summary_off"
-       	    android:defaultValue="true"/>     	
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="pref_key_sharing"
+        android:title="@string/sharing_category" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_publish"
+            android:summaryOff="@string/publish_summary_off"
+            android:summaryOn="@string/publish_summary_on"
+            android:title="@string/publish_title" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_fullput"
+            android:summaryOff="@string/fullput_summary_off"
+            android:summaryOn="@string/fullput_summary_on"
+            android:title="@string/fullput_title" />
     </PreferenceCategory>
-    <PreferenceCategory 
-        android:title="@string/settings_nrs_category"
-        android:key="pref_key_nrs">
-       	<Preference    	
-       	    android:key="pref_key_nrs"
-       	    android:title="@string/settings_nrs">
-       	    <intent 
-       	        android:action="project.cs.netinfservice.PREFERENCES"
-       	        android:targetPackage="project.cs.netinfservice"
-       	        android:targetClass="project.cs.netinfservice.application.SettingsActivity"/>
-       	</Preference>
+    
+    <PreferenceCategory
+        android:key="pref_key_nrs"
+        android:title="@string/netinf_category" >
+        <Preference
+            android:key="pref_key_nrs"
+            android:title="@string/netinf_title" >
+            <intent
+                android:action="project.cs.netinfservice.PREFERENCES"
+                android:targetClass="project.cs.netinfservice.application.SettingsActivity"
+                android:targetPackage="project.cs.netinfservice" />
+        </Preference>
     </PreferenceCategory>
+
 </PreferenceScreen>

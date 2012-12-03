@@ -10,7 +10,6 @@ import org.json.simple.JSONObject;
 
 import project.cs.lisa.R;
 import project.cs.lisa.application.MainNetInfActivity;
-import project.cs.lisa.application.SettingsActivity;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.application.http.NetInfResponse;
@@ -26,8 +25,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.webkit.WebView;
 
 /**
@@ -94,13 +91,22 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 displayWebpage(file);
                 try {
-                    publish(file, url, hash, contentType).execute();
+                    if (shouldPublish()) {
+                        publish(file, url, hash, contentType).execute();
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "Could not publish file.");
                     e.printStackTrace();
                 }
             }
         };
+    }
+
+    private boolean shouldPublish() {
+        // Check for publish
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
+        return prefs.getBoolean("pref_key_publish", false);
     }
 
     /**
@@ -155,7 +161,9 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     // Assume retrieve succedded, display page and publish
                     displayWebpage(retrieve.getFile());
                     try {
-                        publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                        if (shouldPublish()) {
+                            publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                        }
                     } catch (IOException e) {
                         MainNetInfActivity.showToast(e.getMessage());
                     }
@@ -217,7 +225,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
             Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
-            
+
             if (isFullPutAvailable) {
                 publishRequest.setFile(file);
             }

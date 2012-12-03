@@ -69,7 +69,7 @@ public class MainNetInfActivity extends Activity {
 
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
-    
+
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
 
@@ -81,34 +81,34 @@ public class MainNetInfActivity extends Activity {
 
     /** The menu. */
     private Menu menu;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initializing the browser.");
-        
+
         Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
         startActivity(LaunchIntent);
-        
+
         setContentView(R.layout.activity_main);
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
 
-//        setupWifi();
+        //        setupWifi();
         setupBluetoothAvailability();
         /*
-         * TODO: Make sure that nothing happens when Netinf node doesn't start. 
+         * TODO: Make sure that nothing happens when Netinf node doesn't start.
          * Find a way to communicate between this activity and the netinf activity.
-         */  
+         */
         setupBroadcastReceiver();
 
         // Get the input address
         EditText editText = (EditText) findViewById(R.id.url);
         editText.setText(UProperties.INSTANCE.getPropertyWithName("default.webpage"));
 
-//        showDialog(new ShareDialog());
-        
+        //        showDialog(new ShareDialog());
+
 
     }
 
@@ -121,33 +121,33 @@ public class MainNetInfActivity extends Activity {
                 "Wifi Information",
                 getString(R.string.dialog_wifi_msg),
                 new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "doPositiveClickWifiInfoMessage()");
-
-                // This is run when OK is clicked
-                // Create a WifiHandler
-                WifiHandler wifiHandler = new WifiHandler() {
                     @Override
-                    public void onDiscoveryDone(Set<String> wifis) {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "doPositiveClickWifiInfoMessage()");
 
-                        // This is run when the WIFI discovery is done
-                        // Create a ListDialog that shows the networks
-                        ListDialog listDialog = new ListDialog(wifis) {
+                        // This is run when OK is clicked
+                        // Create a WifiHandler
+                        WifiHandler wifiHandler = new WifiHandler() {
                             @Override
-                            public void onConfirm(String wifi) {
+                            public void onDiscoveryDone(Set<String> wifis) {
 
-                                // This is run when the ListDialog is confirmed
-                                connectToSelectedNetwork(wifi);
+                                // This is run when the WIFI discovery is done
+                                // Create a ListDialog that shows the networks
+                                ListDialog listDialog = new ListDialog(wifis) {
+                                    @Override
+                                    public void onConfirm(String wifi) {
+
+                                        // This is run when the ListDialog is confirmed
+                                        connectToSelectedNetwork(wifi);
+                                    }
+                                };
+                                showDialog(listDialog);
                             }
                         };
-                        showDialog(listDialog);
+                        // Start WifiHandler discovery
+                        wifiHandler.startDiscovery();
                     }
-                };
-                // Start WifiHandler discovery
-                wifiHandler.startDiscovery();
-            }
-        }));
+                }));
     }
 
     /**
@@ -219,18 +219,15 @@ public class MainNetInfActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.menu_publish_file:
-            item.setChecked(item.isChecked() ? false : true);
-            break;
-        case R.id.menu_settings:
-        	Intent settingsIntent = new Intent(this,SettingsActivity.class);
-        	startActivity(settingsIntent);
-        default:
-            break;
+            case R.id.menu_settings:
+                Intent settingsIntent = new Intent(this,SettingsActivity.class);
+                startActivity(settingsIntent);
+            default:
+                break;
         }
         return true;
     }
-    
+
     /**
      * Receives messages from the StarterNodeThread when the node is starter.
      * Right now it does not do anything. Just log
@@ -283,7 +280,7 @@ public class MainNetInfActivity extends Activity {
         Log.d(TAG, "cancelToast()");
         sToast.cancel();
     }
-    
+
     public Menu getMenu() {
         return menu;
     }
