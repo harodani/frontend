@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 
 import project.cs.lisa.R;
 import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.SettingsActivity;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.application.http.NetInfResponse;
@@ -21,7 +22,9 @@ import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -211,9 +214,11 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             publishRequest.setMetadata(metadata);
 
             // Check for fullput
-            Menu menu = (Menu) MainNetInfActivity.getActivity().getMenu();
-            MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
-            if (fullPut.isChecked()) {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
+            boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
+            Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
+            
+            if (isFullPutAvailable) {
                 publishRequest.setFile(file);
             }
 

@@ -27,11 +27,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.restlet.resource.Get;
 
+import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.netinf.access.rest.resources.LisaServerResource;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.util.UProperties;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.inject.Injector;
@@ -63,6 +66,13 @@ public class SearchRequest extends LisaServerResource {
     /** Message ID string. **/
     private String mMsgId;
 
+    
+    /** Key for accessing the NRS IP. */
+	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+	/** Key for accessing the NRS Port. */
+	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+    
+    
     // TODO: Remove search into a better place.
     // TODO: Hey, I said 'throw away netinf model'. Bad sentence.
     @Override
@@ -94,10 +104,10 @@ public class SearchRequest extends LisaServerResource {
     private HttpPost createSearch(String msgId, String tokens, String ext)
             throws UnsupportedEncodingException {
         Log.d(TAG, "createSearch()");      
-        Log.d(TAG, "Creating search to send to " + mHost + ":" + mPort);
+        Log.d(TAG, "Creating search to send to " + getHost() + ":" + getPort());
         
         // POST
-        HttpPost post = new HttpPost(mHost + ":" + mPort + "/netinfproto/search");
+        HttpPost post = new HttpPost(getHost() + ":" + getPort() + "/netinfproto/search");
 
         // URI
         String completeUri = "?msgid=" + msgId  + "&tokens=" + tokens + "&ext=" + ext;
@@ -369,4 +379,30 @@ public class SearchRequest extends LisaServerResource {
         return msgId;
     }
 
+    /**
+     * Get the NRS Address.
+     * @return the IP Address of the NRS
+     */
+    private String getHost() {
+    	SharedPreferences sharedPreferences = 
+    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+    	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
+    	return mHost;
+
+	}
+    
+    
+    
+    /**
+     * Get the NRS port.
+     * @return the port of the NRS
+     */
+    private String getPort() {
+    	SharedPreferences sharedPreferences = 
+    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+		mPort  = sharedPreferences.getString(PREF_KEY_NRS_PORT, mPort);
+		return mPort;
+
+	}
+    
 }
