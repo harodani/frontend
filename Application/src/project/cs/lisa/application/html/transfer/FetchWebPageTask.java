@@ -217,11 +217,8 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
             Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
-            /*
-            Menu menu = (Menu) MainNetInfActivity.getActivity().getMenu();
-            MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
-            */
-            if (isFullPutAvailable/*fullPut.isChecked()*/) {
+            
+            if (isFullPutAvailable) {
                 publishRequest.setFile(file);
             }
 

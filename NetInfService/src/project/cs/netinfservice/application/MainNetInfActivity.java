@@ -37,6 +37,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -55,9 +57,12 @@ public class MainNetInfActivity extends Activity {
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
 
+    /** Preference file. */
+    private static final String PREF_FILE = "NetInfServicePrefsFile";
+    
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
-
+    
     /** Thread for staring a NetInf node. */
     private StarterNodeThread mStarterNodeThread;
 
@@ -69,11 +74,17 @@ public class MainNetInfActivity extends Activity {
 
     /** The filter for choosing what actions the broadcast receiver will catch. */
     private IntentFilter mIntentFilter;
-
+    
+    /** Activity */
+    private static MainNetInfActivity sMainNetInfActivity;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
+        
+        createPreferenceFile();
+        
         setContentView(R.layout.activity_main);
 
         // Turn on the Bluetooth server if Bluetooth is enabled
@@ -100,6 +111,8 @@ public class MainNetInfActivity extends Activity {
         mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
 
+        sMainNetInfActivity = this;
+        
         setupNode();
 
         /*
@@ -109,7 +122,13 @@ public class MainNetInfActivity extends Activity {
 
     }
 
-    /**
+    private void createPreferenceFile() {
+    	SharedPreferences prefs = getSharedPreferences(PREF_FILE, MODE_WORLD_WRITEABLE);
+    	Editor editor = prefs.edit();
+    	editor.commit();
+	}
+
+	/**
      * Initialize and run the StarterNodeThread.
      */
     private void setupNode() {
@@ -161,5 +180,13 @@ public class MainNetInfActivity extends Activity {
      */
     public void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+    
+    /**
+     * Return an instance of this activity.
+     * @return the activity
+     */
+    public static MainNetInfActivity getActivity() {
+    	return sMainNetInfActivity;
     }
 }
