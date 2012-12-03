@@ -2,12 +2,17 @@ package project.cs.lisa.application.html;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
 import project.cs.lisa.application.MainNetInfActivity;
 import project.cs.lisa.application.http.NetInfResponse;
+import project.cs.lisa.application.http.NetInfRetrieve;
+import project.cs.lisa.application.http.NetInfRetrieveResponse;
 import project.cs.lisa.application.http.NetInfSearch;
 import project.cs.lisa.application.http.NetInfSearchResponse;
 import project.cs.lisa.application.http.RequestFailedException;
@@ -23,6 +28,14 @@ public class NetInfWebViewClient extends WebViewClient {
     
     /** Debugging tag. */
     private static final String TAG = "NetInfWebViewClient";
+    
+    /** Timeout for searching. */
+    private static final int SEARCH_TIMEOUT = 
+    		Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfsearch"));
+
+    /** Timeout for retrieve. */
+    private static final int RETRIEVE_TIMEOUT = 
+    		Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfretrieve"));
 
     /** Message indicator for a URL change (i.e. a link was clicked). */
     public static final String URL_WAS_UPDATED = "new_url";
@@ -38,6 +51,9 @@ public class NetInfWebViewClient extends WebViewClient {
 
     /** NetInf Restlet Port. */
     private static final String PORT = UProperties.INSTANCE.getPropertyWithName("access.http.port");
+    
+    /** Hash Algorithm. */
+    private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -74,11 +90,8 @@ public class NetInfWebViewClient extends WebViewClient {
         } else if (url.startsWith("http")) {
             WebResourceResponse resource = null;
             try {
-                // 1. search
-                // 2. retrieve
-                // 3. publish
-                
-                String hash = search(url);
+
+            	String hash = search(url);
                 String filePath = retrieve(hash);
                 publish();
                 
@@ -96,26 +109,58 @@ public class NetInfWebViewClient extends WebViewClient {
         }
     }
     
+    private File retrieve(String hash) {
+
+    	File file = null;
+    	NetInfRetrieve retrieve = new NetInfRetrieve(HOST, PORT, HASH_ALG, hash);
+    	retrieve.execute();
+    	
+		try {
+			NetInfRetrieveResponse response = (NetInfRetrieveResponse) retrieve.get(RETRIEVE_TIMEOUT, TimeUnit.MILLISECONDS);
+			file = response.getFile();
+		} catch (InterruptedException e) {
+			Log.e(TAG, "Timeout was interrupted. Retrieve didn't finish.");
+			hash = null;
+		} catch (ExecutionException e) {
+			Log.e(TAG, "Retrieve failed.");
+			hash = null;
+		} catch (TimeoutException e) {
+			Log.e(TAG, "Retrieve for object timed out.");
+			hash = null;
+		} catch (RequestFailedException e) {
+			Log.e(TAG, "Retrieve failed.");
+			hash = null;
+		}
+		return file;
+	}
+
+	/**
+     * Search for a URL and return a selected hash if one was found or null.
+     * @param url The URL pointing to the resource in a web view.
+     * @return The hash corresponding to the URL.
+     */
     private String search(String url) {
         
         String hash = null;
-        NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty") {
-            @Override
-            public void onPostExecute(NetInfResponse response) {
-                NetInfSearchResponse search = (NetInfSearchResponse) response;
-                
-                try {
-                    // Assume search succeeded, select a hash from the results and retrieve it
-                    hash = selectHash(search);
-                } catch (RequestFailedException e) {
-                    // If the search failed for any reason, use uplink
-                    Log.e(TAG, "Downloading web page because search failed: " + search.getStatus());
-                }
-                
-            }
-        };
+        NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty");
         
         search.execute();
+        try {
+			NetInfSearchResponse response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
+			hash = selectHash(response);
+		} catch (InterruptedException e) {
+			Log.e(TAG, "Timeout was interrupted. Searching didn't finish.");
+			hash = null;
+		} catch (ExecutionException e) {
+			Log.e(TAG, "Search failed.");
+			hash = null;
+		} catch (TimeoutException e) {
+			Log.e(TAG, "Searching for object timed out.");
+			hash = null;
+		} catch (RequestFailedException e) {
+			Log.e(TAG, "Search failed.");
+			hash = null;
+		}
         return hash;
 
     }
@@ -127,7 +172,7 @@ public class NetInfWebViewClient extends WebViewClient {
      * @return
      *      The selected hash
      * @throws RequestFailedException
-     *      In case the seach failed
+     *      In case the search failed
      */
     private String selectHash(NetInfSearchResponse search) throws RequestFailedException {
         JSONObject firstResult = (JSONObject) search.getSearchResults().get(0);
