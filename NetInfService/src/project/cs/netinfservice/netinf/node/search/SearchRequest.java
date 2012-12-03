@@ -44,6 +44,9 @@ public class SearchRequest extends LisaServerResource {
     /** Debug Tag. */
     private static final String TAG = "SearchRequest";
 
+    /** HTTP Scheme. */
+    private static final String HTTP = "http://";
+    
     /** NRS IP address. **/
     private String mHost;
     
@@ -104,10 +107,10 @@ public class SearchRequest extends LisaServerResource {
     private HttpPost createSearch(String msgId, String tokens, String ext)
             throws UnsupportedEncodingException {
         Log.d(TAG, "createSearch()");      
-        Log.d(TAG, "Creating search to send to " + getHost() + ":" + getPort());
+        Log.d(TAG, "Creating search to send to " + HTTP + getHost() + ":" + getPort());
         
         // POST
-        HttpPost post = new HttpPost(getHost() + ":" + getPort() + "/netinfproto/search");
+        HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/search");
 
         // URI
         String completeUri = "?msgid=" + msgId  + "&tokens=" + tokens + "&ext=" + ext;

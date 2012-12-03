@@ -97,7 +97,9 @@ implements ResolutionService {
     public static final String TAG = "NameResolutionService";
     /** Message ID random value max. **/
     public static final int MSG_ID_MAX = 100000000;
-
+    /** HTTP Scheme. */
+    private static final String HTTP = "http://";
+    
     /** NRS IP address. **/
     private String mHost;
     /** NRS port. **/
@@ -606,7 +608,7 @@ implements ResolutionService {
         String bluetoothMac = getBluetoothMac(io);
         String filePath     = getFilePath(io);
 
-        HttpPost post = new HttpPost(getHost() + ":" + getPort() + "/netinfproto/publish");
+        HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/publish");
 
         MultipartEntity entity = new MultipartEntity();
 
@@ -655,7 +657,7 @@ implements ResolutionService {
      */
     private HttpPost createGet(String uri) throws UnsupportedEncodingException {
 
-        HttpPost post = new HttpPost(getHost() + ":" + getPort() + "/netinfproto/get");
+        HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/get");
 
         String msgid = Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX));
         String ext = "no extension";

@@ -28,6 +28,7 @@ package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
 import project.cs.netinfservice.netinf.node.resolution.NameResolutionService;
+import project.cs.netinfservice.util.UProperties;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -58,8 +59,12 @@ public class SettingsFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.preferences);
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        findPreference(PREF_KEY_NRS_IP).setSummary(prefs.getString(PREF_KEY_NRS_IP, ""));
-        findPreference(PREF_KEY_NRS_PORT).setSummary(prefs.getString(PREF_KEY_NRS_PORT, ""));
+        findPreference(PREF_KEY_NRS_IP).setSummary(
+        		prefs.getString(PREF_KEY_NRS_IP,
+        		UProperties.INSTANCE.getPropertyWithName("nrs.http.host")));
+        findPreference(PREF_KEY_NRS_PORT).setSummary(
+        		prefs.getString(PREF_KEY_NRS_PORT,
+        		UProperties.INSTANCE.getPropertyWithName("nrs.http.port")));
         
     }
 	
