@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory 
+        android:title="@string/settings_nrs"
+        android:key="pref_key_nrs" >
+        <EditTextPreference 
+            android:key="pref_key_nrs_ip"
+            android:title="@string/settings_nrs_ip" />
+        <EditTextPreference 
+            android:key="pref_key_nrs_port"
+            android:title="@string/settings_nrs_port" />
+    </PreferenceCategory>
+</PreferenceScreen>
