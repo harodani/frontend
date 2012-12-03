@@ -2,6 +2,9 @@ package project.cs.lisa.application.html;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -9,7 +12,10 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
+import project.cs.lisa.R;
 import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.http.Locator;
+import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfRetrieve;
 import project.cs.lisa.application.http.NetInfRetrieveResponse;
@@ -17,9 +23,13 @@ import project.cs.lisa.application.http.NetInfSearch;
 import project.cs.lisa.application.http.NetInfSearchResponse;
 import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.util.UProperties;
+import project.cs.lisa.util.metadata.Metadata;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -85,20 +95,47 @@ public class NetInfWebViewClient extends WebViewClient {
          */
 
         if (!url.startsWith("http")) {
+        	Log.d(TAG, "Resource is already provided.");
             return null;
             
         } else if (url.startsWith("http")) {
+        	Log.d(TAG, "Try to retrieve resource from url.");
+        	File file = null;
+        	String contentType = null;
+        	
+        	// Get and publish resource
+			try {
+
+        	// Search for url
+        	NetInfSearchResponse searchResponse = search(url);
+        	if (searchResponse == null) 
+        		return null;
+        	
+        	// Get url data
+        	String hash;
+        	hash = selectHash(searchResponse);
+
+        	NetInfRetrieveResponse retrieveResponse = retrieve(hash);
+        	if (retrieveResponse == null)
+        		return null;
+   
+        	file = retrieveResponse.getFile();
+        	contentType = retrieveResponse.getContentType();
+   
+        	// Publish
+            publish(file, new URL(url), hash, contentType);
+            
+			} catch (RequestFailedException e1) {
+				Log.e(TAG, "Request for resource failed. Downloading from uplink.");
+				return null;
+			} catch (MalformedURLException e) {
+				Log.e(TAG, "Malformed URL for resource. Could not publish.");
+			}            
+			
             WebResourceResponse resource = null;
             try {
-
-            	String hash = search(url);
-                String filePath = retrieve(hash);
-                publish();
-                
-                resource = new WebResourceResponse("image/jpg", "base64",
-                        FileUtils.openInputStream(new File(Environment.getExternalStorageDirectory() + "/cat.jpg")));
+                resource = new WebResourceResponse(contentType, "base64", FileUtils.openInputStream(file));
             } catch (IOException e) {
-                e.printStackTrace();
                 Log.e("TAG", "Could not open file");
             }
 
@@ -109,60 +146,107 @@ public class NetInfWebViewClient extends WebViewClient {
         }
     }
     
-    private File retrieve(String hash) {
-
-    	File file = null;
-    	NetInfRetrieve retrieve = new NetInfRetrieve(HOST, PORT, HASH_ALG, hash);
-    	retrieve.execute();
-    	
-		try {
-			NetInfRetrieveResponse response = (NetInfRetrieveResponse) retrieve.get(RETRIEVE_TIMEOUT, TimeUnit.MILLISECONDS);
-			file = response.getFile();
-		} catch (InterruptedException e) {
-			Log.e(TAG, "Timeout was interrupted. Retrieve didn't finish.");
-			hash = null;
-		} catch (ExecutionException e) {
-			Log.e(TAG, "Retrieve failed.");
-			hash = null;
-		} catch (TimeoutException e) {
-			Log.e(TAG, "Retrieve for object timed out.");
-			hash = null;
-		} catch (RequestFailedException e) {
-			Log.e(TAG, "Retrieve failed.");
-			hash = null;
-		}
-		return file;
-	}
-
 	/**
      * Search for a URL and return a selected hash if one was found or null.
      * @param url The URL pointing to the resource in a web view.
      * @return The hash corresponding to the URL.
      */
-    private String search(String url) {
-        
-        String hash = null;
+    private NetInfSearchResponse search(String url) {
+    	NetInfSearchResponse response;
         NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty");
-        
         search.execute();
+        
         try {
-			NetInfSearchResponse response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
-			hash = selectHash(response);
+			response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			Log.e(TAG, "Timeout was interrupted. Searching didn't finish.");
-			hash = null;
+			return null;
 		} catch (ExecutionException e) {
 			Log.e(TAG, "Search failed.");
-			hash = null;
+			return null;
 		} catch (TimeoutException e) {
 			Log.e(TAG, "Searching for object timed out.");
-			hash = null;
-		} catch (RequestFailedException e) {
-			Log.e(TAG, "Search failed.");
-			hash = null;
+			return null;
 		}
-        return hash;
+        return response;
 
+    }
+
+    private NetInfRetrieveResponse retrieve(String hash) {
+
+    	NetInfRetrieveResponse response = null;
+    	NetInfRetrieve retrieve = new NetInfRetrieve(HOST, PORT, HASH_ALG, hash);
+    	retrieve.execute();
+    	
+		try {
+			response = (NetInfRetrieveResponse) retrieve.get(RETRIEVE_TIMEOUT, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			Log.e(TAG, "Timeout was interrupted. Retrieve didn't finish.");
+			return null;
+		} catch (ExecutionException e) {
+			Log.e(TAG, "Retrieve failed.");
+			return null;
+		} catch (TimeoutException e) {
+			Log.e(TAG, "Retrieve for object timed out.");
+			return null;
+		}
+		return response;
+	}
+
+    private NetInfPublish createPublishRequest(File file, URL url, String hash, String contentType)
+            throws IOException {
+
+        // Create metadata
+        Metadata metadata = new Metadata();
+        metadata.insert("filesize", String.valueOf(file.length()));
+        metadata.insert("filepath", file.getAbsolutePath());
+        metadata.insert("time", Long.toString(System.currentTimeMillis()));
+        metadata.insert("url", url.toString());
+
+        Log.d(TAG, "Trying to publish a new file.");
+
+        // Try to get the Bluetooth MAC
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null) {
+            throw new IOException("Error: Bluetooth not supported");
+        } else if (!adapter.isEnabled()) {
+            throw new IOException("Error: Bluetooth not enabled");
+        } else {
+            // Create Locator set to be used in the publish
+            HashSet<Locator> locators = new HashSet<Locator>();
+            locators.add(new Locator(Locator.Type.BLUETOOTH, adapter.getAddress()));
+
+            // Create the publish, adding locators, content type, and metadata
+            NetInfPublish publishRequest = new NetInfPublish(HOST, PORT, HASH_ALG, hash, locators);
+            publishRequest.setContentType(contentType);
+            publishRequest.setMetadata(metadata);
+
+            // Check for fullput
+            Menu menu = (Menu) MainNetInfActivity.getActivity().getMenu();
+            MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
+            if (fullPut.isChecked()) {
+                publishRequest.setFile(file);
+            }
+
+            return publishRequest;
+        }
+    }
+
+    /**
+     * Executes a NetInf publish request.
+     * @param file
+     * @param url
+     * @param hash
+     * @param contentType
+     */
+    private void publish(File file, URL url, String hash, String contentType) {
+    	NetInfPublish publish;
+		try {
+			publish = createPublishRequest(file, url, hash, contentType);
+			publish.execute();
+		} catch (IOException e) {
+			Log.e(TAG, "Something went wrong with publish this resource.");
+		}
     }
     
     /**
