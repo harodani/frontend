@@ -40,6 +40,9 @@ import netinf.node.resolution.ResolutionService;
 import netinf.node.resolution.ResolutionServiceSelector;
 import netinf.node.resolution.impl.ResolutionControllerImplWithoutSecurity;
 import netinf.node.resolution.impl.SimpleResolutionServiceSelector;
+import netinf.node.search.SearchController;
+import netinf.node.search.SearchService;
+import netinf.node.search.impl.SearchControllerImpl;
 import netinf.node.transfer.TransferController;
 import netinf.node.transfer.impl.TransferControllerImpl;
 
@@ -50,6 +53,7 @@ import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.access.rest.RESTAccessServer;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.netinf.node.resolution.NameResolutionService;
+import project.cs.netinfservice.netinf.node.search.SearchServiceSQLite;
 import project.cs.netinfservice.util.UProperties;
 import android.util.Log;
 
@@ -101,6 +105,13 @@ public class Module extends AbstractModule  {
 
         Log.d(TAG, "Binding 9");
         bind(IODatabaseFactory.class).toProvider(FactoryProvider.newFactory(IODatabaseFactory.class, IODatabase.class));
+
+        Log.d(TAG, "Binding 10");
+        bind(SearchServiceSQLite.class);
+
+        Log.d(TAG, "Binding 11");
+        bind(SearchController.class).to(SearchControllerImpl.class).in(Singleton.class);
+
     }
 
     /**
@@ -123,4 +134,11 @@ public class Module extends AbstractModule  {
 
         return (ResolutionService[]) ArrayUtils.addAll(nameResolutionService, localResolutionService);
     }
+
+    @Singleton
+    @Provides
+    SearchService[] provideSearchServices(SearchServiceSQLite searchServiceSQLite) {
+       return new SearchService[] { searchServiceSQLite };
+    }
+
 }

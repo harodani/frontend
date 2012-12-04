@@ -38,7 +38,7 @@ import org.restlet.routing.Router;
 
 import project.cs.netinfservice.netinf.access.rest.resources.BOResource;
 import project.cs.netinfservice.netinf.access.rest.resources.IOResource;
-import project.cs.netinfservice.netinf.node.search.SearchRequest;
+import project.cs.netinfservice.netinf.access.rest.resources.SearchResource;
 
 /**
  * Routes NetInf requests to the appropriate classes.
@@ -90,8 +90,8 @@ public class RESTApplication extends Application {
 			router.attach("/publish", IOResource.class);
 
 			router.attach("/retrieve", BOResource.class);
-			
-			router.attach("/search", SearchRequest.class);
+
+			router.attach("/search", SearchResource.class);
 
 			return router;
 		}
