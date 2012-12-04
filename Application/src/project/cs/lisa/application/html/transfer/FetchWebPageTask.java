@@ -259,7 +259,8 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         }
         try {
             String result = FileUtils.readFileToString(webPage);
-            mWebView.loadDataWithBaseURL(result, result, "text/html", null, null);
+            Log.d(TAG, result);
+            mWebView.loadData(result, "text/html; charset=utf-8", "UTF-8");
         } catch (IOException e) {
             MainNetInfActivity.showToast("Could not load web page.");
         }

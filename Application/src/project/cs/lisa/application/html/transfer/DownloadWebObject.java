@@ -28,11 +28,6 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
     /** The directory containing the published files. */
     private String mSharedFolder;
 
-    private URL mUrl;
-
-    private String contentType;
-
-
     public DownloadWebObject() {
         String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
         mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
@@ -43,7 +38,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         URL url = urls[0];
         WebObject webObject = null;
         try {
-            webObject = downloadWebPage(url);
+            webObject = downloadWebObject(url);
         } catch (IOException e) {
             Log.e(TAG, "Could not download web page from uplink.");
             e.printStackTrace();
@@ -66,15 +61,15 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
     }
 
     /**
-     * Downloads a web page and saves it to file.
+     * Downloads a web object and saves it to file.
      * @param url
-     *      The URL of the web page to download
+     *      The URL of the web object to download
      * @return
      *      A file containing the downloaded web page
      * @throws IOException
-     *      In case the web page could not be downloaded and saved
+     *      In case the web object could not be downloaded and saved
      */
-    private WebObject downloadWebPage(URL url) throws IOException {
+    private WebObject downloadWebObject(URL url) throws IOException {
 
         if (!isNetworkConnected()) {
             return null;

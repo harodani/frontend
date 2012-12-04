@@ -55,6 +55,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -131,6 +132,7 @@ public class MainNetInfActivity extends Activity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(NODE_STARTED_MESSAGE);
         mIntentFilter.addAction(NetInfWebViewClient.URL_WAS_UPDATED);
+        mIntentFilter.addAction(NetInfWebViewClient.FINISHED_LOADING_PAGE);
         registerReceiver(mBroadcastReceiver, mIntentFilter);
 
 
@@ -173,7 +175,8 @@ public class MainNetInfActivity extends Activity {
         });
 
         mWebView = (WebView) findViewById(R.id.webView);
-        //        mWebView.getSettings().setJavaScriptEnabled(true);
+        // mWebView: enable pinch zooming
+        mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAppCacheEnabled(true);
         mWebView.setWebViewClient(new NetInfWebViewClient());
 
@@ -241,10 +244,11 @@ public class MainNetInfActivity extends Activity {
     public final void startFetchingWebPage() {
 
         // get the web page address
-        EditText editText = (EditText) findViewById(R.id.url);
         URL url = null;
         try {
-            url = new URL(editText.getText().toString());
+        	String inputUrl = mEditText.getText().toString();
+        	url = new URL(URLUtil.guessUrl(inputUrl));
+        	mEditText.setText(url.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             showToast("Malformed url!");
@@ -254,7 +258,7 @@ public class MainNetInfActivity extends Activity {
         // Dismiss keyboard
         InputMethodManager imm =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
         mWebView.requestFocus();
 
         if (!addressIsValid(url.toString())) {
@@ -267,6 +271,7 @@ public class MainNetInfActivity extends Activity {
 
         } else {
             // start downloading the web page
+            mSpinningBar.setVisibility(View.VISIBLE);
             FetchWebPageTask task = new FetchWebPageTask(mWebView);
             task.execute(url);
         }
@@ -314,13 +319,17 @@ public class MainNetInfActivity extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                Log.d(TAG, "action was: " + action);
                 
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
                     String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
                     mEditText.setText(newUrl);
+                    startFetchingWebPage();                    
                     
                 } else if (action.equals(NetInfWebViewClient.FINISHED_LOADING_PAGE)) {
                     mSpinningBar.setVisibility(View.INVISIBLE);
+                    img.setImageResource(R.drawable.refresh);
+                    img.setTag(R.drawable.refresh);
                     
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");

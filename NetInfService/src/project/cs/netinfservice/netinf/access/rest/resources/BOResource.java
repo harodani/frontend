@@ -201,6 +201,7 @@ public class BOResource extends LisaServerResource {
 		// Set saving filename to the same filename as in metadata
 		String hash = io.getIdentifier().getIdentifierLabel(
 				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+		hash = hash.replaceAll("/", "\\/");
 		String filePath = Environment.getExternalStorageDirectory() 
 				+ UProperties.INSTANCE.getPropertyWithName("sharing.folder")
 				+ hash;

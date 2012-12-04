@@ -1,7 +1,7 @@
 <resources>
 
-    <string name="app_name">NetInfService</string>
-    <string name="title_activity">NetInfService</string>
+    <string name="app_name">Elephant</string>
+    <string name="title_activity">Elephant</string>
     
     <string name="settings_nrs">Name Resolution Service</string>
     <string name="settings_sharing">Sharing options</string>
