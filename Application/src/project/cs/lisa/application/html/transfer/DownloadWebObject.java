@@ -2,6 +2,7 @@ package project.cs.lisa.application.html.transfer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
@@ -86,7 +87,16 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         String contentType = representation.getMediaType().toString();
 
         // Create file and hash
-        byte[] bytes = IOUtils.toByteArray(representation.getStream());
+        Log.d(TAG, "crashing here: " + url.toString());
+        InputStream is = representation.getStream();
+        
+        byte[] bytes = null;
+        try {
+        	bytes = IOUtils.toByteArray(is);
+        } catch (NullPointerException e) {
+        	Log.e(TAG, "Error occured. Could not find the resource.");
+        	throw new IOException("Error occured. Could not find the resource.");
+        }
 
         String hash = hashContent(bytes);
         File file = new File(mSharedFolder + hash);
