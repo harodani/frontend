@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 
 /**
@@ -128,7 +129,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 try {
                     // Assume retrieve succedded, display page and publish
-                    displayWebpage(retrieve.getFile());
+                    displayWebpage(retrieve.getFile(), url.getHost());
                     try {
                         publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
                     } catch (IOException e) {
@@ -164,7 +165,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                 String hash = webObject.getHash();
                 String contentType = webObject.getContentType();
 
-                displayWebpage(file);
+                displayWebpage(file, url.getHost());
                 try {
                     publish(file, url, hash, contentType).execute();
                 } catch (IOException e) {
@@ -251,16 +252,20 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      * @param webPage
      *      The web page
      */
-    private void displayWebpage(File webPage) {
+    private void displayWebpage(File webPage, String baseUrl) {
         if (webPage == null) {
             Log.d(TAG, "webPage == null");
             MainNetInfActivity.showToast("Could not download web page.");
             return;
         }
+        
         try {
+        	if (!URLUtil.isHttpsUrl(baseUrl)) {
+        		baseUrl = "http://" + baseUrl;
+        	}
+        	
             String result = FileUtils.readFileToString(webPage);
-            Log.d(TAG, result);
-            mWebView.loadData(result, "text/html; charset=utf-8", "UTF-8");
+            mWebView.loadDataWithBaseURL(baseUrl, result, "text/html", "UTF-8", null);
         } catch (IOException e) {
             MainNetInfActivity.showToast("Could not load web page.");
         }

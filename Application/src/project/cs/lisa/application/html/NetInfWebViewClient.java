@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.URLUtil;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -82,7 +83,6 @@ public class NetInfWebViewClient extends WebViewClient {
 	@Override
 	public void onPageFinished(WebView view, String url) {
 		super.onPageFinished(view, url);
-		Log.d(TAG, "Web view finished loading webpage: " + url);
 		Intent intent = new Intent(FINISHED_LOADING_PAGE);
 		MainNetInfActivity.getActivity().sendBroadcast(intent);
 	}
@@ -91,7 +91,7 @@ public class NetInfWebViewClient extends WebViewClient {
 	public WebResourceResponse shouldInterceptRequest(WebView view,
 			String url) {
 
-		Log.d(TAG, url);
+		Log.d(TAG, "Intercepting resource.");
 
 		/*
 		 * Ignore hashing raw data
@@ -101,8 +101,8 @@ public class NetInfWebViewClient extends WebViewClient {
                     new ByteArrayInputStream(array_raw));
 		 */
 
-		if (!url.startsWith("http")) {
-			Log.d(TAG, "Resource is already provided.");
+		if (!URLUtil.isHttpsUrl(url)) {
+			super.shouldInterceptRequest(view, url);
 			return null;
 
 		} else if (url.startsWith("http")) {
@@ -160,6 +160,8 @@ public class NetInfWebViewClient extends WebViewClient {
 			Log.e(TAG, "Unexpected url while intercepting resources.");
 			return super.shouldInterceptRequest(view, url);
 		}
+		
+
 	}
 
 	/**
