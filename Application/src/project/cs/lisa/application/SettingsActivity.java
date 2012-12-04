@@ -36,7 +36,7 @@ import android.os.Bundle;
  * @author Linus Sunde
  *
  */
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends BaseMenuActivity {
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {

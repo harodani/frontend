@@ -34,4 +34,23 @@
     <string name="sharing_summary_off">Bluetooth sharing disabled</string>
     <string name="settings_nrs_category">Name Resolution Service Settings</string>
     <string name="settings_nrs">Name Resolution Service</string>
+    
+    <string name="help">Help</string>
+    
+    <string name="help_share_title">Sharing Options</string>
+    <string name="help_share_text">Sharing improves your browsing experience using Bluetooth. Sharing therefore
+        requires Bluetooth to be enabled.</string>
+    
+    <string name="help_wifi_title">WiFi Connection</string>
+    <string name="help_wifi_text">The application requires a Name Resolution Service (NRS) 
+        to work. For this to be available, you need to be connected to the Wi-Fi network providing it.</string>
+        
+    <string name="help_fullput_title">Upload web pages</string>
+    <string name="help_fullput_text">When you upload the web pages that you have browsed, other users can
+        download them faster. Turn on or off this option in the settings menu.</string>
+        
+    <string name="help_nrs_title">Name Resolution Service</string>
+    <string name="help_nrs_text">The Name Resolution Service (NRS) is required for the application to work. 
+        You can change the connection to a new NRS in the settings menu.</string>
+        
 </resources>

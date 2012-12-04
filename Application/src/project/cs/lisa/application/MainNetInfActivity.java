@@ -65,7 +65,7 @@ import android.widget.Toast;
  * @author Linus Sunde
  *
  */
-public class MainNetInfActivity extends Activity {
+public class MainNetInfActivity extends BaseMenuActivity {
 
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
@@ -208,28 +208,7 @@ public class MainNetInfActivity extends Activity {
                 "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu()");
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        this.menu = menu;
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.menu_publish_file:
-            item.setChecked(item.isChecked() ? false : true);
-            break;
-        case R.id.menu_settings:
-        	Intent settingsIntent = new Intent(this,SettingsActivity.class);
-        	startActivity(settingsIntent);
-        default:
-            break;
-        }
-        return true;
-    }
+    
     
     /**
      * Receives messages from the StarterNodeThread when the node is starter.
