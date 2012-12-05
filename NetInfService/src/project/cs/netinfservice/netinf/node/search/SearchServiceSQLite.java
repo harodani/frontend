@@ -16,15 +16,34 @@ import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
+import android.util.Log;
 
 import com.google.inject.Inject;
 
+/**
+ * Enables search for a URL in the local SQLite DB and remote NRS.
+ * @author Linus Sunde
+ * @author Thiago Costa Porto
+ */
 public class SearchServiceSQLite implements SearchService {
 
+    /** Log Tag. */
+    private static final String TAG = "SearchServiceSQLite";
+
+    /** DatamodelFactory used to create identifiers. */
     private DatamodelFactory mDatamodelFactory;
+    /** The identity of a certain instance of this class. */
     private SearchServiceIdentityObject mIdentityObject;
+    /** The local SQLite DB. */
     private IODatabase mDatabase;
 
+    /**
+     * Creates a new instance of this class.
+     * @param datamodelFactory
+     *      The DatamodelFactory to use when creating identifiers
+     * @param databaseFactory
+     *      The IODatabaseFactory to use when accessing the local SQLite DB
+     */
     @Inject
     public SearchServiceSQLite(final DatamodelFactory datamodelFactory, IODatabaseFactory databaseFactory) {
         mDatamodelFactory = datamodelFactory;
@@ -73,12 +92,16 @@ public class SearchServiceSQLite implements SearchService {
             resultSet.add(identifier);
 
         } catch (DatabaseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            Log.w(TAG, e.getMessage() != null ? e.getMessage() : "Search in local db failed");
+
         }
 
-        searchController.handleSearchEvent(new SearchServiceResultEvent("search result of " + getIdentityObject().getName(), searchId,
-                searchIdentity, resultSet));
+        searchController.handleSearchEvent(new SearchServiceResultEvent(
+                "search result of " + getIdentityObject().getName(),
+                searchId,
+                searchIdentity,
+                resultSet));
 
     }
 
@@ -86,11 +109,15 @@ public class SearchServiceSQLite implements SearchService {
     public void getBySPARQL(String query, int searchId,
             SearchServiceIdentityObject searchIdentity, SearchController searchController) {
         // NOT SUPPORTED
-        searchController.handleSearchEvent(new SearchServiceResultEvent("search result of " + getIdentityObject().getName(), searchId,
-                searchIdentity, new HashSet<Identifier>()));
+        searchController.handleSearchEvent(new SearchServiceResultEvent(
+                "search result of " + getIdentityObject().getName(),
+                searchId,
+                searchIdentity,
+                new HashSet<Identifier>()));
     }
 
     // TODO Make sure we can always return true here. Is the DB really ready?
+    // We think it should be
     @Override
     public boolean isReady() {
         return true;
@@ -99,17 +126,22 @@ public class SearchServiceSQLite implements SearchService {
     @Override
     public SearchServiceIdentityObject getIdentityObject() {
         if (mIdentityObject == null) {
-            createIdentityObject();
+            mIdentityObject = createIdentityObject();
         }
         return mIdentityObject;
     }
 
-    private void createIdentityObject() {
+    /**
+     * Creates a new IdentityObject.
+     * @return
+     *      The created IdentityObject
+     */
+    private SearchServiceIdentityObject createIdentityObject() {
         SearchServiceIdentityObject idO = mDatamodelFactory.createSearchServiceIdentityObject();
         idO.setIdentifier(mDatamodelFactory.createIdentifier());
         idO.setName("SearchServiceSQLLite");
         idO.setDescription("This Search Service can be used to search in the local SQLLite DB.");
-        mIdentityObject = idO;
+        return idO;
     }
 
     @Override
