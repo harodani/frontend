@@ -34,10 +34,13 @@ import project.cs.lisa.R;
 import project.cs.lisa.application.dialogs.ListDialog;
 import project.cs.lisa.application.dialogs.OkButtonDialog;
 import project.cs.lisa.application.html.transfer.FetchWebPageTask;
+import project.cs.lisa.application.http.NetInfResponse;
+import project.cs.lisa.application.http.NetInfSearch;
+import project.cs.lisa.application.http.NetInfSearchResponse;
+import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.application.wifi.WifiHandler;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.util.UProperties;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
@@ -49,7 +52,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
@@ -109,7 +111,26 @@ public class MainNetInfActivity extends BaseMenuActivity {
 
         //        showDialog(new ShareDialog());
 
+        //DEBUG
+        debug();
 
+    }
+
+    public void debug() {
+        // DEBUG
+        NetInfSearch search = new NetInfSearch("localhost", "8080", "http://mini100.sytes.net/icn/index.html", "empty") {
+            @Override
+            protected void onPostExecute(NetInfResponse response) {
+                 NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
+                 Log.d("DEBUG", searchResponse.getStatus().toString());
+                 try {
+                    Log.d("DEBUG", searchResponse.getSearchResults().toString());
+                } catch (RequestFailedException e) {
+                    Log.d("DEBUG", "Search failed :(");
+                }
+            }
+        };
+        search.execute();
     }
 
     /**

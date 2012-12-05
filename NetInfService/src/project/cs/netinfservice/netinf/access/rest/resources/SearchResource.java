@@ -50,19 +50,17 @@ public class SearchResource extends LisaServerResource {
             Log.d(TAG, "" + DefinedQueryTemplates.URL);
             List<Identifier> results = mNodeConnection.performSearch(DefinedQueryTemplates.URL, new String[] { mTokens }, TIMEOUT);
 
-            Log.d(TAG, "printf34");
             // TODO Lets return a proper JSONObject.toString instead of a hardcoded string!
             if (results.isEmpty()) {
+                Log.d(TAG, "Empty result set.");
                 return "{\"results\":[]}";
             }
                 Identifier identifier = results.get(0);
-                Log.d(TAG, "printf2");
 
                 JSONObject jsonObject = new JSONObject();
-                Log.d(TAG, "printf1234");
-                jsonObject.put("results", new JSONArray().add(identifierToJson(identifier)));
-                Log.d(TAG, "print12397123f");
-
+                JSONArray resultArray = new JSONArray();
+                resultArray.add(identifierToJson(identifier));
+                jsonObject.put("results", resultArray);
 
             return jsonObject.toString();
 

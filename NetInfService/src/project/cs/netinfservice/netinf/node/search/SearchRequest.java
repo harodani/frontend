@@ -46,22 +46,22 @@ public class SearchRequest extends LisaServerResource {
 
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
-    
+
     /** NRS IP address. **/
     private String mHost;
-    
+
     /** NRS port. **/
     private String mPort;
-    
+
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = 10000;
 
-    /** HTTP Client **/
+    /** HTTP Client. **/
     private HttpClient mClient;
 
     /** Keywords string. **/
     private String mTokens;
-    
+
     // TODO: Verify if Ext should be JSON
     /** Ext string. **/
     private String mExt;
@@ -69,13 +69,13 @@ public class SearchRequest extends LisaServerResource {
     /** Message ID string. **/
     private String mMsgId;
 
-    
+
     /** Key for accessing the NRS IP. */
 	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
-    
-    
+
+
     // TODO: Remove search into a better place.
     // TODO: Hey, I said 'throw away netinf model'. Bad sentence.
     @Override
@@ -106,18 +106,18 @@ public class SearchRequest extends LisaServerResource {
      */
     private HttpPost createSearch(String msgId, String tokens, String ext)
             throws UnsupportedEncodingException {
-        Log.d(TAG, "createSearch()");      
+        Log.d(TAG, "createSearch()");
         Log.d(TAG, "Creating search to send to " + HTTP + getHost() + ":" + getPort());
-        
+
         // POST
         HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/search");
 
         // URI
         String completeUri = "?msgid=" + msgId  + "&tokens=" + tokens + "&ext=" + ext;
-        
+
         // Logs URI
         Log.d(TAG, "createSearch() URI:\n" + completeUri);
-        
+
         // Encode the URL
         String encodeUrl = null;
         encodeUrl = URLEncoder.encode(completeUri, "UTF-8");
@@ -125,16 +125,16 @@ public class SearchRequest extends LisaServerResource {
         // create new entity
         HttpEntity newEntity =
                 new InputStreamEntity(fromString(encodeUrl), encodeUrl.getBytes().length);
-        
+
         // Add header
         post.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        
+
         // set post entity
         post.setEntity(newEntity);
 
         return post;
     }
-    
+
     // TODO: Fix handleResponse return results
     /**
      * Handles the HTTP response from the server
@@ -145,17 +145,17 @@ public class SearchRequest extends LisaServerResource {
     private String handleResponse(HttpResponse response)
             throws InvalidResponseException {
         Log.d(TAG, "handleResponse() [search]");
-        
+
         // HTTP Status Response from the HTTP request response
         int statusCode = response.getStatusLine().getStatusCode();
         Log.d(TAG, "statusCode = " + statusCode);
-        
+
         // Return object
         JSONObject json = null;
-        
+
         // Temp string
         String jsonString = null;
-        
+
         switch (statusCode) {
             // Status Code OK: 200
             case HttpStatus.SC_OK:
@@ -187,31 +187,31 @@ public class SearchRequest extends LisaServerResource {
     @Get
     public String search() {
         Log.d(TAG, "search()");
-        
+
         // Search request requires three fields: tokens (keywords), message-id and ext.
         mTokens = getQuery().getFirstValue("tokens", true);
         mMsgId = newMsgId();//getQuery().getFirstValue("msgId", true);
         mExt = getQuery().getFirstValue("ext", true);
-        
+
         /* DATABASE SEARCH */
         // Injector
         Injector injector = MainNetInfApplication.getInjector();
-        
+
         // Get LRS instance
         LocalResolutionService lrs = injector.getInstance(LocalResolutionService.class);
-        
+
         // Populate list of urls
         List<String> listUrls = new ArrayList<String>();
         listUrls.add(mTokens);
-        
+
         List<SearchResult> listResults = lrs.search(listUrls);
 
         Log.d(TAG, "The url list:");
         for(SearchResult result : listResults) {
             Log.d(TAG, result.getMetaData().convertToMetadataString());
-        	
+
         }
-        
+
         if (!listResults.isEmpty()) {
             JSONObject json = new JSONObject();
             json.put("status", 200);
@@ -228,7 +228,7 @@ public class SearchRequest extends LisaServerResource {
         }
 
         /* SERVER SEARCH */
-        
+
         try {
             // Create NetInf SEARCH request
             Log.d(TAG, "Creating HTTP POST");
@@ -249,7 +249,7 @@ public class SearchRequest extends LisaServerResource {
             Log.d(TAG, "Handling HTTP POST Response");
             String json = handleResponse(response);
             Log.d(TAG, "search() succeeded. Returning JSON Object");
-            
+
             // Returns JSON Object
             return json;
         } catch (InvalidResponseException e) {
@@ -262,11 +262,11 @@ public class SearchRequest extends LisaServerResource {
             Log.d(TAG, "IOException");
             e.printStackTrace();
         }
-        
+
         Log.e(TAG, "search() failed. Returning null");
         return null;
     }
- 
+
     /**
      * Converts a string to a type ByteArrayInputStream.
      *
@@ -387,25 +387,25 @@ public class SearchRequest extends LisaServerResource {
      * @return the IP Address of the NRS
      */
     private String getHost() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
     	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
     	return mHost;
 
 	}
-    
-    
-    
+
+
+
     /**
      * Get the NRS port.
      * @return the port of the NRS
      */
     private String getPort() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
 		mPort  = sharedPreferences.getString(PREF_KEY_NRS_PORT, mPort);
 		return mPort;
 
 	}
-    
+
 }

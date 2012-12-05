@@ -28,8 +28,6 @@ package project.cs.netinfservice.application;
 
 import java.io.IOException;
 
-import org.restlet.resource.ClientResource;
-
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import android.app.Activity;
@@ -127,12 +125,6 @@ public class MainNetInfActivity extends Activity {
          * Set up some notification depending on the connection: colors.
          * Ask Paolo, he knows.
          */
-
-        // DEBUG
-        String url = "http://localhost:8080/search?tokens=www.harold.com";
-        ClientResource resource = new ClientResource(url);
-        resource.get();
-
 
     }
 

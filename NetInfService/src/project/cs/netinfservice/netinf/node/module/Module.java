@@ -53,7 +53,7 @@ import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.access.rest.RESTAccessServer;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.netinf.node.resolution.NameResolutionService;
-import project.cs.netinfservice.netinf.node.search.SearchServiceSQLite;
+import project.cs.netinfservice.netinf.node.search.UrlSearchService;
 import project.cs.netinfservice.util.UProperties;
 import android.util.Log;
 
@@ -107,7 +107,7 @@ public class Module extends AbstractModule  {
         bind(IODatabaseFactory.class).toProvider(FactoryProvider.newFactory(IODatabaseFactory.class, IODatabase.class));
 
         Log.d(TAG, "Binding 10");
-        bind(SearchServiceSQLite.class);
+        bind(UrlSearchService.class);
 
         Log.d(TAG, "Binding 11");
         bind(SearchController.class).to(SearchControllerImpl.class).in(Singleton.class);
@@ -137,7 +137,7 @@ public class Module extends AbstractModule  {
 
     @Singleton
     @Provides
-    SearchService[] provideSearchServices(SearchServiceSQLite searchServiceSQLite) {
+    SearchService[] provideSearchServices(UrlSearchService searchServiceSQLite) {
        return new SearchService[] { searchServiceSQLite };
     }
 
