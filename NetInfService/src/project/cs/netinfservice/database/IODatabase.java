@@ -339,8 +339,11 @@ public class IODatabase
 		
 		metadata.insert(mFilepathLabel, cursor.getString(3));
 		metadata.insert(mFilesizeLabel, cursor.getString(4));
+		
+		// Get the algorithm
+		String hashAlg = cursor.getString(1);
 
-		return new SearchResultImpl(hash, metadata);
+		return new SearchResultImpl(hash, hashAlg, metadata);
 	}
 
 	/**

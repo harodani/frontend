@@ -39,17 +39,22 @@ public class SearchResultImpl implements SearchResult {
 	/** The hash of the found entity. */
 	private String mHash;
 	
+	/** The hash algorithm used for creating the hash. */
+	private String mHashAlg;
+	
 	/** The metadata associated with that hash. */
 	private Metadata mMetadata;
 	
 	/**
 	 * Creates a search object entity.
 	 * 
-	 * @param hash		The hash corresponding to this search result
-	 * @param metadata	The meta data corresponding to this search result
+	 * @param hash			The hash corresponding to this search result
+	 * @param hashAlgorithm	The algorithm used for creating the hash
+	 * @param metadata		The meta data corresponding to this search result
 	 */
-	public SearchResultImpl(String hash, Metadata metadata) {
+	public SearchResultImpl(String hash, String hashAlgorithm, Metadata metadata) {
 		mHash = hash;
+		mHashAlg = hashAlgorithm;
 		mMetadata = metadata;
 	}
 
@@ -61,6 +66,11 @@ public class SearchResultImpl implements SearchResult {
 	@Override
 	public String getHash() {
 		return mHash;
+	}
+
+	@Override
+	public String getHashAlgorithm() {
+		return mHashAlg;
 	}
 
 }

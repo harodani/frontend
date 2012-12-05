@@ -50,5 +50,12 @@ public interface SearchResult {
 	 */
 	String getHash();
 	
+	
+	/**
+	 * Returns the hash algorithm used for hashing the content.
+	 * 
+	 * @return The hash algorithm
+	 */
+	String getHashAlgorithm();
 
 }
