@@ -235,6 +235,7 @@ public class IODatabaseTest extends AndroidTestCase {
 
     	// Check if the search result was created correctly.
     	assertEquals(HASH, result.getHash());
+    	assertEquals(HASH_ALG, result.getHashAlgorithm());
     	
     	Metadata metadata = result.getMetaData();
     	JSONObject jsonMetadata = null;
