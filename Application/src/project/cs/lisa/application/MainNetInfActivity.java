@@ -178,6 +178,10 @@ public class MainNetInfActivity extends Activity {
         // mWebView: enable pinch zooming
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAppCacheEnabled(true);
+        mWebView.getSettings().setBuiltInZoomControls(true);
+        mWebView.getSettings().setSupportZoom(true);
+        mWebView.getSettings().setUseWideViewPort(true);
+        mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.setWebViewClient(new NetInfWebViewClient());
 
         mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -376,4 +380,5 @@ public class MainNetInfActivity extends Activity {
     public Menu getMenu() {
         return mMenu;
     }
+    
 }

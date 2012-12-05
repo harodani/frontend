@@ -101,11 +101,12 @@ public class NetInfWebViewClient extends WebViewClient {
                     new ByteArrayInputStream(array_raw));
 		 */
 
-		if (!URLUtil.isHttpsUrl(url)) {
+		if (!URLUtil.isHttpUrl(url)) {
+			Log.d(TAG, "Resource, raw data: " + url);
 			super.shouldInterceptRequest(view, url);
 			return null;
 
-		} else if (url.startsWith("http")) {
+		} else if (URLUtil.isHttpUrl(url)) {
 			Log.d(TAG, "Try to retrieve resource from url.");
 			WebObject resource = null;
 			File file = null;
@@ -193,7 +194,7 @@ public class NetInfWebViewClient extends WebViewClient {
 		NetInfSearchResponse response;
 		NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty");
 		search.execute();
-		response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
+		response = (NetInfSearchResponse) search.get();
 
 		return response;
 
