@@ -41,7 +41,6 @@ public class NetInfSearch extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-        Log.d(TAG, "doInBackground()");
 
         try {
             HttpGet search = new HttpGet(getUri());

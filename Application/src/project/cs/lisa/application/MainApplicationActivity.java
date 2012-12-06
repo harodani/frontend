@@ -200,6 +200,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mWebView.setWebViewClient(new NetInfWebViewClient());
 
         mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
+        mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
+        mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
         mSpinningBar.setVisibility(View.INVISIBLE);
 
         //        showDialog(new ShareDialog());
@@ -342,6 +344,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     startFetchingWebPage();                    
 
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     img.setImageResource(R.drawable.refresh);
                     img.setTag(R.drawable.refresh);
@@ -351,15 +355,23 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using Bluetooth");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_blue));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_blue));
 
                 } else if (action.equals(LOCAL_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using local file system");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_green));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_green));
                     
                 } else if (action.equals(UPLINK_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using uplink");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_red));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_red));
                     
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using nrs cache");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_black));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_black));
                 }
             }
         };

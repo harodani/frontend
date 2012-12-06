@@ -131,9 +131,8 @@ public class UrlSearchService implements SearchService {
         // Search in the database
         try {
             Set<Identifier> results = searchDatabase(url);
-            Log.d(TAG, "Result from database:");
-            for (Identifier result : results)
-                logIdentifierContent(result);
+            Log.d(TAG, "Search found the url in database (" + url + ")");
+
             // If we found something, don't ask the NRS
             searchController.handleSearchEvent(new SearchServiceResultEvent(
                     "search result of " + getIdentityObject().getName(),
@@ -142,7 +141,7 @@ public class UrlSearchService implements SearchService {
                     results));
             return;
         } catch (DatabaseException e) {
-            Log.w(TAG, e.getMessage() != null ? e.getMessage() : "Search in local db failed");
+            Log.e(TAG, "Search in local db didn't find anything or failed");
         }
 
         // Search in the NRS
@@ -152,11 +151,11 @@ public class UrlSearchService implements SearchService {
             HttpPost search = createSearch(url);
             HttpResponse response = mClient.execute(search);
             results = handleResponse(response);
-            Log.d(TAG, "Result from NRS");
-            for (Identifier result : results)
-                logIdentifierContent(result);
+            
+            Log.d(TAG, "Search found the url in the NRS (" + url + ")");
+
         } catch (Exception e) {
-            Log.w(TAG, e.getMessage() != null ? e.getMessage() : "Search in NRS failed");
+            Log.e(TAG, "Search in NRS didn't find anything or failed");
         }
 
         searchController.handleSearchEvent(new SearchServiceResultEvent(
@@ -210,7 +209,6 @@ public class UrlSearchService implements SearchService {
     }
 
     private void logIdentifierContent(Identifier identifier) {
-        Log.d(TAG, "logIdentifierContent()");
         List<IdentifierLabel> labels = identifier.getIdentifierLabels();
         for (IdentifierLabel label : labels) {
             Log.d(TAG, "Label: " + label.getLabelName());
@@ -285,8 +283,6 @@ public class UrlSearchService implements SearchService {
      *      In case UTF-8 is not supported
      */
     private HttpPost createSearch(String url) throws UnsupportedEncodingException {
-        Log.d(TAG, "createSearch()");
-        Log.d(TAG, "Creating search to send to " + HTTP + getHost() + ":" + getPort());
 
         // POST
         String uri = HTTP + getHost() + ":" + getPort() + "/netinfproto/search";
@@ -300,10 +296,6 @@ public class UrlSearchService implements SearchService {
         query.append(URLEncoder.encode(url, "UTF-8"));
         query.append("&ext=");
         query.append("empty");
-
-        // Logs URI
-        Log.d(TAG, "createSearch() uri: " + uri);
-        Log.d(TAG, "createSearch() query: " + query.toString());
 
         // Encode the URL
         String encodeUrl = query.toString();

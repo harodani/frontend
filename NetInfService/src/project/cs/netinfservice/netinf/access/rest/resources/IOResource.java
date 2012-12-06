@@ -100,7 +100,6 @@ public class IOResource extends LisaServerResource {
     @Override
     protected void doInit() {
         super.doInit();
-        Log.d(TAG, "doInit()");
 
         mHashAlg           = getQuery().getFirstValue("hashAlg", true);
         mHash              = getQuery().getFirstValue("hash", true);
@@ -108,13 +107,6 @@ public class IOResource extends LisaServerResource {
         mBluetoothMac      = getQuery().getFirstValue("btmac", true);
         mMeta              = getQuery().getFirstValue("meta", true);
         mFilePath          = getQuery().getFirstValue("filePath", true);
-
-        Log.d(TAG, "mHashAlg = " + mHashAlg);
-        Log.d(TAG, "mHash = " + mHash);
-        Log.d(TAG, "mContentType = " + mContentType);
-        Log.d(TAG, "mBluetoothMac = " + mBluetoothMac);
-        Log.d(TAG, "mMeta = " + mMeta);
-        Log.d(TAG, "mFilePath = " + mFilePath);
 
         mDatamodelFactory = getDatamodelFactory();
         mNodeConnection   = getNodeConnection();
@@ -126,7 +118,7 @@ public class IOResource extends LisaServerResource {
      */
     @Post
     public void handlePost() throws NetInfCheckedException {
-        Log.e(TAG, "@Post");
+        Log.d(TAG, "RESTful API received publish request with file data");
         IOBuilder builder = new IOBuilder(mDatamodelFactory);
         builder.addFilePathLocator(mFilePath);
         publish(builder);
@@ -156,7 +148,7 @@ public class IOResource extends LisaServerResource {
      */
     @Put
     public void putIO() throws NetInfCheckedException {
-        Log.d(TAG, "putIO()");
+        Log.d(TAG, "RESTful API received publish request");
         publish();
     }
 
@@ -182,10 +174,7 @@ public class IOResource extends LisaServerResource {
         }
         builder.setMetaData(mMeta);
 
-        Log.d(TAG, "calling putIO()");
         mNodeConnection.putIO(builder.build());
-
-        Log.d(TAG, "Publish succeeded.");
 
     }
 
