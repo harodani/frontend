@@ -38,7 +38,6 @@ import project.cs.lisa.application.html.transfer.FetchWebPageTask;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.networksettings.WifiHandler;
 import project.cs.lisa.util.UProperties;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
@@ -50,7 +49,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -72,10 +70,10 @@ import android.widget.Toast;
  * @author Linus Sunde
  *
  */
-public class MainApplicationActivity extends Activity {
+public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Debugging tag. */
-    private static final String TAG = "MainNetInfActivity";
+    private static final String TAG = "MainApplicationActivity";
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
@@ -126,11 +124,9 @@ public class MainApplicationActivity extends Activity {
         //        setupWifi();
         setupBluetoothAvailability();
         /*
-         * TODO: Make sure that nothing happens when Netinf node doesn't start. 
+         * TODO: Make sure that nothing happens when Netinf node doesn't start.
          * Find a way to communicate between this activity and the netinf activity.
-         */  
-
-        // Setup a broadcast receiver for being notified when the Bluetooth is enabled/disabled
+         */
         setupBroadcastReceiver();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(NODE_STARTED_MESSAGE);
@@ -205,7 +201,6 @@ public class MainApplicationActivity extends Activity {
             WifiHandler wifiHandler = new WifiHandler() {
                 @Override
                 public void onDiscoveryDone(Set<String> wifis) {
-
                     // This is run when the WIFI discovery is done
                     // Create a ListDialog that shows the networks
                     ListDialog listDialog = new ListDialog(wifis) {
@@ -224,6 +219,25 @@ public class MainApplicationActivity extends Activity {
         }
     }
 
+// TODO Please don't delete yet
+//    public void debug() {
+//        // DEBUG
+//        NetInfSearch search = null;
+//            search = new NetInfSearch("localhost", "8080", "http://support.google.com/richmedia/bin/answer.py?hl=en&answer=1100953&ctx=cb&src=cb&cbid=100pnperzakdj&cbrank=5", "empty") {
+//                @Override
+//                protected void onPostExecute(NetInfResponse response) {
+//                     NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
+//                     Log.d("DEBUG", searchResponse.getStatus().toString());
+//                     try {
+//                        Log.d("DEBUG", searchResponse.getSearchResults().toString());
+//                    } catch (RequestFailedException e) {
+//                        Log.d("DEBUG", "Search failed :(");
+//                    }
+//                }
+//            };
+//        search.execute();
+//    }
+
     /**
      * Set up the WiFi connection.
      */
@@ -232,6 +246,7 @@ public class MainApplicationActivity extends Activity {
                 "Wifi Information",
                 getString(R.string.dialog_wifi_msg),
                 new WifiDialogListener()));
+
     }
 
     /**
@@ -292,29 +307,6 @@ public class MainApplicationActivity extends Activity {
     public boolean addressIsValid(String url) {
         return url.matches(
                 "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu()");
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        this.mMenu = menu;
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.menu_publish_file:
-            item.setChecked(item.isChecked() ? false : true);
-            break;
-        case R.id.menu_settings:
-            Intent settingsIntent = new Intent(this,SettingsActivity.class);
-            startActivity(settingsIntent);
-        default:
-            break;
-        }
-        return true;
     }
 
     /**

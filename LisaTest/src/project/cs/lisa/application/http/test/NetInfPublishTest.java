@@ -15,7 +15,7 @@ import project.cs.lisa.application.http.NetInfPublishResponse;
 import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfStatus;
 import project.cs.lisa.mock.MockServer;
-import project.cs.netinfservice.netinf.node.metadata.Metadata;
+import project.cs.lisa.util.metadata.Metadata;
 import android.test.InstrumentationTestCase;
 
 public class NetInfPublishTest extends InstrumentationTestCase {
@@ -254,7 +254,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         metadata.insert(mMetaKey, mMetaValue);
 
         publish.setMetadata(metadata);
-
+        
         // Run on UI thread
         runTestOnUiThread(new Runnable() {
             @Override

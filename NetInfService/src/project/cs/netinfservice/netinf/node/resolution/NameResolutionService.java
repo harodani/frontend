@@ -69,10 +69,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import project.cs.netinfservice.application.MainNetInfActivity;
+import project.cs.netinfservice.application.SettingsActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.inject.Inject;
@@ -93,7 +97,9 @@ implements ResolutionService {
     public static final String TAG = "NameResolutionService";
     /** Message ID random value max. **/
     public static final int MSG_ID_MAX = 100000000;
-
+    /** HTTP Scheme. */
+    private static final String HTTP = "http://";
+    
     /** NRS IP address. **/
     private String mHost;
     /** NRS port. **/
@@ -106,6 +112,16 @@ implements ResolutionService {
     private final Random mRandomGenerator = new Random();
     /** HTTP Client. **/
     private HttpClient mClient;
+   
+
+    /** Key for accessing the NRS IP. */
+	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+	/** Key for accessing the NRS Port. */
+	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+
+	
+
+
 
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
@@ -127,7 +143,43 @@ implements ResolutionService {
         mHost = host;
         mPort = port;
         mDatamodelFactory = datamodelFactory;
+   
+        
+        Log.d(TAG, "Host: " + mHost);
+        Log.d(TAG, "Port: " + mPort);
+        
     }
+    
+
+    
+    /**
+     * Get the NRS Address.
+     * @return the IP Address of the NRS
+     */
+    private String getHost() {
+    	SharedPreferences sharedPreferences = 
+    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+    	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
+    	return mHost;
+
+	}
+    
+    
+    
+    /**
+     * Get the NRS port.
+     * @return the port of the NRS
+     */
+    private int getPort() {
+    	SharedPreferences sharedPreferences = 
+    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+		mPort = mPort = Integer.parseInt(sharedPreferences
+				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
+		return mPort;
+
+	}
+    
+
 
     @Override
     public void delete(Identifier arg0) {
@@ -556,7 +608,7 @@ implements ResolutionService {
         String bluetoothMac = getBluetoothMac(io);
         String filePath     = getFilePath(io);
 
-        HttpPost post = new HttpPost(mHost + ":" + mPort + "/netinfproto/publish");
+        HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/publish");
 
         MultipartEntity entity = new MultipartEntity();
 
@@ -605,7 +657,7 @@ implements ResolutionService {
      */
     private HttpPost createGet(String uri) throws UnsupportedEncodingException {
 
-        HttpPost post = new HttpPost(mHost + ":" + mPort + "/netinfproto/get");
+        HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/get");
 
         String msgid = Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX));
         String ext = "no extension";

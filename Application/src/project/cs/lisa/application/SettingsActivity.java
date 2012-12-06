@@ -36,16 +36,17 @@ import android.os.Bundle;
  * @author Linus Sunde
  *
  */
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends BaseMenuActivity {
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+        
     }
-
+	
 }

@@ -42,7 +42,6 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
             webObject = downloadWebObject(url);
         } catch (IOException e) {
             Log.e(TAG, "Could not download web page from uplink.");
-            e.printStackTrace();
         }
         return webObject;
     }

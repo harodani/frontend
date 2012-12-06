@@ -1,4 +1,4 @@
-package project.cs.lisa.util.database.test;
+package project.cs.netinfservice.database.test;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,14 +15,14 @@ import netinf.common.datamodel.impl.DatamodelFactoryImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import project.cs.lisa.util.UProperties;
 import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.netinf.node.metadata.Metadata;
-import project.cs.netinfservice.netinf.node.metadata.MetadataParser;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.util.IOBuilder;
+import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfservice.util.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
@@ -235,6 +235,7 @@ public class IODatabaseTest extends AndroidTestCase {
 
     	// Check if the search result was created correctly.
     	assertEquals(HASH, result.getHash());
+    	assertEquals(HASH_ALG, result.getHashAlgorithm());
     	
     	Metadata metadata = result.getMetaData();
     	JSONObject jsonMetadata = null;

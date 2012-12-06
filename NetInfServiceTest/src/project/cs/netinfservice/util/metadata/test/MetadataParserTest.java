@@ -1,4 +1,4 @@
-package project.cs.lisa.metadata.test;
+package project.cs.netinfservice.util.metadata.test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,7 @@ import junit.framework.Assert;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import project.cs.netinfservice.netinf.node.metadata.MetadataParser;
+import project.cs.netinfservice.util.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 
 /**

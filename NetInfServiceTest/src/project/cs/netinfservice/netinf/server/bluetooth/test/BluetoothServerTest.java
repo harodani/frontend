@@ -1,4 +1,4 @@
-package project.cs.lisa.bluetooth.test;
+package project.cs.netinfservice.netinf.server.bluetooth.test;
 
 import java.io.IOException;
 

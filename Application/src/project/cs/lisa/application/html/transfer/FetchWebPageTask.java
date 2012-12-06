@@ -8,7 +8,6 @@ import java.util.HashSet;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
-import project.cs.lisa.R;
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
@@ -22,10 +21,10 @@ import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
 
@@ -80,6 +79,13 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         return null;
     }
 
+    private boolean shouldPublish() {
+        // Check for publish
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+        return prefs.getBoolean("pref_key_publish", false);
+    }
+
     /**
      * Creates a new task that searches for and tries to retrieve a URL using NetInf.
      * If the NetInf requests fail, it tries to fetch the URL from the Internet.
@@ -132,7 +138,9 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     // Assume retrieve succedded, display page and publish
                     displayWebpage(retrieve.getFile(), url.getHost());
                     try {
-                        publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                        if (shouldPublish()) {
+                            publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                        }
                     } catch (IOException e) {
                         MainApplicationActivity.showToast(e.getMessage());
                     }
@@ -227,9 +235,11 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             publishRequest.setMetadata(metadata);
 
             // Check for fullput
-            Menu menu = (Menu) MainApplicationActivity.getActivity().getMenu();
-            MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
-            if (fullPut.isChecked()) {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+            boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
+            Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
+
+            if (isFullPutAvailable) {
                 publishRequest.setFile(file);
             }
 

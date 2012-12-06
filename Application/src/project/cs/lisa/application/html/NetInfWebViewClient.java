@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
-import project.cs.lisa.R;
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.html.transfer.DownloadWebObject;
 import project.cs.lisa.application.html.transfer.WebObject;
@@ -25,9 +24,9 @@ import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.webkit.URLUtil;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -151,6 +150,7 @@ public class NetInfWebViewClient extends WebViewClient {
 				Log.e("TAG", "Could not open file");
 			}
 
+			System.gc();
 			return response;
 		} else {
 			Log.e(TAG, "Unexpected url while intercepting resources.");
@@ -235,9 +235,9 @@ public class NetInfWebViewClient extends WebViewClient {
 			publishRequest.setMetadata(metadata);
 
 			// Check for fullput
-			Menu menu = (Menu) MainApplicationActivity.getActivity().getMenu();
-			MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
-			if (fullPut.isChecked()) {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+            boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
+			if (isFullPutAvailable) {
 				publishRequest.setFile(file);
 			}
 

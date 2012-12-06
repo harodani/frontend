@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.lisa.util.UProperties;
+import android.util.Log;
 
 /**
  * Represents a response to a NetInfSearch.
@@ -17,6 +18,8 @@ import project.cs.lisa.util.UProperties;
  */
 public class NetInfSearchResponse extends NetInfResponse {
 
+    /** Log Tag. */
+    private static final String TAG = "NetInfSearchResponse";
     /** Search results JSON Key used by the RESTful API. */
     private static final String RESULTS_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.search.results");
@@ -62,6 +65,7 @@ public class NetInfSearchResponse extends NetInfResponse {
             setStatus(NetInfStatus.NO_CONTENT);
             return;
         }
+        Log.d(TAG, "jsonString = " + jsonString);
         Object obj = JSONValue.parse(jsonString);
         if (!(obj instanceof JSONObject)) {
             setStatus(NetInfStatus.INVALID_CONTENT);
@@ -74,15 +78,20 @@ public class NetInfSearchResponse extends NetInfResponse {
             setStatus(NetInfStatus.NO_SEARCH_RESULTS);
             return;
         }
+        
         Object resultsObj = json.get(RESULTS_KEY);
         if (!(resultsObj instanceof JSONArray)) {
             setStatus(NetInfStatus.INVALID_SEARCH_RESULTS);
             return;
         }
         mSearchResults = (JSONArray) resultsObj;
-
-        // Everything hopefully OK
-        setStatus(NetInfStatus.OK);
+        
+        if (mSearchResults.isEmpty()) {
+        	setStatus(NetInfStatus.NO_SEARCH_RESULTS);
+        } else {
+	        // Everything hopefully OK
+	        setStatus(NetInfStatus.OK);
+        }
     }
 
     /**
