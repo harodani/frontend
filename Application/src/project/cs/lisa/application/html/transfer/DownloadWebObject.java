@@ -4,10 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.FileNameMap;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 import org.apache.commons.io.FileUtils;
 
@@ -15,6 +13,7 @@ import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.hash.Hash;
 import project.cs.lisa.util.UProperties;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -28,6 +27,9 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
     /** The directory containing the published files. */
     private String mSharedFolder;
+    
+    /** Uplink transmission used to transfer a resource. */
+    public static final String UPLINK_TRANSMISSION = "project.cs.lisa.UPLINK_TRANSMISSION";
 
     public DownloadWebObject() {
         String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
@@ -77,6 +79,9 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
             return null;
         }
 
+        Intent intent = new Intent(UPLINK_TRANSMISSION);
+        MainApplicationActivity.getActivity().sendBroadcast(intent);
+        
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String contentType = connection.getContentType();
         if (contentType == null) {

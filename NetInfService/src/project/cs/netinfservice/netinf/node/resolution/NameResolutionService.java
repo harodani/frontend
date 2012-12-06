@@ -70,10 +70,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
-import project.cs.netinfservice.application.SettingsActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -95,33 +95,39 @@ implements ResolutionService {
 
     /** Debug tag. **/
     public static final String TAG = "NameResolutionService";
+
     /** Message ID random value max. **/
     public static final int MSG_ID_MAX = 100000000;
+    
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
     
     /** NRS IP address. **/
     private String mHost;
+    
     /** NRS port. **/
     private int mPort;
+    
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = 5000;
+    
     /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
     private final DatamodelFactory mDatamodelFactory;
+    
     /** Random number generator used to create message IDs. **/
     private final Random mRandomGenerator = new Random();
+    
+    /** NRS cache transmission used to transfer a resource. */
+    public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
+    
     /** HTTP Client. **/
     private HttpClient mClient;
-   
 
     /** Key for accessing the NRS IP. */
 	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+	
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
-
-	
-
-
 
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
@@ -444,6 +450,10 @@ implements ResolutionService {
             String contentType = response.getHeaders("Content-Type")[0].getValue();
             byte[] boundary = (contentType.substring(contentType.indexOf("boundary=") + 9)).getBytes();
             Log.d(TAG, "boundary = " + Arrays.toString(boundary));
+
+            Log.d(TAG, "Sending Intent " + NRS_TRANSMISSION);
+            Intent intent = new Intent(NRS_TRANSMISSION);
+            MainNetInfActivity.getActivity().sendBroadcast(intent);
 
             @SuppressWarnings("deprecation")
             MultipartStream multipartStream =
