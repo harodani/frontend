@@ -297,7 +297,7 @@ public class UrlSearchService implements SearchService {
         query.append("?msgid=");
         query.append(Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX)));
         query.append("&tokens=");
-        query.append(url);
+        query.append(URLEncoder.encode(url, "UTF-8"));
         query.append("&ext=");
         query.append("empty");
 
@@ -306,8 +306,8 @@ public class UrlSearchService implements SearchService {
         Log.d(TAG, "createSearch() query: " + query.toString());
 
         // Encode the URL
-        String encodeUrl = null;
-        encodeUrl = URLEncoder.encode(query.toString(), "UTF-8");
+        String encodeUrl = query.toString();
+        //encodeUrl = URLEncoder.encode(query.toString(), "UTF-8");
 
         // Create new entity
         HttpEntity newEntity =

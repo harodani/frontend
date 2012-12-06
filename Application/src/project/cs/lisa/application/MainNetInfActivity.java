@@ -34,10 +34,6 @@ import project.cs.lisa.R;
 import project.cs.lisa.application.dialogs.ListDialog;
 import project.cs.lisa.application.dialogs.OkButtonDialog;
 import project.cs.lisa.application.html.transfer.FetchWebPageTask;
-import project.cs.lisa.application.http.NetInfResponse;
-import project.cs.lisa.application.http.NetInfSearch;
-import project.cs.lisa.application.http.NetInfSearchResponse;
-import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.application.wifi.WifiHandler;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.util.UProperties;
@@ -111,27 +107,26 @@ public class MainNetInfActivity extends BaseMenuActivity {
 
         //        showDialog(new ShareDialog());
 
-        //DEBUG
-        debug();
-
     }
 
-    public void debug() {
-        // DEBUG
-        NetInfSearch search = new NetInfSearch("localhost", "8080", "http://mini100.sytes.net/icn/index.html", "empty") {
-            @Override
-            protected void onPostExecute(NetInfResponse response) {
-                 NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
-                 Log.d("DEBUG", searchResponse.getStatus().toString());
-                 try {
-                    Log.d("DEBUG", searchResponse.getSearchResults().toString());
-                } catch (RequestFailedException e) {
-                    Log.d("DEBUG", "Search failed :(");
-                }
-            }
-        };
-        search.execute();
-    }
+// TODO Please don't delete yet
+//    public void debug() {
+//        // DEBUG
+//        NetInfSearch search = null;
+//            search = new NetInfSearch("localhost", "8080", "http://support.google.com/richmedia/bin/answer.py?hl=en&answer=1100953&ctx=cb&src=cb&cbid=100pnperzakdj&cbrank=5", "empty") {
+//                @Override
+//                protected void onPostExecute(NetInfResponse response) {
+//                     NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
+//                     Log.d("DEBUG", searchResponse.getStatus().toString());
+//                     try {
+//                        Log.d("DEBUG", searchResponse.getSearchResults().toString());
+//                    } catch (RequestFailedException e) {
+//                        Log.d("DEBUG", "Search failed :(");
+//                    }
+//                }
+//            };
+//        search.execute();
+//    }
 
     /**
      * Set up the WiFi connection.
