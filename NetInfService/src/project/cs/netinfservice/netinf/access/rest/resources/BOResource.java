@@ -135,7 +135,7 @@ public class BOResource extends LisaServerResource {
 	 */
 	@Get
 	public String retrieveBO() {
-		Log.d(TAG, "Trying to retrieve the BO.");
+	    Log.d(TAG, "RESTful API received retrieve request");
 
 		byte[] fileData = null;
 
@@ -144,7 +144,7 @@ public class BOResource extends LisaServerResource {
 
 		// Retrieve the data corresponding to the hash from another device.
 		if (io == null) {
-			Log.e(TAG, "InformationObject is null. Nothing was done here.");
+			Log.e(TAG, "NetInf Get did not produce an InformationObject");
 			return null;
 		}
 
@@ -152,7 +152,7 @@ public class BOResource extends LisaServerResource {
 		Attribute filepathAttribute =
 				io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
 		if (filepathAttribute != null) {
-			Log.d(TAG, "The NetInf GET contained the file");
+			Log.d(TAG, "Response to the NetInf Get contained the file");
 			String contentType = io.getIdentifier().getIdentifierLabel(
 					SailDefinedLabelName.CONTENT_TYPE.getLabelName())
 					.getLabelValue();
@@ -164,7 +164,7 @@ public class BOResource extends LisaServerResource {
 			metadata.insert(sFilepath, filePath);
 			return metadata.convertToString();
 		}
-		Log.d(TAG, "The NetInf GET didn't contain the file");
+		Log.d(TAG, "Response to the NetInf Get did NOT contain the file");
 
 		TransferDispatcher tsDispatcher = TransferDispatcher.INSTANCE;
 
@@ -233,7 +233,6 @@ public class BOResource extends LisaServerResource {
 	 * @return The IO that contains the locator list.
 	 */
 	private InformationObject retrieveDO() {
-		Log.d(TAG, "Retrieve the IO from a resolution service (Remote or local).");
 
 		Identifier identifier = createIdentifier(mHashAlgorithm, mHashValue);
 		InformationObject io = null;

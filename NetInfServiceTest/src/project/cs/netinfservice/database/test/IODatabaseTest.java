@@ -13,7 +13,8 @@ import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.impl.DatamodelFactoryImpl;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
@@ -134,10 +135,14 @@ public class IODatabaseTest extends AndroidTestCase {
 		// Check meta data key value pairs
 		String gotIoMetadata = newIdentifier.getIdentifierLabel(
 		            SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
+		Object jsonMetadata = JSONValue.parse(gotIoMetadata);
+		if (!(jsonMetadata instanceof JSONObject)) {
+			Assert.fail("Valid JSON metadata. Should not have raised an exception.");
+		}
 		
 		Map<String, Object> metadataMap = new HashMap<String, Object>();
 		try {
-			metadataMap = MetadataParser.toMap(new JSONObject(gotIoMetadata));
+			metadataMap = MetadataParser.toMap((JSONObject) jsonMetadata);
 		} catch (JSONException e) {
 			Assert.fail("Should not have thrown an exception.");
 		}
@@ -153,6 +158,8 @@ public class IODatabaseTest extends AndroidTestCase {
 		
 		assertEquals(expectedList.size(), list.size());
 		assertTrue(expectedList.containsAll(list));
+		
+		mIoDatabase.deleteIO(mIo);
 		 
 	}
 	
@@ -195,6 +202,7 @@ public class IODatabaseTest extends AndroidTestCase {
 		int expectedListLength = 3;
 		assertEquals(expectedListLength, actualUrlsStored.size());
 		
+		mIoDatabase.deleteIO(mIo);
 	}
 	
 	
@@ -238,24 +246,22 @@ public class IODatabaseTest extends AndroidTestCase {
     	assertEquals(HASH_ALG, result.getHashAlgorithm());
     	
     	Metadata metadata = result.getMetaData();
-    	JSONObject jsonMetadata = null;
-    	try {
-			jsonMetadata = new JSONObject(metadata.convertToMetadataString());
-
-
-		} catch (JSONException e) {
-			Assert.fail("Should not have thrown an exception. Valid metadata String.");
-		}
+    	Object jsonMetadata = JSONValue.parse(metadata.convertToMetadataString());
+    	if (! (jsonMetadata instanceof JSONObject)) {
+    		Assert.fail("Metadata string is correct. Should not fail.");
+    	}
+    	
     	// Compare if the returned object is the right object we wanted to search for
     	Map<String, Object> map = null;
 		try {
-			map = MetadataParser.toMap(jsonMetadata);
+			map = MetadataParser.toMap((JSONObject) jsonMetadata);
 		} catch (JSONException e) {
 			Assert.fail("Should not have raised an exception");
 		}
     	
 		String[] expectedUrl = {URL_1, URL_2};
 		List<String> expectedUrlList = Arrays.asList(expectedUrl);
+		System.out.println(map.get(LABEL_URL).toString());
     	
 		// We know that the result will be a list of Strings: Url list
 		@SuppressWarnings("unchecked")
@@ -264,6 +270,9 @@ public class IODatabaseTest extends AndroidTestCase {
 		
 		assertEquals(FILE_PATH, map.get(LABEL_FILEPATH));
 		assertEquals(FILE_SIZE, map.get(LABEL_FILESIZE));
+		
+		mIoDatabase.deleteIO(mIo);
+
 	}
 	
 	private InformationObject createIO() {

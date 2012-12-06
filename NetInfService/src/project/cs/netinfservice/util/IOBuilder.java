@@ -26,12 +26,20 @@
  */
 package project.cs.netinfservice.util;
 
+import java.util.List;
+import java.util.Set;
+
 import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.DefinedAttributePurpose;
 import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.IdentifierLabel;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.util.metadata.Metadata;
@@ -45,29 +53,32 @@ import project.cs.netinfservice.util.metadata.Metadata;
 public class IOBuilder {
 
     /** All bluetooth locators have the following indicator in their address. */
-    private static final String BLUETOOTH_LOCATOR_PREFIX = "nimacbt://";
+    public static final String BLUETOOTH_LOCATOR_PREFIX = "nimacbt://";
     
 	/**
 	 * The label for identifying content types.
 	 */
-	private static final String CONTENT_TYPE_LABEL =
+	public static final String CONTENT_TYPE_LABEL =
 			SailDefinedLabelName.CONTENT_TYPE.getLabelName();
 
 	/**
 	 * The label for identifying the hash contents.
 	 */
-	private static final String HASH_LABEL =
+	public static final String HASH_LABEL =
 			SailDefinedLabelName.HASH_CONTENT.getLabelName();
 
 	/**
 	 * The label for identifying the hash algorithm.
 	 */
-	private static final String HASH_ALG_LABEL = SailDefinedLabelName.HASH_ALG.getLabelName();
+	public static final String HASH_ALG_LABEL = SailDefinedLabelName.HASH_ALG.getLabelName();
 
 	/**
 	 * The label for identifying the meta data.
 	 */
-	private static final String META_LABEL = SailDefinedLabelName.META_DATA.getLabelName();
+	public static final String META_LABEL = SailDefinedLabelName.META_DATA.getLabelName();
+	
+	/** The metadata label for urls. */
+	public static final String URL_LABEL = UProperties.INSTANCE.getPropertyWithName("metadata.url");
 
 	/** The datamodel factory that is needed to create information objects. */
 	private DatamodelFactory mFactory;
@@ -80,6 +91,9 @@ public class IOBuilder {
 
 	/** The Information Object. **/
 	private InformationObject mIo;
+	
+	/** The url array that contains all urls corresponding to this io. */
+	private JSONArray mUrlArray;
 
 	/**
 	 * Creates a new Builder.
@@ -91,6 +105,7 @@ public class IOBuilder {
 		mIdentifier = mFactory.createIdentifier();
 		mMetadata = new Metadata();
 		mIo = mFactory.createInformationObject();
+		mUrlArray = new JSONArray();
 
 	}
 
@@ -147,7 +162,11 @@ public class IOBuilder {
 	 * @return		Returns this Builder.
 	 */
 	public IOBuilder addMetaData(String key, String value) {
-		mMetadata.insert(key, value);
+		if (key.equals(URL_LABEL)) {
+			mUrlArray.add(value);
+		} else {
+			mMetadata.insert(key, value);			
+		}
 		return this;
 	}
 
@@ -199,10 +218,13 @@ public class IOBuilder {
 	 * @return	The information object that was created.
 	 */
 	public InformationObject build() {
+		mMetadata.insert(URL_LABEL, mUrlArray);
+		
 		String metaString;
 		if (mMetadata.convertToString().contains("meta")) {
 			// The metadata was setted and not created from scratch
 			metaString = mMetadata.convertToString();
+			System.out.println("Metadata string: " + metaString);
 		} else {
 			metaString = mMetadata.convertToMetadataString();
 		}

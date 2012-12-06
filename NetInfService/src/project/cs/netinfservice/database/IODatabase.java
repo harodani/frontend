@@ -35,7 +35,9 @@ import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
@@ -203,6 +205,7 @@ public class IODatabase
 		String metadata = identifier.getIdentifierLabel(
 						SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
 		Map<String, Object> metadataMap = extractMetaData(metadata);
+		System.out.println("Metadata: adding " + metadata);
 		
 		String filePath = (String) metadataMap.get(mFilepathLabel);
 		String fileSize = (String) metadataMap.get(mFilesizeLabel);
@@ -213,7 +216,7 @@ public class IODatabase
 		//Populate urlList with one or several URLs
 		List<String> urlList;
 		if (urlJsonObject instanceof ArrayList) {
-			urlList  = (List<String>) ((ArrayList<String>) urlJsonObject).clone();
+			urlList  = (ArrayList<String>) urlJsonObject;
 		} else {
 			String url = (String) urlJsonObject;
 			urlList = new ArrayList<String>();
@@ -226,6 +229,7 @@ public class IODatabase
 			ContentValues ioEntry = 
 					createIOEntry(hash, hashAlgorithm, contentType, filePath, fileSize);
 			
+			System.out.println("New information object: " + urlList.toString());
 			insert(TABLE_IO, ioEntry);
 		} else {
 			Log.d(TAG, "Information object already exists in database.");
@@ -277,6 +281,7 @@ public class IODatabase
 		do {
 			urlList.add(cursor.getString(1));
 		} while (cursor.moveToNext());
+		
 		return urlList;
 	}
 	
@@ -304,7 +309,7 @@ public class IODatabase
 			.addMetaData(mFilesizeLabel, cursor.getString(4));
 		
 		cursor = query(TABLE_URL, KEY_HASH, hash);
-
+		
 		do {
 			builder.addMetaData(mUrlLabel, cursor.getString(1));
 		} while (cursor.moveToNext());
@@ -329,10 +334,12 @@ public class IODatabase
 		String hash = cursor.getString(0);
 		
 		// Add all url fields
+		JSONArray urlArray = new JSONArray();
 		cursor = query(TABLE_URL, KEY_HASH, hash);
 		do {
-			metadata.insert(KEY_URL, cursor.getString(1));
+			urlArray.add(cursor.getString(1));
 		} while (cursor.moveToNext());
+		metadata.insert(KEY_URL, urlArray);
 		
 		// Build the metadata corresponding to the hash
 		cursor = query(TABLE_IO, KEY_HASH, hash);
@@ -384,10 +391,16 @@ public class IODatabase
 	 * @throws DatabaseException	Thrown, if a failure occured during extracting
 	 */
 	private Map<String, Object> extractMetaData(String metadata) throws DatabaseException {
-		Log.d(TAG, "Extracting metadata = " + metadata);
+		Object jsonObject = JSONValue.parse(metadata);
+		if (!(jsonObject instanceof JSONObject)) {
+			Log.e(TAG, "Invalid metadata.");
+			throw new DatabaseException(
+					"Metadata in the information object was an invalid JSONObject.");
+		}
+		
 		Map<String, Object> metadataMap = null;	
 		try {
-			metadataMap = MetadataParser.toMap(new JSONObject(metadata));
+			metadataMap = MetadataParser.toMap((JSONObject) jsonObject);
 		} catch (JSONException e) {
 			Log.e(TAG, "Error extracting metadata");
 			throw new DatabaseException("The IO cannot be inserted into the database. "

@@ -8,8 +8,7 @@ import java.util.HashSet;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
-import project.cs.lisa.R;
-import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.application.http.NetInfResponse;
@@ -21,10 +20,12 @@ import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 
 /**
@@ -47,6 +48,16 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
     /** Hash Algorithm. */
     private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
 
+    /** Web view to disply the web page. */
+    private WebView mWebView;
+    
+    /**
+     * Default constructor.
+     */
+    public FetchWebPageTask(WebView webView) {
+        mWebView = webView;
+    }
+
     /**
      * Retrieves and displays a web page.
      * @param urls
@@ -68,44 +79,10 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         return null;
     }
 
-    /**
-     * Creates a new task that downloads and displays a URL.
-     * @param url
-     *      The URL to download
-     * @return
-     *      The created task
-     */
-    private DownloadWebObject downloadAndDisplay(final URL url) {
-        return new DownloadWebObject() {
-            @Override
-            protected void onPostExecute(WebObject webObject) {
-
-                if (webObject == null) {
-                    MainNetInfActivity.showToast("Download failed. Check internet connection.");
-                    return;
-                }
-
-                File file = webObject.getFile();
-                String hash = webObject.getHash();
-                String contentType = webObject.getContentType();
-
-                displayWebpage(file);
-                try {
-                    if (shouldPublish()) {
-                        publish(file, url, hash, contentType).execute();
-                    }
-                } catch (IOException e) {
-                    Log.e(TAG, "Could not publish file.");
-                    e.printStackTrace();
-                }
-            }
-        };
-    }
-
     private boolean shouldPublish() {
         // Check for publish
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
+                PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
         return prefs.getBoolean("pref_key_publish", false);
     }
 
@@ -159,19 +136,55 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 try {
                     // Assume retrieve succedded, display page and publish
-                    displayWebpage(retrieve.getFile());
+                    displayWebpage(retrieve.getFile(), url.getHost());
                     try {
                         if (shouldPublish()) {
                             publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
                         }
                     } catch (IOException e) {
-                        MainNetInfActivity.showToast(e.getMessage());
+                        MainApplicationActivity.showToast(e.getMessage());
                     }
                 } catch (RequestFailedException e) {
                     // If the retrieve failed for any reason, use uplink
                     downloadAndDisplay(url).execute(url);
                 }
 
+            }
+        };
+    }
+
+    /**
+     * Creates a new task that downloads and displays a URL.
+     * @param url
+     *      The URL to download
+     * @return
+     *      The created task
+     */
+    private DownloadWebObject downloadAndDisplay(final URL url) {
+        return new DownloadWebObject() {
+            @Override
+            protected void onPostExecute(WebObject webObject) {
+
+                if (webObject == null) {
+                    MainApplicationActivity.showToast("Download failed. Check internet connection.");
+            		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
+            		MainApplicationActivity.getActivity().sendBroadcast(intent);
+                    return;
+                }
+                
+                Log.d(TAG, "Get web object");
+
+                File file = webObject.getFile();
+                String hash = webObject.getHash();
+                String contentType = webObject.getContentType();
+
+                displayWebpage(file, url.getHost());
+                try {
+                    publish(file, url, hash, contentType).execute();
+                } catch (IOException e) {
+                    Log.e(TAG, "Could not publish file.");
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -222,7 +235,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             publishRequest.setMetadata(metadata);
 
             // Check for fullput
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity().getApplicationContext());
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
             Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
 
@@ -254,18 +267,22 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      * @param webPage
      *      The web page
      */
-    private void displayWebpage(File webPage) {
+    private void displayWebpage(File webPage, String baseUrl) {
         if (webPage == null) {
             Log.d(TAG, "webPage == null");
-            MainNetInfActivity.showToast("Could not download web page.");
+            MainApplicationActivity.showToast("Could not download web page.");
             return;
         }
+        
         try {
+        	if (!URLUtil.isHttpsUrl(baseUrl)) {
+        		baseUrl = "http://" + baseUrl;
+        	}
+        	
             String result = FileUtils.readFileToString(webPage);
-            WebView webView = (WebView) MainNetInfActivity.getActivity().findViewById(R.id.webView);
-            webView.loadDataWithBaseURL(result, result, "text/html", null, null);
+            mWebView.loadDataWithBaseURL(baseUrl, result, "text/html", "UTF-8", null);
         } catch (IOException e) {
-            MainNetInfActivity.showToast("Could not load web page.");
+            MainApplicationActivity.showToast("Could not load web page.");
         }
     }
 }

@@ -94,8 +94,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
             String hashAlg, String hash) {
         this(pathPrefix);
 
-        Log.d(TAG, "NetInfRequest()");
-
         addQuery("hashAlg", hashAlg);
         addQuery("hash", hash);
     }
@@ -128,10 +126,7 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      In case the HTTP request failed
      */
     protected HttpResponse execute(HttpUriRequest request) throws IOException {
-        Log.d(TAG, "execute()");
         Log.d(TAG, "uri = " + request.getURI());
-        Log.d(TAG, "class = " + request.getClass().toString());
-        Log.d(TAG, "method = " + request.getMethod().toString());
 
         // Execute the HTTP request
         return mClient.execute(request);
@@ -145,9 +140,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      The value of the query key
      */
     protected void addQuery(String key, String value) {
-        Log.d(TAG, "addQuery()");
-        Log.d(TAG, "key = " + key);
-        Log.d(TAG, "value = " + value);
         if (key == null) {
             throw new IllegalArgumentException("addQuery called with null key");
         }
@@ -165,7 +157,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      In case UTF-8 is not supported
      */
     protected String getQueryString() throws UnsupportedEncodingException {
-        Log.d(TAG, "getQueryString()");
         StringBuilder queryString = new StringBuilder();
         boolean first = true;
         for (String key : mQueryVariables.keySet()) {
@@ -189,7 +180,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      In case UTF-8 is not supported
      */
     protected String getUri() throws UnsupportedEncodingException {
-        Log.d(TAG, "getUri()");
         StringBuilder uri = new StringBuilder();
         uri.append(HTTP);
         uri.append(mHost);
