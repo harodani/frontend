@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.cs.netinfservice.application.MainNetInfApplication;
+import project.cs.netinfservice.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -50,7 +51,8 @@ public enum BluetoothDiscovery {
     INSTANCE;
 
     /** The constant timeout for the Bluetooth discovery task. */
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.timeout"));
 
     /** The Debug TAG for this Activity. */
     private static final String TAG = "BluetoothDiscovery";
@@ -142,6 +144,10 @@ public enum BluetoothDiscovery {
         };
     }
     
+    /**
+     * Return the list of discovered devices.
+     * @return the list of discovered devices
+     */
     public List<String> getAvailableDevices() {
 		return mAvailableDevices;
 

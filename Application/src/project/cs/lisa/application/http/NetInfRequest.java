@@ -13,6 +13,8 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import project.cs.lisa.util.UProperties;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,20 +31,17 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     /** Debug Log Tag. */
     private static final String TAG = "NetInfRequest";
 
-    // TODO inject from properties?
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
 
-    // TODO inject from properties?
     // TODO handle timeout
     /** HTTP Timeout. */
-    private static final int TIMEOUT = 6000000;
+    private static final int TIMEOUT = 
+    		Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("httprequest.timeout"));
 
-    // TODO inject from properties?
     /** Target Host. */
     private String mHost;
 
-    // TODO inject from properties?
     /** Target Port. */
     private String mPort;
 
@@ -64,12 +63,12 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      * @param pathPrefix
      *      The start of the path
      */
-    protected NetInfRequest(String host, String port, String pathPrefix) {
+    protected NetInfRequest(String pathPrefix) {
 
         Log.d(TAG, "NetInfRequest()");
 
-        mHost = host;
-        mPort = port;
+        mHost = UProperties.INSTANCE.getPropertyWithName("nrs.http.host");
+        mPort = UProperties.INSTANCE.getPropertyWithName("nrs.http.port");;
         mPathPrefix = pathPrefix;
 
         // HTTP client with a timeout
@@ -90,9 +89,9 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      * @param hash
      *      Hash
      */
-    public NetInfRequest(String host, String port, String pathPrefix,
+    public NetInfRequest(String pathPrefix,
             String hashAlg, String hash) {
-        this(host, port, pathPrefix);
+        this(pathPrefix);
 
         Log.d(TAG, "NetInfRequest()");
 

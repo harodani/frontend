@@ -56,7 +56,7 @@ public class NetInfRetrieve extends NetInfRequest {
 	public NetInfRetrieve(String host, String port,
 			String hashAlg, String hash) {
 
-		super(host, port, "retrieve", hashAlg, hash);
+		super("retrieve", hashAlg, hash);
 	}
 
     /**

@@ -84,6 +84,7 @@ public class MainNetInfActivity extends Activity {
     /** Activity. */
     private static MainNetInfActivity sMainNetInfActivity;
     
+    /** Handles the Bluetooth discovery interval */
     private Handler handler;
 
 

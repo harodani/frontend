@@ -217,7 +217,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             locators.add(new Locator(Locator.Type.BLUETOOTH, adapter.getAddress()));
 
             // Create the publish, adding locators, content type, and metadata
-            NetInfPublish publishRequest = new NetInfPublish(HOST, PORT, HASH_ALG, hash, locators);
+            NetInfPublish publishRequest = new NetInfPublish(HASH_ALG, hash, locators);
             publishRequest.setContentType(contentType);
             publishRequest.setMetadata(metadata);
 

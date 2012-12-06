@@ -120,13 +120,13 @@ public enum TransferDispatcher {
         /* Try to discover available devices and only keep those
          * locators that are right now available via bluetooth.
          */
-        List<String> availableFilteredBluetoothLocators = filterBluetoothLocators(locators,false);
+        List<String> availableFilteredBluetoothLocators = filterBluetoothLocators(locators, false);
         
         //If the device was not discover it will try to discover again
         if (availableFilteredBluetoothLocators == null 
         		|| availableFilteredBluetoothLocators.isEmpty()) {
         	Log.d(TAG, "The device was not in the previous discovery. Discovering again.");
-        	availableFilteredBluetoothLocators = filterBluetoothLocators(locators,true);
+        	availableFilteredBluetoothLocators = filterBluetoothLocators(locators, true);
         }
         
         byte[] resultArray;

@@ -64,12 +64,15 @@ public class BluetoothServer extends Thread {
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     /** The buffer for reading in the hash out of a file request message. */
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.buffer"));
 
     /** 
      * Represents the number of attempts to create the Bluetooth server socket. 
      */
-    private static final int NUMBER_OF_ATTEMPTS = 2;
+    private static final int NUMBER_OF_ATTEMPTS = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.number_attempts"));
+
 
     /** Flag determining how long to listen for incoming pairing 
      * requests. 

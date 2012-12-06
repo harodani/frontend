@@ -69,10 +69,9 @@ public class NetInfPublish extends NetInfRequest {
      * @param locators
      *      Set of locators to publish
      */
-    public NetInfPublish(String host, String port,
-            String hashAlg, String hash, Set<Locator> locators) {
+    public NetInfPublish(String hashAlg, String hash, Set<Locator> locators) {
 
-        super(host, port, "publish", hashAlg, hash);
+        super("publish", hashAlg, hash);
         Log.d(TAG, "NetInfPublish()");
         mLocators = locators;
     }

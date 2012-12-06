@@ -61,7 +61,8 @@ public class StarterNodeThread extends Thread {
         if (resolutionController != null) {
             // Plug in Resolution Services
             Log.d(TAG, "getting resolution services...");
-            ResolutionService[] resolutionServices = MainNetInfApplication.getInjector().getInstance(ResolutionService[].class);
+            ResolutionService[] resolutionServices = 
+            		MainNetInfApplication.getInjector().getInstance(ResolutionService[].class);
 
             if (resolutionServices.length == 0) {
                 Log.d(TAG, "(NODE ) I have no active resolution services");
@@ -70,7 +71,8 @@ public class StarterNodeThread extends Thread {
             Log.d(TAG, "adding resolution services...");
             for (ResolutionService resolutionService : resolutionServices) {
                 resolutionController.addResolutionService(resolutionService);
-                Log.d(TAG, "Added resolution service '" + resolutionService.getClass().getCanonicalName() + "'");
+                Log.d(TAG, "Added resolution service '" 
+                		+ resolutionService.getClass().getCanonicalName() + "'");
                 Log.d(TAG, "(NODE ) I can resolve via " + resolutionService.describe());
             }
         }
@@ -82,7 +84,8 @@ public class StarterNodeThread extends Thread {
 
         if (searchController != null) {
             // Plug in Search Services
-            SearchService[] searchServices = MainNetInfApplication.getInjector().getInstance(SearchService[].class);
+            SearchService[] searchServices = MainNetInfApplication
+            		.getInjector().getInstance(SearchService[].class);
 
             if (searchServices.length == 0) {
                 Log.d(TAG, "(NODE ) I have no active search services");

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import project.cs.netinfservice.netinf.provider.ByteArrayProvider;
+import project.cs.netinfservice.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -58,7 +59,8 @@ public class BluetoothProvider implements ByteArrayProvider {
     private static final String BLUETOOTH_LOCATOR_INDICATOR = "nimacbt";
 
     /** Represents the number of attempts to connect to a remote device. */
-    private static final int NUMBER_OF_ATTEMPTS = 2;
+    private static final int NUMBER_OF_ATTEMPTS = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.number_attempts"));
 
     /** The Bluetooth adapter. */
     private BluetoothAdapter mBluetoothAdapter = null;

@@ -39,6 +39,7 @@ import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
+import project.cs.netinfservice.util.UProperties;
 import android.util.Log;
 
 import com.google.inject.Inject;
@@ -148,7 +149,9 @@ public class LocalResolutionService
 	    ResolutionServiceIdentityObject identity = mDatamodelFactory
 	            .createDatamodelObject(ResolutionServiceIdentityObject.class);
 	    identity.setName(TAG);
-	    identity.setDefaultPriority(77);
+	    int priority = Integer.parseInt(UProperties.INSTANCE
+	    		.getPropertyWithName("lrs.priority"));
+	    identity.setDefaultPriority(priority);
 	    identity.setDescription(describe());
 	    return identity;
 	}

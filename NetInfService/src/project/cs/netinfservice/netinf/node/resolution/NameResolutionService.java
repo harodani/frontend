@@ -74,6 +74,7 @@ import project.cs.netinfservice.application.SettingsActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
+import project.cs.netinfservice.util.UProperties;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -96,7 +97,8 @@ implements ResolutionService {
     /** Debug tag. **/
     public static final String TAG = "NameResolutionService";
     /** Message ID random value max. **/
-    public static final int MSG_ID_MAX = 100000000;
+    public static final int MSG_ID_MAX = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.max_messsage"));
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
     
@@ -105,7 +107,8 @@ implements ResolutionService {
     /** NRS port. **/
     private int mPort;
     /** HTTP connection timeout. **/
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = Integer
+    		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.timeout"));
     /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
     private final DatamodelFactory mDatamodelFactory;
     /** Random number generator used to create message IDs. **/
@@ -173,7 +176,7 @@ implements ResolutionService {
     private int getPort() {
     	SharedPreferences sharedPreferences = 
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
-		mPort = mPort = Integer.parseInt(sharedPreferences
+		mPort = Integer.parseInt(sharedPreferences
 				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
 		return mPort;
 
@@ -682,7 +685,9 @@ implements ResolutionService {
         ResolutionServiceIdentityObject identity = mDatamodelFactory
                 .createDatamodelObject(ResolutionServiceIdentityObject.class);
         identity.setName(TAG);
-        identity.setDefaultPriority(42);
+        int priority = Integer.parseInt(UProperties.INSTANCE
+	    		.getPropertyWithName("nrs.priority"));
+        identity.setDefaultPriority(priority);
         identity.setDescription(describe());
         return identity;
     }
