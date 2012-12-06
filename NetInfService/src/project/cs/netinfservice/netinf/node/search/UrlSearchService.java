@@ -387,7 +387,7 @@ public class UrlSearchService implements SearchService {
 
     @Override
     public String describe() {
-        return "the local SQLite DB";
+        return "the URL search service";
     }
 
 }
