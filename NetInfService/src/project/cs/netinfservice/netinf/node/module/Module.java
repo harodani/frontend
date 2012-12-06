@@ -63,10 +63,17 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryProvider;
 import com.google.inject.name.Names;
 
+/**
+ * Bindings.
+ * @author Linus Sunde
+ *
+ */
 public class Module extends AbstractModule  {
 
+	/** Debug tag. */
     public static final String TAG = "Module";
 
+    /** Constructor */
     public Module() {
         Log.d(TAG, "Module()");
     }
@@ -104,14 +111,14 @@ public class Module extends AbstractModule  {
         bind(AccessServer.class).to(RESTAccessServer.class).in(Singleton.class);
 
         Log.d(TAG, "Binding 9");
-        bind(IODatabaseFactory.class).toProvider(FactoryProvider.newFactory(IODatabaseFactory.class, IODatabase.class));
+        bind(IODatabaseFactory.class)
+        .toProvider(FactoryProvider.newFactory(IODatabaseFactory.class, IODatabase.class));
 
         Log.d(TAG, "Binding 10");
         bind(UrlSearchService.class);
 
         Log.d(TAG, "Binding 11");
         bind(SearchController.class).to(SearchControllerImpl.class).in(Singleton.class);
-
     }
 
     /**
@@ -121,8 +128,9 @@ public class Module extends AbstractModule  {
      * to this method, since this puts GUICE in
      * charge of creating the correct instance of the according service.
      *
-     * @param nrs	The name resolution service
-     * @param lrs	The local resolution service
+     * @param 	nrs	The name resolution service
+     * @param 	lrs	The local resolution service
+     * @return 	The list of resulution services
      */
     @Singleton
     @Provides
@@ -132,8 +140,10 @@ public class Module extends AbstractModule  {
         ResolutionService[] localResolutionService  = { lrs };
         ResolutionService[] nameResolutionService = { nrs };
 
-        return (ResolutionService[]) ArrayUtils.addAll(nameResolutionService, localResolutionService);
+        return (ResolutionService[]) ArrayUtils
+        		.addAll(nameResolutionService, localResolutionService);
     }
+
 
     @Singleton
     @Provides

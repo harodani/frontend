@@ -37,8 +37,10 @@ import android.util.Log;
 
 public class StarterNodeThread extends Thread {
 
+	/** Debug TAG. */
     public static final String TAG = "StarterNodeThread";
 
+    /** The NetInf Node that is going to be started. */
     private NetInfNode mNode;
 
     @Override
@@ -51,7 +53,7 @@ public class StarterNodeThread extends Thread {
     }
 
     /**
-     * Begin all the resolution services
+     * Begin all the resolution services.
      */
     private void startResolution() {
         Log.d(TAG, "startResolution()");

@@ -30,13 +30,16 @@
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
  *
  *     * Redistributions of source code must retain the above copyright notice,
  *       this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice,
- *       this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of the University of Paderborn nor the names of its contributors may be used to endorse
+ *       this list of conditions and the following disclaimer in the documentation 
+ *       and/or other materials provided with the distribution.
+ *     	 Neither the name of the University of Paderborn nor the names of 
+ *       its contributors may be used to endorse
  *       or promote products derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
@@ -122,7 +125,7 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Debug.
-     * @throws NetInfCheckedException
+     * @throws NetInfCheckedException Thrown when publish fails
      */
     @Post
     public void handlePost() throws NetInfCheckedException {
@@ -150,9 +153,7 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Publish an IO.
-     * @return      JSON String with key "status" set to "ok" if publish succeeded
-     *              or "failed" if publish failed
-     * @throws NetInfCheckedException
+     * @throws NetInfCheckedException thrown when publish fails
      */
     @Put
     public void putIO() throws NetInfCheckedException {
@@ -160,10 +161,19 @@ public class IOResource extends LisaServerResource {
         publish();
     }
 
+    /**
+     * Publish an IO.
+     * @throws NetInfCheckedException thrown when publish fails
+     */
     private void publish() throws NetInfCheckedException {
         publish(new IOBuilder(mDatamodelFactory));
     }
 
+    /**
+     * Publish an IO.
+     * @param builder 					An IOBuilder
+     * @throws NetInfCheckedException	Thrown when putIO fails
+     */
     private void publish(IOBuilder builder) throws NetInfCheckedException {
 
         builder.setHash(mHash).setHashAlgorithm(mHashAlg);
