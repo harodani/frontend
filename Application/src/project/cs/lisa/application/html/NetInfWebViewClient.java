@@ -187,7 +187,7 @@ public class NetInfWebViewClient extends WebViewClient {
 	 */
 	private NetInfSearchResponse search(String url) throws Exception {
 		NetInfSearchResponse response;
-		NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty");
+		NetInfSearch search = new NetInfSearch(url.toString(), "empty");
 		search.execute();
 		response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
 		Log.d(TAG, "Search response: " + response.toString());
@@ -230,7 +230,7 @@ public class NetInfWebViewClient extends WebViewClient {
 			locators.add(new Locator(Locator.Type.BLUETOOTH, adapter.getAddress()));
 
 			// Create the publish, adding locators, content type, and metadata
-			NetInfPublish publishRequest = new NetInfPublish(HOST, PORT, HASH_ALG, hash, locators);
+			NetInfPublish publishRequest = new NetInfPublish(HASH_ALG, hash, locators);
 			publishRequest.setContentType(contentType);
 			publishRequest.setMetadata(metadata);
 

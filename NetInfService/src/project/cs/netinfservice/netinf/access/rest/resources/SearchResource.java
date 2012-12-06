@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.restlet.resource.Get;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
+import project.cs.netinfservice.util.UProperties;
 import project.cs.netinfservice.util.metadata.Metadata;
 import android.util.Log;
 
@@ -20,7 +21,8 @@ public class SearchResource extends LisaServerResource {
 
     private static final String TAG = "SearchResource";
 
-    private static final int TIMEOUT = 1000;
+    private static final int TIMEOUT = Integer.parseInt(UProperties.INSTANCE
+            .getPropertyWithName("search.timeout"));
 
     private String mTokens;
 

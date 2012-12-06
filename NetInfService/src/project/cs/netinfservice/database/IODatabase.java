@@ -39,6 +39,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.netinf.node.search.SearchResultImpl;
@@ -48,6 +49,7 @@ import project.cs.netinfservice.util.metadata.Metadata;
 import project.cs.netinfservice.util.metadata.MetadataParser;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -101,7 +103,10 @@ public class IODatabase
 	/** The file size of the file associated with the IO. */
 	private static final String KEY_FILE_SIZE = "file_size";
 	
-	/** Meta-data label for the filepath. */
+    /** Local File system (database) transmission used to transfer a resource. */
+    public static final String LOCAL_TRANSMISSION = "project.cs.netinfservice.LOCAL_TRANSMISSION";
+
+    /** Meta-data label for the filepath. */
 	private final String mFilepathLabel;
 	
 	/** Meta-data label for the file size. */
@@ -299,6 +304,11 @@ public class IODatabase
 		Cursor cursor = query(TABLE_IO, KEY_HASH, hash);
 		
 		Log.d(TAG, "Found information object.");
+		
+        Log.d(TAG, "Sending Intent " + LOCAL_TRANSMISSION);
+        Intent intent = new Intent(LOCAL_TRANSMISSION);
+        MainNetInfActivity.getActivity().sendBroadcast(intent);
+
 		
 		IOBuilder builder = new IOBuilder(mDatamodelFactory);
 		builder.setHash(cursor.getString(0))

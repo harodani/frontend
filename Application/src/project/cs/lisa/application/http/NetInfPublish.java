@@ -110,6 +110,7 @@ public class NetInfPublish extends NetInfRequest {
             HttpResponse httpResponse = execute(request);
             return new NetInfPublishResponse(httpResponse);
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP publish request to local node failed");
             return new NetInfPublishResponse();
         }
     }

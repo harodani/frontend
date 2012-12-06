@@ -74,6 +74,7 @@ public class NetInfRetrieve extends NetInfRequest {
             HttpResponse httpResponse = execute(get);
             return new NetInfRetrieveResponse(httpResponse);
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP retrieve request to local node failed");
             return new NetInfRetrieveResponse();
         }
 

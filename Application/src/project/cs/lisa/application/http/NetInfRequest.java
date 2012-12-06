@@ -68,8 +68,8 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
 
         Log.d(TAG, "NetInfRequest()");
 
-        mHost = UProperties.INSTANCE.getPropertyWithName("nrs.http.host");
-        mPort = UProperties.INSTANCE.getPropertyWithName("nrs.http.port");;
+        mHost = UProperties.INSTANCE.getPropertyWithName("access.http.host");
+        mPort = UProperties.INSTANCE.getPropertyWithName("access.http.port");;
         mPathPrefix = pathPrefix;
 
         // HTTP client with a timeout
