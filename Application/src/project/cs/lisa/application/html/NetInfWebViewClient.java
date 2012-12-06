@@ -5,15 +5,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
 import project.cs.lisa.R;
-import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.html.transfer.DownloadWebObject;
 import project.cs.lisa.application.html.transfer.WebObject;
 import project.cs.lisa.application.http.Locator;
@@ -58,9 +56,6 @@ public class NetInfWebViewClient extends WebViewClient {
 	/** The url extra field for the intent for URL updates. */
 	public static final String URL = "url";
 
-	/** The url extra field for the intent for URL updates. */
-	public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
-
 	/** NetInf Restlet Address. */
 	private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
 
@@ -76,15 +71,15 @@ public class NetInfWebViewClient extends WebViewClient {
 		Log.d(TAG, "Url was updated. Sending intent.");
 		Intent intent = new Intent(URL_WAS_UPDATED);
 		intent.putExtra(URL, url);
-		MainNetInfActivity.getActivity().sendBroadcast(intent);
+		MainApplicationActivity.getActivity().sendBroadcast(intent);
 		return true;
 	}
 
 	@Override
 	public void onPageFinished(WebView view, String url) {
 		super.onPageFinished(view, url);
-		Intent intent = new Intent(FINISHED_LOADING_PAGE);
-		MainNetInfActivity.getActivity().sendBroadcast(intent);
+		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
+		MainApplicationActivity.getActivity().sendBroadcast(intent);
 	}
 
 	@Override
@@ -107,7 +102,7 @@ public class NetInfWebViewClient extends WebViewClient {
 			return null;
 
 		} else if (URLUtil.isHttpUrl(url)) {
-			Log.d(TAG, "Try to retrieve resource from url.");
+			Log.d(TAG, "Try to retrieve resource from url: " + url);
 			WebObject resource = null;
 			File file = null;
 			String contentType = null;
@@ -194,8 +189,8 @@ public class NetInfWebViewClient extends WebViewClient {
 		NetInfSearchResponse response;
 		NetInfSearch search = new NetInfSearch(HOST, PORT, url.toString(), "empty");
 		search.execute();
-		response = (NetInfSearchResponse) search.get();
-
+		response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
+		Log.d(TAG, "Search response: " + response.toString());
 		return response;
 
 	}
@@ -240,7 +235,7 @@ public class NetInfWebViewClient extends WebViewClient {
 			publishRequest.setMetadata(metadata);
 
 			// Check for fullput
-			Menu menu = (Menu) MainNetInfActivity.getActivity().getMenu();
+			Menu menu = (Menu) MainApplicationActivity.getActivity().getMenu();
 			MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
 			if (fullPut.isChecked()) {
 				publishRequest.setFile(file);

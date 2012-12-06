@@ -72,7 +72,7 @@ import android.widget.Toast;
  * @author Linus Sunde
  *
  */
-public class MainNetInfActivity extends Activity {
+public class MainApplicationActivity extends Activity {
 
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
@@ -80,8 +80,11 @@ public class MainNetInfActivity extends Activity {
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
 
+	/** The url extra field for the intent for URL updates. */
+	public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
+    
     /** Activity context. */
-    private static MainNetInfActivity sMainNetInfActivity;
+    private static MainApplicationActivity sMainNetInfActivity;
 
     /** Broadcast receiver. */
     private BroadcastReceiver mBroadcastReceiver;
@@ -132,7 +135,7 @@ public class MainNetInfActivity extends Activity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(NODE_STARTED_MESSAGE);
         mIntentFilter.addAction(NetInfWebViewClient.URL_WAS_UPDATED);
-        mIntentFilter.addAction(NetInfWebViewClient.FINISHED_LOADING_PAGE);
+        mIntentFilter.addAction(MainApplicationActivity.FINISHED_LOADING_PAGE);
         registerReceiver(mBroadcastReceiver, mIntentFilter);
 
 
@@ -330,7 +333,7 @@ public class MainNetInfActivity extends Activity {
                     mEditText.setText(newUrl);
                     startFetchingWebPage();                    
                     
-                } else if (action.equals(NetInfWebViewClient.FINISHED_LOADING_PAGE)) {
+                } else if (action.equals(FINISHED_LOADING_PAGE)) {
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     img.setImageResource(R.drawable.refresh);
                     img.setTag(R.drawable.refresh);
@@ -354,7 +357,7 @@ public class MainNetInfActivity extends Activity {
      * Returns the context of this activity.
      * @return  the context
      */
-    public static MainNetInfActivity getActivity() {
+    public static MainApplicationActivity getActivity() {
         return sMainNetInfActivity;
     }
 

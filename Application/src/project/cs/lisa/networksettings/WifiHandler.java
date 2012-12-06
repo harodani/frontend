@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.dialogs.ListDialog;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -75,12 +75,12 @@ public class WifiHandler {
     private String currentChosenNetwork;
 
     public WifiHandler() {
-        wifiManager = (WifiManager) MainNetInfActivity.getActivity().getSystemService(Context.WIFI_SERVICE); 
+        wifiManager = (WifiManager) MainApplicationActivity.getActivity().getSystemService(Context.WIFI_SERVICE); 
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
 
-        progressBar = new ProgressDialog(MainNetInfActivity.getActivity());
+        progressBar = new ProgressDialog(MainApplicationActivity.getActivity());
         setUpBroadcastReceiver();
     }
 
@@ -92,7 +92,7 @@ public class WifiHandler {
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        MainNetInfActivity.getActivity().registerReceiver(mReceiver, filter);
+        MainApplicationActivity.getActivity().registerReceiver(mReceiver, filter);
 
 
         wifiManager.startScan();
@@ -184,7 +184,7 @@ public class WifiHandler {
                     Log.d(TAG, "chosenNetwork: " + chosenNetWork);
 
                     if (chosenNetWork.equals(currentChosenNetwork) && state == SupplicantState.COMPLETED) {
-                        new AlertDialog.Builder(MainNetInfActivity.getActivity())
+                        new AlertDialog.Builder(MainApplicationActivity.getActivity())
                         .setMessage("You have been successfully connected to " + currentChosenNetwork)
                         .setTitle("Wifi message")
                         .setCancelable(true)
@@ -195,7 +195,7 @@ public class WifiHandler {
                     }
 
                     if (doneScanning) {
-                        MainNetInfActivity.getActivity().unregisterReceiver(mReceiver);
+                        MainApplicationActivity.getActivity().unregisterReceiver(mReceiver);
                     }
                 }
             }

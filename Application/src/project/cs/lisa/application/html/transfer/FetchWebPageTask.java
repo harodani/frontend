@@ -9,7 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
 import project.cs.lisa.R;
-import project.cs.lisa.application.MainNetInfActivity;
+import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.http.Locator;
 import project.cs.lisa.application.http.NetInfPublish;
 import project.cs.lisa.application.http.NetInfResponse;
@@ -21,6 +21,7 @@ import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Menu;
@@ -133,7 +134,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     try {
                         publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
                     } catch (IOException e) {
-                        MainNetInfActivity.showToast(e.getMessage());
+                        MainApplicationActivity.showToast(e.getMessage());
                     }
                 } catch (RequestFailedException e) {
                     // If the retrieve failed for any reason, use uplink
@@ -157,9 +158,13 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             protected void onPostExecute(WebObject webObject) {
 
                 if (webObject == null) {
-                    MainNetInfActivity.showToast("Download failed. Check internet connection.");
+                    MainApplicationActivity.showToast("Download failed. Check internet connection.");
+            		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
+            		MainApplicationActivity.getActivity().sendBroadcast(intent);
                     return;
                 }
+                
+                Log.d(TAG, "Get web object");
 
                 File file = webObject.getFile();
                 String hash = webObject.getHash();
@@ -222,7 +227,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             publishRequest.setMetadata(metadata);
 
             // Check for fullput
-            Menu menu = (Menu) MainNetInfActivity.getActivity().getMenu();
+            Menu menu = (Menu) MainApplicationActivity.getActivity().getMenu();
             MenuItem fullPut = menu.findItem(R.id.menu_publish_file);
             if (fullPut.isChecked()) {
                 publishRequest.setFile(file);
@@ -255,7 +260,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
     private void displayWebpage(File webPage, String baseUrl) {
         if (webPage == null) {
             Log.d(TAG, "webPage == null");
-            MainNetInfActivity.showToast("Could not download web page.");
+            MainApplicationActivity.showToast("Could not download web page.");
             return;
         }
         
@@ -267,7 +272,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             String result = FileUtils.readFileToString(webPage);
             mWebView.loadDataWithBaseURL(baseUrl, result, "text/html", "UTF-8", null);
         } catch (IOException e) {
-            MainNetInfActivity.showToast("Could not load web page.");
+            MainApplicationActivity.showToast("Could not load web page.");
         }
     }
 }
