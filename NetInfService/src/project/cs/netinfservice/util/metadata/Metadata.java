@@ -98,12 +98,10 @@ public class Metadata {
             Log.d(TAG, "The JSON Object was created, but you gave me two arrays of "
                     + "different sizes!");
             // Null or lost values
-            if (key.length > value.length) {
+            if (key.length > value.length) 
                 Log.d(TAG, "The JSON Object created has null values.");
-            }
-            else {
+            else 
                 Log.d(TAG, "The JSON Object created has lost values.");
-            }
         }
 
         for (int i = 0; i < key.length; i++) {

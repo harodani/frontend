@@ -225,7 +225,7 @@ public class Metadata {
     public String remove_brackets(String str) {
         // TODO Auto-generated method stub
         Log.d(TAG, "str " + str);
-        Log.d(TAG, "return: " + str.substring(str.indexOf("\"")+1, str.indexOf("\"", str.length()-6)));
-        return str.substring(str.indexOf("\"")+1, str.indexOf("\"", str.length()-6));
+        Log.d(TAG, "return: " + str.substring(str.indexOf("\"")+1, str.indexOf("\"", str.length() - 6)));
+        return str.substring(str.indexOf("\"") + 1, str.indexOf("\"", str.length() - 6));
     }
 }

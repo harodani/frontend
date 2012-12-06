@@ -116,7 +116,7 @@ public class BluetoothProvider implements ByteArrayProvider {
      * @return  The Bluetooth socket for the communication.
      * @throws  IOException The exception for the socket.
      */
-    private BluetoothSocket connectToRemoteDevice(String locator) throws IOException{
+    private BluetoothSocket connectToRemoteDevice(String locator) throws IOException {
         Log.d(TAG, "Start requesting a socket to a remote device: " + locator);
 
         BluetoothSocket socket = null;

@@ -177,7 +177,7 @@ public class SearchRequest extends LisaServerResource {
 
         // Search request requires three fields: tokens (keywords), message-id and ext.
         mTokens = getQuery().getFirstValue("tokens", true);
-        mMsgId = newMsgId();//getQuery().getFirstValue("msgId", true);
+        mMsgId = newMsgId();
         mExt = getQuery().getFirstValue("ext", true);
 
         /* DATABASE SEARCH */

@@ -84,10 +84,13 @@ public class MainNetInfActivity extends Activity {
     /** Activity. */
     private static MainNetInfActivity sMainNetInfActivity;
     
-    /** Handles the Bluetooth discovery interval */
-    private Handler handler;
+    /** Handles the Bluetooth discovery interval. */
+    private Handler mHandler;
 
 
+    /**
+     * Creates a Listener for the preference menu.
+     */
     private OnSharedPreferenceChangeListener mListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(
@@ -131,23 +134,9 @@ public class MainNetInfActivity extends Activity {
                 .commit();
         
         //Initialize a handler
-        handler = new Handler();
+        mHandler = new Handler();
         
-        /* Creates and run a thread that is run every interval ms
-         * that runs the Bluetooth Discovery in background 
-        */
-        Runnable bluetoothTask = new Runnable() {
-			
-			@Override
-			public void run() {
-				Log.d(TAG, "Discovering bluetooth. ");
-				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
-		        btDiscovery.startBluetoothDiscovery();
-		        int interval = Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.interval"));
-		        handler.postDelayed(this, interval);
-			}
-		};
-		new Thread(bluetoothTask).start();
+        runBluetoothDiscoveryBackground();
 
         /*
          * Set up some notification depending on the connection: colors.
@@ -155,8 +144,33 @@ public class MainNetInfActivity extends Activity {
          */
 
     }
+    
+    
 
     /**
+     * Creates and run a thread that is run every interval ms
+     * that runs the Bluetooth Discovery in background.
+     */
+    private void runBluetoothDiscoveryBackground() {
+		// TODO Auto-generated method stub
+    	Runnable bluetoothTask = new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d(TAG, "Discovering bluetooth. ");
+				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
+		        btDiscovery.startBluetoothDiscovery();
+		        int interval = Integer.parseInt(UProperties.INSTANCE
+		        		.getPropertyWithName("bluetooth.interval"));
+		        mHandler.postDelayed(this, interval);
+			}
+		};
+		new Thread(bluetoothTask).start();
+	}
+
+
+
+	/**
      * Stops the Bluetooth server.
      */
     private void stopBluetoothServer() {
