@@ -141,4 +141,9 @@ public enum BluetoothDiscovery {
             }
         };
     }
+    
+    public List<String> getAvailableDevices() {
+		return mAvailableDevices;
+
+	}
 }
