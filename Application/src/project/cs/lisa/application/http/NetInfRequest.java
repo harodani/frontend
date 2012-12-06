@@ -32,7 +32,8 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     private static final String TAG = "NetInfRequest";
 
     /** HTTP Scheme. */
-    private static final String HTTP = "http://";
+    private static final String HTTP = 
+    		UProperties.INSTANCE.getPropertyWithName("http");
 
     // TODO handle timeout
     /** HTTP Timeout. */

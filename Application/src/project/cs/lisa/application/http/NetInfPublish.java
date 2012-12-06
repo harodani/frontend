@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import project.cs.lisa.util.UProperties;
 import project.cs.lisa.util.metadata.Metadata;
 import android.util.Log;
 
@@ -48,7 +49,8 @@ public class NetInfPublish extends NetInfRequest {
     public static final String TAG = "NetInfPublish";
 
     /** Encoding. */
-    public static final String ENCODING = "UTF-8";
+    public static final String ENCODING = 
+    		UProperties.INSTANCE.getPropertyWithName("httprequest.encode");
 
     /** Locators. */
     private Set<Locator> mLocators;
