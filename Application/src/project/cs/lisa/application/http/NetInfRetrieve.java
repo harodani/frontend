@@ -68,7 +68,6 @@ public class NetInfRetrieve extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-        Log.d(TAG, "doInBackground()");
 
         try {
             HttpGet get = new HttpGet(getUri());

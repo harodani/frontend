@@ -32,10 +32,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.provider.ByteArrayProvider;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -59,6 +61,9 @@ public class BluetoothProvider implements ByteArrayProvider {
 
     /** Represents the number of attempts to connect to a remote device. */
     private static final int NUMBER_OF_ATTEMPTS = 2;
+    
+    /** Bluetooth transmission used to transfer a resource. */
+    public static final String BLUETOOTH_TRANSMISSION = "project.cs.netinfservice.BLUETOOTH_TRANSMISSION";
 
     /** The Bluetooth adapter. */
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -177,6 +182,10 @@ public class BluetoothProvider implements ByteArrayProvider {
      */
     private byte[] downloadFile(BluetoothSocket socket) throws IOException {
         Log.d(TAG, "Begining downloading the file");
+
+        Log.d(TAG, "Sending Intent " + BLUETOOTH_TRANSMISSION);
+        Intent intent = new Intent(BLUETOOTH_TRANSMISSION);
+        MainNetInfActivity.getActivity().sendBroadcast(intent);
 
         DataInputStream inStream = null;
         byte[] buffer = null;

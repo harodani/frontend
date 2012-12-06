@@ -76,11 +76,23 @@ public class MainApplicationActivity extends BaseMenuActivity {
     private static final String TAG = "MainApplicationActivity";
 
     /** Message communicating if the node were started successfully. */
-    public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
+    public static final String NODE_STARTED_MESSAGE = "project.cs.lisa.node.started";
 
-	/** The url extra field for the intent for URL updates. */
-	public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
-    
+    /** The url extra field for the intent for URL updates. */
+    public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
+
+    /** Bluetooth transmission used to transfer a resource. */
+    public static final String BLUETOOTH_TRANSMISSION = "project.cs.netinfservice.BLUETOOTH_TRANSMISSION";
+
+    /** Local File system (database) transmission used to transfer a resource. */
+    public static final String LOCAL_TRANSMISSION = "project.cs.netinfservice.LOCAL_TRANSMISSION";
+
+    /** Uplink transmission used to transfer a resource. */
+    public static final String UPLINK_TRANSMISSION = "project.cs.lisa.UPLINK_TRANSMISSION";
+
+    /** NRS cache transmission used to transfer a resource. */
+    public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
+
     /** Activity context. */
     private static MainApplicationActivity sMainNetInfActivity;
 
@@ -131,7 +143,11 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(NODE_STARTED_MESSAGE);
         mIntentFilter.addAction(NetInfWebViewClient.URL_WAS_UPDATED);
-        mIntentFilter.addAction(MainApplicationActivity.FINISHED_LOADING_PAGE);
+        mIntentFilter.addAction(FINISHED_LOADING_PAGE);
+        mIntentFilter.addAction(BLUETOOTH_TRANSMISSION);
+        mIntentFilter.addAction(LOCAL_TRANSMISSION);
+        mIntentFilter.addAction(UPLINK_TRANSMISSION);
+        mIntentFilter.addAction(NRS_TRANSMISSION);
         registerReceiver(mBroadcastReceiver, mIntentFilter);
 
 
@@ -184,6 +200,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mWebView.setWebViewClient(new NetInfWebViewClient());
 
         mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
+        mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
+        mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
         mSpinningBar.setVisibility(View.INVISIBLE);
 
         //        showDialog(new ShareDialog());
@@ -219,24 +237,24 @@ public class MainApplicationActivity extends BaseMenuActivity {
         }
     }
 
-// TODO Please don't delete yet
-//    public void debug() {
-//        // DEBUG
-//        NetInfSearch search = null;
-//            search = new NetInfSearch("localhost", "8080", "http://support.google.com/richmedia/bin/answer.py?hl=en&answer=1100953&ctx=cb&src=cb&cbid=100pnperzakdj&cbrank=5", "empty") {
-//                @Override
-//                protected void onPostExecute(NetInfResponse response) {
-//                     NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
-//                     Log.d("DEBUG", searchResponse.getStatus().toString());
-//                     try {
-//                        Log.d("DEBUG", searchResponse.getSearchResults().toString());
-//                    } catch (RequestFailedException e) {
-//                        Log.d("DEBUG", "Search failed :(");
-//                    }
-//                }
-//            };
-//        search.execute();
-//    }
+    // TODO Please don't delete yet
+    //    public void debug() {
+    //        // DEBUG
+    //        NetInfSearch search = null;
+    //            search = new NetInfSearch("localhost", "8080", "http://support.google.com/richmedia/bin/answer.py?hl=en&answer=1100953&ctx=cb&src=cb&cbid=100pnperzakdj&cbrank=5", "empty") {
+    //                @Override
+    //                protected void onPostExecute(NetInfResponse response) {
+    //                     NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
+    //                     Log.d("DEBUG", searchResponse.getStatus().toString());
+    //                     try {
+    //                        Log.d("DEBUG", searchResponse.getSearchResults().toString());
+    //                    } catch (RequestFailedException e) {
+    //                        Log.d("DEBUG", "Search failed :(");
+    //                    }
+    //                }
+    //            };
+    //        search.execute();
+    //    }
 
     /**
      * Set up the WiFi connection.
@@ -268,9 +286,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
         // get the web page address
         URL url = null;
         try {
-        	String inputUrl = mEditText.getText().toString();
-        	url = new URL(URLUtil.guessUrl(inputUrl));
-        	mEditText.setText(url.toString());
+            String inputUrl = mEditText.getText().toString();
+            url = new URL(URLUtil.guessUrl(inputUrl));
+            mEditText.setText(url.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             showToast("Malformed url!");
@@ -319,19 +337,41 @@ public class MainApplicationActivity extends BaseMenuActivity {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 Log.d(TAG, "action was: " + action);
-                
+
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
                     String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
                     mEditText.setText(newUrl);
                     startFetchingWebPage();                    
-                    
+
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     img.setImageResource(R.drawable.refresh);
                     img.setTag(R.drawable.refresh);
-                    
+
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
+                    
+                } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
+                    Log.d(TAG, "Trasferring resource using Bluetooth");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_blue));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_blue));
+
+                } else if (action.equals(LOCAL_TRANSMISSION)) {
+                    Log.d(TAG, "Trasferring resource using local file system");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_green));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_green));
+                    
+                } else if (action.equals(UPLINK_TRANSMISSION)) {
+                    Log.d(TAG, "Trasferring resource using uplink");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_red));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_red));
+                    
+                } else if (action.equals(NRS_TRANSMISSION)) {
+                    Log.d(TAG, "Trasferring resource using nrs cache");
+                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_black));
+                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_black));
                 }
             }
         };
@@ -375,5 +415,5 @@ public class MainApplicationActivity extends BaseMenuActivity {
     public Menu getMenu() {
         return mMenu;
     }
-    
+
 }

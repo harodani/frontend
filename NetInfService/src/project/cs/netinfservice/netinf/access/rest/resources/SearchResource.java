@@ -33,11 +33,8 @@ public class SearchResource extends LisaServerResource {
     @Override
     protected void doInit() {
         super.doInit();
-        Log.d(TAG, "doInit()");
 
         mTokens = getQuery().getFirstValue("tokens", true);
-
-        Log.d(TAG, "mTokens = " + mTokens);
 
         mDatamodelFactory = getDatamodelFactory();
         mNodeConnection   = getNodeConnection();
@@ -45,14 +42,12 @@ public class SearchResource extends LisaServerResource {
 
     @Get
     public String search() throws NetInfCheckedException {
-        Log.d(TAG, "printf");
+        Log.d(TAG, "RESTful API received search request");
         try {
-            Log.d(TAG, "" + DefinedQueryTemplates.URL);
             List<Identifier> results = mNodeConnection.performSearch(DefinedQueryTemplates.URL, new String[] { mTokens }, TIMEOUT);
 
             // TODO Lets return a proper JSONObject.toString instead of a hardcoded string!
             if (results.isEmpty()) {
-                Log.d(TAG, "Empty result set.");
                 return "{\"results\":[]}";
             }
                 Identifier identifier = results.get(0);
