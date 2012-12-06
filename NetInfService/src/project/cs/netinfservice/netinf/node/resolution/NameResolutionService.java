@@ -101,32 +101,32 @@ implements ResolutionService {
 
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
-    
+
     /** NRS IP address. **/
     private String mHost;
-    
+
     /** NRS port. **/
     private int mPort;
-    
+
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = Integer
     		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.timeout"));
 
     /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
     private final DatamodelFactory mDatamodelFactory;
-    
+
     /** Random number generator used to create message IDs. **/
     private final Random mRandomGenerator = new Random();
-    
+
     /** NRS cache transmission used to transfer a resource. */
     public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
-    
+
     /** HTTP Client. **/
     private HttpClient mClient;
 
     /** Key for accessing the NRS IP. */
 	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
-	
+
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
@@ -151,36 +151,36 @@ implements ResolutionService {
         mPort = port;
         mDatamodelFactory = datamodelFactory;
     }
-    
 
-    
+
+
     /**
      * Get the NRS Address.
      * @return the IP Address of the NRS
      */
     private String getHost() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
     	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
     	return mHost;
 
 	}
-    
-    
-    
+
+
+
     /**
      * Get the NRS port.
      * @return the port of the NRS
      */
     private int getPort() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
 		mPort = Integer.parseInt(sharedPreferences
 				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
 		return mPort;
 
 	}
-    
+
 
 
     @Override
@@ -284,12 +284,13 @@ implements ResolutionService {
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
             throw new InvalidResponseException("Entity is null.");
-        } else if (response.getEntity().getContentType() == null) {
-            throw new InvalidResponseException("Content-Type is null.");
-        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
-            throw new InvalidResponseException("Content-Type is "
-                    + response.getEntity().getContentType().getValue()
-                    + ", expected \"application/json\"");
+            // TODO seems like content-type is not set
+//        } else if (response.getEntity().getContentType() == null) {
+//            throw new InvalidResponseException("Content-Type is null.");
+//        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
+//            throw new InvalidResponseException("Content-Type is "
+//                    + response.getEntity().getContentType().getValue()
+//                    + ", expected \"application/json\"");
         }
         try {
             String jsonString = streamToString(response.getEntity().getContent());
@@ -383,8 +384,12 @@ implements ResolutionService {
             throws InvalidResponseException {
         InformationObject io = mDatamodelFactory.createInformationObject();
         io.setIdentifier(identifier);
+        Log.w(TAG, "reading json");
         String jsonString = readJson(response);
+        Log.w(TAG, jsonString);
+        Log.w(TAG, "parsing json");
         JSONObject json = parseJson(jsonString);
+        Log.w(TAG, json.toString());
         addContentType(identifier, json);
         addMetadata(identifier, json);
         addLocators(io, json);
@@ -511,11 +516,11 @@ implements ResolutionService {
             return io;
 
         } catch (InvalidResponseException e) {
-            Log.e(TAG, "get() failed, InvalidResponseException, returning null");
+            Log.e(TAG, "InvalidResponseException: " + (e.getMessage() != null ? e.getMessage() : ""));
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "get() failed, UnsupportedEncodingException, returning null");
         } catch (IOException e) {
-            Log.e(TAG, "get() failed, IOException, returning null");
+            Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
         Log.e(TAG, "get() failed. Returning null");
         return null;

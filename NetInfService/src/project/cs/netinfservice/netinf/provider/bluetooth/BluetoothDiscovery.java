@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Uppsala University
  *
  * Project CS course, Fall 2012
@@ -41,13 +41,13 @@ import android.util.Log;
 
 /**
  * Singleton for performing a Bluetooth discovery task.
- * 
+ *
  * @author Paolo Boschini
  * @author Kim-Anh Tran
  */
 public enum BluetoothDiscovery {
 
-    /** The unique reference for this singleton. */ 
+    /** The unique reference for this singleton. */
     INSTANCE;
 
     /** The constant timeout for the Bluetooth discovery task. */
@@ -88,18 +88,18 @@ public enum BluetoothDiscovery {
      * It performs a discovery within a fixed timeout of TIMEOUT seconds.
      * Why? Well, because there is no sense
      * trying to discover Bluetooth devices for a longer time.
-     * 
+     *
      * @return  The list of available devices represented by MAC:addresses.
      */
     public synchronized List<String> startBluetoothDiscovery() {
     	Log.d(TAG, "Start bluetooth discovery.");
-    	
-        // Initiate a new list every time we start a discovery 
+
+        // Initiate a new list every time we start a discovery
         mAvailableDevices = new ArrayList<String>();
 
         mBluetoothAdapter.startDiscovery();
 
-        // Wait for the discover to finish within n seconds 
+        // Wait for the discover to finish within n seconds
         try {
             Thread.sleep(TIMEOUT);
         } catch (InterruptedException e) {
@@ -108,7 +108,7 @@ public enum BluetoothDiscovery {
 
         // Discovery done, cancel it
         mBluetoothAdapter.cancelDiscovery();
-        
+
         Log.d(TAG, "Bluetooth discovery is finished.");
 
         return mAvailableDevices;
@@ -121,7 +121,7 @@ public enum BluetoothDiscovery {
      */
     private void setUpBroadcastReceiver() {
     	Log.d(TAG, "Set up broadcast receiver.");
-    	
+
         mBroadcastReceiver = new BroadcastReceiver() {
 
             @Override
@@ -136,20 +136,20 @@ public enum BluetoothDiscovery {
                     // This checks the Bluetooth signal strength of the surrounding devices
                     short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                     Log.d(TAG, device.getName() + ", " + device.getAddress() + ", " + rssi + " dB");
-                    
+
                     // Updates the list of available devices
-                    mAvailableDevices.add(device.getAddress());            
+                    mAvailableDevices.add(device.getAddress());
                 }
             }
         };
     }
-    
+
     /**
      * Return the list of discovered devices.
      * @return the list of discovered devices
      */
     public List<String> getAvailableDevices() {
-		return mAvailableDevices;
+		return new ArrayList<String>(mAvailableDevices);
 
 	}
 }
