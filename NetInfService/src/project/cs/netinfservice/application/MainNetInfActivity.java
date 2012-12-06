@@ -27,9 +27,14 @@
 package project.cs.netinfservice.application;
 
 import java.io.IOException;
+import java.util.List;
+
+import org.restlet.resource.Post;
 
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
+import project.cs.netinfservice.netinf.provider.bluetooth.BluetoothDiscovery;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
+import project.cs.netinfservice.util.UProperties;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -39,6 +44,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -77,6 +83,8 @@ public class MainNetInfActivity extends Activity {
 
     /** Activity. */
     private static MainNetInfActivity sMainNetInfActivity;
+    
+    private Handler handler;
 
 
     private OnSharedPreferenceChangeListener mListener = new OnSharedPreferenceChangeListener() {
@@ -120,6 +128,25 @@ public class MainNetInfActivity extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+        
+        //Initialize a handler
+        handler = new Handler();
+        
+        /* Creates and run a thread that is run every interval ms
+         * that runs the Bluetooth Discovery in background 
+        */
+        Runnable bluetoothTask = new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d(TAG, "Discovering bluetooth. ");
+				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
+		        btDiscovery.startBluetoothDiscovery();
+		        int interval = Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.interval"));
+		        handler.postDelayed(this, interval);
+			}
+		};
+		new Thread(bluetoothTask).start();
 
         /*
          * Set up some notification depending on the connection: colors.
