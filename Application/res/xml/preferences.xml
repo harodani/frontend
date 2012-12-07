@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="pref_key_sharing"
+        android:title="@string/sharing_category" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_publish"
+            android:summaryOff="@string/publish_summary_off"
+            android:summaryOn="@string/publish_summary_on"
+            android:title="@string/publish_title" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_fullput"
+            android:summaryOff="@string/fullput_summary_off"
+            android:summaryOn="@string/fullput_summary_on"
+            android:title="@string/fullput_title" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:key="pref_key_nrs"
+        android:title="@string/netinf_category" >
+        <Preference
+            android:key="pref_key_nrs"
+            android:title="@string/netinf_title" >
+            <intent
+                android:action="project.cs.netinfservice.PREFERENCES"
+                android:targetClass="project.cs.netinfservice.application.SettingsActivity"
+                android:targetPackage="project.cs.netinfservice" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

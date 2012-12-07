@@ -54,7 +54,6 @@ package project.cs.lisa.netinf.access.rest.resources;
 import netinf.common.communication.NetInfNodeConnection;
 import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.exceptions.NetInfCheckedException;
-import netinf.common.exceptions.NetInfUncheckedException;
 
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
@@ -123,9 +122,10 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Debug.
+     * @throws NetInfCheckedException
      */
     @Post
-    public void handlePost() {
+    public void handlePost() throws NetInfCheckedException {
         Log.e(TAG, "@Post");
         IOBuilder builder = new IOBuilder(mDatamodelFactory);
         builder.addFilePathLocator(mFilePath);
@@ -152,18 +152,19 @@ public class IOResource extends LisaServerResource {
      * Publish an IO.
      * @return      JSON String with key "status" set to "ok" if publish succeeded
      *              or "failed" if publish failed
+     * @throws NetInfCheckedException
      */
     @Put
-    public String putIO() {
+    public void putIO() throws NetInfCheckedException {
         Log.d(TAG, "putIO()");
-        return publish();
+        publish();
     }
 
-    private String publish() {
-        return publish(new IOBuilder(mDatamodelFactory));
+    private void publish() throws NetInfCheckedException {
+        publish(new IOBuilder(mDatamodelFactory));
     }
 
-    private String publish(IOBuilder builder) {
+    private void publish(IOBuilder builder) throws NetInfCheckedException {
 
         builder.setHash(mHash).setHashAlgorithm(mHashAlg);
 
@@ -182,18 +183,19 @@ public class IOResource extends LisaServerResource {
         builder.setMetaData(mMeta);
 
         //Putting the IO
-        try {
-            Log.d(TAG, "calling putIO()");
-            mNodeConnection.putIO(builder.build());
-        } catch (NetInfCheckedException e) {
-            Log.e(TAG, e.getMessage());
-            return "{\"status\":\"failed\"}";
-        } catch (NetInfUncheckedException e) {
-            Log.e(TAG, e.getMessage());
-            return "{\"status\":\"failed\"}";
-        }
+        //        try {
+        Log.d(TAG, "calling putIO()");
+        mNodeConnection.putIO(builder.build());
+        //        } catch (NetInfCheckedException e) {
+        //            Log.e(TAG, e.getMessage());
+        //            return "{\"status\":\"failed\"}";
+        //        } catch (NetInfUncheckedException e) {
+        //            Log.e(TAG, e.getMessage());
+        //            return "{\"status\":\"failed\"}";
+        //        }
+
+        //        setStatus(Status.SUCCESS_NO_CONTENT);
         Log.d(TAG, "Publish succeeded.");
-        return "{\"status\":\"ok\"}";
 
     }
 

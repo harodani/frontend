@@ -20,7 +20,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
+public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
 
     /** Debugging tag. */
     private static final String TAG = "DownloadWebObject";

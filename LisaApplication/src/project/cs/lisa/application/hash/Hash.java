@@ -100,7 +100,7 @@ public class Hash {
 //        map1[i++] = '_'; // base64url
     }
 
-    public Hash (byte[] byteArray){
+    public Hash(byte[] byteArray) {
         mByteArray = byteArray;
     }
 

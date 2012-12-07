@@ -4,11 +4,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfRetrieve;
+import project.cs.lisa.application.http.NetInfRetrieveResponse;
+import project.cs.lisa.application.http.NetInfStatus;
+import project.cs.lisa.application.http.RequestFailedException;
 import project.cs.lisa.mock.MockServer;
 import android.test.InstrumentationTestCase;
 
@@ -35,10 +39,11 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
             assertNotNull("Hash algorithm not in URI query", getQuery().getFirstValue("hashAlg"));
             if(getQuery().getFirstValue("hash").equals(mHash)) {
                 JSONObject json = new JSONObject();
-                json.put("filePath", mFilePath);
-                json.put("contentType", mContentType);
+                json.put("path", mFilePath);
+                json.put("ct", mContentType);
                 return json.toJSONString();
             } else {
+                setStatus(Status.SUCCESS_NO_CONTENT);
                 return null;
             }
         }
@@ -66,7 +71,7 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
         assertTrue("Server should be stopped", mMockServer.isStopped());
     }
 
-    public void testRetrieveExistent() throws Throwable {
+    public void testRetrieveFileWritingFailed() throws Throwable {
 
         // Signal used to wait for ASyncTask
         final CountDownLatch signal = new CountDownLatch(1);
@@ -74,15 +79,20 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
         // Create retrieve
         final NetInfRetrieve retrieve = new NetInfRetrieve(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNotNull("Should have received a response", jsonResponse);
-                Object obj = JSONValue.parse(jsonResponse);
-                assertTrue("Should have received JSON as response", obj instanceof JSONObject);
-                JSONObject json = (JSONObject) obj;
-                assertTrue("JSON response should have contained file path",json.containsKey("filePath"));
-                assertTrue("JSON response should have contained content type", json.containsKey("contentType"));
-                assertEquals("JSON response contained wrong file path", json.get("filePath"), mFilePath);
-                assertEquals("JSON response contained wrong content type", json.get("contentType"), mContentType);
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a retrieve response", response instanceof NetInfRetrieveResponse);
+                NetInfRetrieveResponse retrieveResponse = (NetInfRetrieveResponse) response;
+                System.out.println(retrieveResponse.getStatus());
+                assertEquals("Retrieve should have succeeded, but the file doesn't exist",
+                        NetInfStatus.FILE_DOES_NOT_EXIST, retrieveResponse.getStatus());
+                try {
+                    retrieveResponse.getFile().getAbsolutePath();
+                    fail("Should have thrown RequestFailedException since file shouldn't exist");
+                } catch (RequestFailedException e) {
+                    // Should throw exception since the file doesn't exist
+                }
+
                 // Signal done
                 signal.countDown();
             }
@@ -109,8 +119,11 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
 
         final NetInfRetrieve retrieve = new NetInfRetrieve(mHost, Integer.toString(MockServer.PORT), mHashAlg, mWrongHash) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNull("Should not have received a response", jsonResponse);
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a retrieve response", response instanceof NetInfRetrieveResponse);
+                assertFalse("Retrieve should not have succeeded",
+                        ((NetInfRetrieveResponse) response).getStatus() == NetInfStatus.OK);
                 signal.countDown();
             }
         };
@@ -136,8 +149,11 @@ public class NetInfRetrieveTest extends InstrumentationTestCase {
 
         final NetInfRetrieve retrieve = new NetInfRetrieve(mHost, Integer.toString(MockServer.WRONG_PORT), mHashAlg, mHash) {
             @Override
-            protected void onPostExecute(String jsonResponse) {
-                assertNull("Should not have received a response", jsonResponse);
+            protected void onPostExecute(NetInfResponse response) {
+                assertNotNull("Should always receive a response", response);
+                assertTrue("Response should be a retrieve response", response instanceof NetInfRetrieveResponse);
+                assertFalse("Retrieve should not have succeeded",
+                        ((NetInfRetrieveResponse) response).getStatus() == NetInfStatus.OK);
                 signal.countDown();
             }
         };
