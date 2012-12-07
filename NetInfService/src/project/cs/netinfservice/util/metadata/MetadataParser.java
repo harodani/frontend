@@ -106,6 +106,7 @@ public class MetadataParser {
         return map;
     }
 
+    /*
     public static Map<String, Object> toMap(org.json.JSONObject metadata) throws JSONException {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 
@@ -129,6 +130,7 @@ public class MetadataParser {
 
                 if (value instanceof JSONArray) {
                     List<String> list = extractList((JSONArray) value);
+                    System.out.println("list metadata parser:" + list.toString());
                     map.put(key, list);
                 } else {
                     map.put(key, value);
@@ -145,7 +147,7 @@ public class MetadataParser {
         }
 
         return map;
-    }
+    }*/
 
     /**
      * Converts a json array into a collection of corresponding string values.

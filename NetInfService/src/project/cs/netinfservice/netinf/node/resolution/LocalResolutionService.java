@@ -52,8 +52,7 @@ import com.google.inject.Inject;
  *
  */
 public class LocalResolutionService
-		extends AbstractResolutionServiceWithoutId
-		implements ResolutionSearchService {
+		extends AbstractResolutionServiceWithoutId {
 
 	/** The debug tag. */
 	private static final String TAG = "LocalResolutionService";
@@ -111,27 +110,6 @@ public class LocalResolutionService
 		}
 
 		return io;
-	}
-
-	@Override
-	public List<SearchResult> search(List<String> keywords) {
-		Log.d(TAG, "Searching in database for the following url: " + keywords.get(0));
-
-		// Searching within the database will expect only one keyword: the url
-		List<SearchResult> results = new LinkedList<SearchResult>();
-		String url = keywords.get(0);
-		SearchResult result = null;
-
-		try {
-			result = mDatabase.searchIO(url);
-		} catch (DatabaseException e) {
-			Log.e(TAG, "No entry found that corresponds to the url: " + url);
-			return results;
-		}
-
-		results.add(result);
-
-		return results;
 	}
 
 	@Override

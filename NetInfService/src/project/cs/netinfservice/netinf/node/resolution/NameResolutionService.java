@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -51,7 +50,6 @@ import netinf.common.exceptions.NetInfResolutionException;
 import netinf.node.resolution.ResolutionService;
 
 import org.apache.commons.fileupload.MultipartStream;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -70,11 +68,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
-import project.cs.netinfservice.application.SettingsActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
 import project.cs.netinfservice.util.UProperties;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -96,33 +94,46 @@ implements ResolutionService {
 
     /** Debug tag. **/
     public static final String TAG = "NameResolutionService";
+
     /** Message ID random value max. **/
     public static final int MSG_ID_MAX = Integer
     		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.max_messsage"));
+
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
-    
+
     /** NRS IP address. **/
     private String mHost;
+
     /** NRS port. **/
     private int mPort;
+
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = Integer
     		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.timeout"));
+
     /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
     private final DatamodelFactory mDatamodelFactory;
+
     /** Random number generator used to create message IDs. **/
     private final Random mRandomGenerator = new Random();
+
+    /** NRS cache transmission used to transfer a resource. */
+    public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
+
     /** HTTP Client. **/
     private HttpClient mClient;
-   
 
     /** Key for accessing the NRS IP. */
 	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2208306ab5ac5f5c94f2da59c749ecf45b62be12
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
      * @param host                 The NRS IP Address
@@ -143,42 +154,37 @@ implements ResolutionService {
         mHost = host;
         mPort = port;
         mDatamodelFactory = datamodelFactory;
-   
-        
-        Log.d(TAG, "Host: " + mHost);
-        Log.d(TAG, "Port: " + mPort);
-        
     }
-    
 
-    
+
+
     /**
      * Get the NRS Address.
      * @return the IP Address of the NRS
      */
     private String getHost() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
     	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
     	return mHost;
 
 	}
-    
-    
-    
+
+
+
     /**
      * Get the NRS port.
      * @return the port of the NRS
      */
     private int getPort() {
-    	SharedPreferences sharedPreferences = 
+    	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
 		mPort = Integer.parseInt(sharedPreferences
 				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
 		return mPort;
 
 	}
-    
+
 
 
     @Override
@@ -197,10 +203,8 @@ implements ResolutionService {
      * @return             The hash algorithm
      */
     private String getHashAlg(Identifier identifier) {
-        Log.d(TAG, "getHashAlg()");
         String hashAlg = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_ALG.getLabelName()).getLabelValue();
-        Log.d(TAG, "hashAlg = " + hashAlg);
         return hashAlg;
     }
 
@@ -210,10 +214,8 @@ implements ResolutionService {
      * @return             The hash
      */
     private String getHash(Identifier identifier) {
-        Log.d(TAG, "getHash()");
         String hash = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-        Log.d(TAG, "hash = " + hash);
         return hash;
     }
 
@@ -223,10 +225,8 @@ implements ResolutionService {
      * @return             The content-type
      */
     private String getContentType(Identifier identifier) {
-        Log.d(TAG, "getContentType()");
         String contentType = identifier.getIdentifierLabel(
                 SailDefinedLabelName.CONTENT_TYPE.getLabelName()).getLabelValue();
-        Log.d(TAG, "contentType = " + contentType);
         return contentType;
     }
 
@@ -236,10 +236,8 @@ implements ResolutionService {
      * @return             The metadata
      */
     private String getMetadata(Identifier identifier) {
-        Log.d(TAG, "getMetadata()");
         String metadata = identifier.getIdentifierLabel(
                 SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
-        Log.d(TAG, "metadata = " + metadata);
         return metadata;
     }
 
@@ -251,7 +249,6 @@ implements ResolutionService {
      *      The file path
      */
     private String getFilePath(InformationObject io) {
-        Log.d(TAG, "getFilePath()");
         Attribute filepathAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
         String filepath = null;
@@ -259,7 +256,6 @@ implements ResolutionService {
             filepath = filepathAttribute.getValueRaw();
             filepath = filepath.substring(filepath.indexOf(":") + 1);
         }
-        Log.d(TAG, "filepath = " + filepath);
         return filepath;
     }
 
@@ -271,7 +267,6 @@ implements ResolutionService {
      *      The bluetooth locator
      */
     private String getBluetoothMac(InformationObject io) {
-        Log.d(TAG, "getBluetoothLocator()");
         Attribute bluetoothAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI());
         String bluetoothLocator = null;
@@ -279,7 +274,6 @@ implements ResolutionService {
             bluetoothLocator = bluetoothAttribute.getValueRaw();
             bluetoothLocator = bluetoothLocator.substring(bluetoothLocator.indexOf(":") + 1);
         }
-        Log.d(TAG, "bluetooth = " + bluetoothLocator);
         return bluetoothLocator;
     }
 
@@ -290,21 +284,20 @@ implements ResolutionService {
      * @throws InvalidResponseException    In case reading the JSON failed
      */
     private String readJson(HttpResponse response) throws InvalidResponseException {
-        Log.d(TAG, "readJson()");
         if (response == null) {
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
             throw new InvalidResponseException("Entity is null.");
-        } else if (response.getEntity().getContentType() == null) {
-            throw new InvalidResponseException("Content-Type is null.");
-        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
-            throw new InvalidResponseException("Content-Type is "
-                    + response.getEntity().getContentType().getValue()
-                    + ", expected \"application/json\"");
+            // TODO seems like content-type is not set
+//        } else if (response.getEntity().getContentType() == null) {
+//            throw new InvalidResponseException("Content-Type is null.");
+//        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
+//            throw new InvalidResponseException("Content-Type is "
+//                    + response.getEntity().getContentType().getValue()
+//                    + ", expected \"application/json\"");
         }
         try {
             String jsonString = streamToString(response.getEntity().getContent());
-            Log.d(TAG, "jsonString = " + jsonString);
             return jsonString;
         } catch (IOException e)  {
             throw new InvalidResponseException("Failed to convert stream to string.", e);
@@ -318,14 +311,12 @@ implements ResolutionService {
      * @throws InvalidResponseException    In case the JSON String is invalid
      */
     private JSONObject parseJson(String jsonString) throws InvalidResponseException {
-        Log.d(TAG, "parseJson()");
         JSONObject json = (JSONObject) JSONValue.parse(jsonString);
         if (json == null) {
             Log.e(TAG, "Unable to parse JSON");
             Log.e(TAG, "jsonString = " + jsonString);
             throw new InvalidResponseException("Unable to parse JSON.");
         }
-        Log.d(TAG, "json = " + json.toJSONString());
         return json;
     }
 
@@ -335,24 +326,20 @@ implements ResolutionService {
      * @param json             The JSON
      */
     private void addContentType(Identifier identifier, JSONObject json) {
-        Log.d(TAG, "addContentType()");
 
         // Check that the content-type is a string
         Object object = json.get("ct");
-        Log.d(TAG, "object = " + object);
         if (!(object instanceof String)) {
-            Log.d(TAG, "Content-Type NOT added.");
+            Log.w(TAG, "Content-Type NOT added.");
             return;
         }
         String contentType = (String) object;
-        Log.d(TAG, "contentType = " + contentType);
 
         // Add the content-type
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.CONTENT_TYPE.getLabelName());
         label.setLabelValue(contentType);
         identifier.addIdentifierLabel(label);
-        Log.d(TAG, "Content-Type added.");
     }
 
     /**
@@ -361,23 +348,19 @@ implements ResolutionService {
      * @param json             The JSON
      */
     private void addMetadata(Identifier identifier, JSONObject json) {
-        Log.d(TAG, "addMetadata()");
 
         // Check that the metadata is an JSONObject
         Object object = json.get("metadata");
-        Log.d(TAG, "object = " + object);
         if (!(object instanceof JSONObject)) {
-            Log.d(TAG, "Metadata NOT added.");
+            Log.w(TAG, "Metadata NOT added.");
         }
         JSONObject metadata = (JSONObject) object;
-        Log.d(TAG, "metadata = " + metadata.toJSONString());
 
         // Add the metadata
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.META_DATA.getLabelName());
         label.setLabelValue(metadata.toJSONString());
         identifier.addIdentifierLabel(label);
-        Log.d(TAG, "Metadata added.");
     }
 
     /**
@@ -386,15 +369,11 @@ implements ResolutionService {
      * @param json             The JSON
      */
     private void addLocators(InformationObject io, JSONObject json) {
-        Log.d(TAG, "addLocators()");
         JSONArray locators = (JSONArray) json.get("loc");
 
         for (Object locator : locators) {
 
             String loc = (String) locator;
-            Log.d(TAG, "loc = " + loc);
-//            String locWithoutScheme = loc.split("://")[1];
-//            Log.d(TAG, "locWithoutScheme = " + locWithoutScheme);
 
             Attribute newLocator = mDatamodelFactory.createAttribute();
             newLocator.setAttributePurpose(DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString());
@@ -416,8 +395,12 @@ implements ResolutionService {
             throws InvalidResponseException {
         InformationObject io = mDatamodelFactory.createInformationObject();
         io.setIdentifier(identifier);
+        Log.w(TAG, "reading json");
         String jsonString = readJson(response);
+        Log.w(TAG, jsonString);
+        Log.w(TAG, "parsing json");
         JSONObject json = parseJson(jsonString);
+        Log.w(TAG, json.toString());
         addContentType(identifier, json);
         addMetadata(identifier, json);
         addLocators(io, json);
@@ -434,7 +417,6 @@ implements ResolutionService {
     private InformationObject readIoAndFile(Identifier identifier,
             HttpResponse response) throws InvalidResponseException {
 
-        Log.d(TAG, "readIoAndFile()");
         if (response == null) {
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
@@ -453,12 +435,13 @@ implements ResolutionService {
             InformationObject io = mDatamodelFactory.createInformationObject();
             io.setIdentifier(identifier);
 
-            Log.d(TAG, "name: " + response.getHeaders("Content-Type")[0].getName());
-            Log.d(TAG, "value: " + response.getHeaders("Content-Type")[0].getValue());
             String contentType = response.getHeaders("Content-Type")[0].getValue();
-            byte[] boundary = (contentType
-            		.substring(contentType.indexOf("boundary=") + 9)).getBytes();
-            Log.d(TAG, "boundary = " + Arrays.toString(boundary));
+
+            byte[] boundary = (contentType.substring(contentType.indexOf("boundary=") + 9)).getBytes();
+
+            Log.d(TAG, "Sending Intent " + NRS_TRANSMISSION);
+            Intent intent = new Intent(NRS_TRANSMISSION);
+            MainNetInfActivity.getActivity().sendBroadcast(intent);
 
             @SuppressWarnings("deprecation")
             MultipartStream multipartStream =
@@ -513,22 +496,21 @@ implements ResolutionService {
      */
     private InformationObject handleResponse(Identifier identifier, HttpResponse response)
             throws InvalidResponseException {
-        Log.d(TAG, "handleResponse()");
 
         int statusCode = response.getStatusLine().getStatusCode();
-        Log.d(TAG, "statusCode = " + statusCode);
-        // TODO refactor duplicate code to method
 
         switch (statusCode) {
         case HttpStatus.SC_NON_AUTHORITATIVE_INFORMATION:
-            Log.d(TAG, "Response that should contain locators");
+            Log.d(TAG, statusCode + ": Response that should contain locators");
             // Just locators
             return readIo(identifier, response);
+
         case HttpStatus.SC_OK:
-            Log.d(TAG, "Response that should contain locators and data");
+            Log.d(TAG, statusCode + ": Response that should contain locators and data");
             return readIoAndFile(identifier, response);
+
         default:
-            // Something unhandled
+            Log.w(TAG, statusCode + ": Unexpected Response Code");
             throw new InvalidResponseException("Unexpected Response Code = " + statusCode);
         }
     }
@@ -541,36 +523,24 @@ implements ResolutionService {
      */
     @Override
     public InformationObject get(Identifier identifier) {
-        Log.d(TAG, "get()");
         try {
             // Create NetInf GET request
-            Log.d(TAG, "Creating HTTP POST");
             String uri = "ni:///" + getHashAlg(identifier) + ";" + getHash(identifier);
-            Log.d(TAG, "uri = " + uri);
             HttpPost getRequest = createGet(uri);
 
             // Execute NetInf GET request
-            Log.d(TAG, "Executing HTTP POST");
             HttpResponse response = mClient.execute(getRequest);
 
-            // Print all response headers
-            Log.d(TAG, "HTTP POST Response Headers:");
-            for (Header header : response.getAllHeaders()) {
-                Log.d(TAG, "\t" + header.getName() + " = " + header.getValue());
-            }
-
             // Handle the response
-            Log.d(TAG, "Handling HTTP POST Response");
             InformationObject io = handleResponse(identifier, response);
-            Log.d(TAG, "get() succeeded. Returning InformationObject");
             return io;
 
         } catch (InvalidResponseException e) {
-            Log.e(TAG, "get() failed, InvalidResponseException, returning null");
+            Log.e(TAG, "InvalidResponseException: " + (e.getMessage() != null ? e.getMessage() : ""));
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "get() failed, UnsupportedEncodingException, returning null");
         } catch (IOException e) {
-            Log.e(TAG, "get() failed, IOException, returning null");
+            Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
         Log.e(TAG, "get() failed. Returning null");
         return null;
@@ -584,16 +554,12 @@ implements ResolutionService {
 
     @Override
     public void put(InformationObject io) {
-        Log.d(TAG, "put()");
 
         try {
-            Log.d(TAG, "Creating HTTP POST");
             HttpPost post = createPublish(io);
-            Log.d(TAG, "Executing HTTP POST to " + post.getURI());
             HttpResponse response = mClient.execute(post);
             Log.d(TAG, "statusCode = "
                     + Integer.toString(response.getStatusLine().getStatusCode()));
-            Log.d(TAG, "content = " + streamToString(response.getEntity().getContent()));
 
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);
@@ -613,8 +579,6 @@ implements ResolutionService {
      */
     private HttpPost createPublish(InformationObject io)
             throws UnsupportedEncodingException {
-
-        Log.d(TAG, "createPublish()");
 
         // Extracting values from IO's identifier
         String hashAlg      = getHashAlg(io.getIdentifier());
@@ -655,12 +619,12 @@ implements ResolutionService {
         StringBody rform = new StringBody("json");
         entity.addPart("rform", rform);
 
+        /* Used to print the message sent to the NRS
         try {
             entity.writeTo(System.out);
         } catch (IOException e) {
             Log.e(TAG, "Failed to write MultipartEntity to System.out");
-        }
-
+        } */
         post.setEntity(entity);
         return post;
     }

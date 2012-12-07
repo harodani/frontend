@@ -87,7 +87,6 @@ public class NetInfPublish extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-        Log.d(TAG, "doInBackground()");
 
         // Don't publish without locators
         if (mLocators == null || mLocators.size() == 0) {
@@ -111,6 +110,7 @@ public class NetInfPublish extends NetInfRequest {
             HttpResponse httpResponse = execute(request);
             return new NetInfPublishResponse(httpResponse);
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP publish request to local node failed");
             return new NetInfPublishResponse();
         }
     }
@@ -122,9 +122,7 @@ public class NetInfPublish extends NetInfRequest {
      *      The Metadata object containing the metadata
      */
     public void setMetadata(Metadata metadata) {
-        Log.d(TAG, "setMetadata()");
         String meta = metadata.convertToMetadataString();
-        Log.d(TAG, "meta = " + meta);
         addQuery("meta", meta);
     }
     
@@ -137,7 +135,6 @@ public class NetInfPublish extends NetInfRequest {
         if (contentType == null) {
             throw new IllegalArgumentException("setContentType called with null");
         }
-        Log.d(TAG, "setContentType()");
         addQuery("ct", contentType);
     }
 
@@ -147,7 +144,6 @@ public class NetInfPublish extends NetInfRequest {
      *      The file to publish.
      */
     public void setFile(File file) {
-        Log.d(TAG, "setFile()");
         if (file == null) {
             throw new IllegalArgumentException("setFile() called with null file");
         }

@@ -24,8 +24,8 @@ public class NetInfSearch extends NetInfRequest {
      * @param tokens       Keywords to be searched
      * @param ext          Extensions
      */
-    public NetInfSearch(String host, String port, String tokens, String ext) {
-        super(host, port, "search");
+    public NetInfSearch(String tokens, String ext) {
+        super("search");
 
         // Add extension and tokens fields to URI
         // TODO: When ext is filled, check if encoding is necessary
@@ -41,14 +41,13 @@ public class NetInfSearch extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-        Log.d(TAG, "doInBackground()");
 
         try {
             HttpGet search = new HttpGet(getUri());
             HttpResponse httpResponse = execute(search);
             return new NetInfSearchResponse(httpResponse);
         } catch (IOException e) {
-            Log.d(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP search request to local node failed");
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP search request to local node failed");
             return new NetInfSearchResponse();
         }
     }

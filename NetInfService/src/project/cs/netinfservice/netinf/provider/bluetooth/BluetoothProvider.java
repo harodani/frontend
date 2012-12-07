@@ -32,11 +32,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.provider.ByteArrayProvider;
 import project.cs.netinfservice.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -60,7 +62,10 @@ public class BluetoothProvider implements ByteArrayProvider {
 
     /** Represents the number of attempts to connect to a remote device. */
     private static final int NUMBER_OF_ATTEMPTS = Integer
-    		.parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.number_attempts"));
+            .parseInt(UProperties.INSTANCE.getPropertyWithName("bluetooth.number_attempts"));
+
+    /** Bluetooth transmission used to transfer a resource. */
+    public static final String BLUETOOTH_TRANSMISSION = "project.cs.netinfservice.BLUETOOTH_TRANSMISSION";
 
     /** The Bluetooth adapter. */
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -128,27 +133,27 @@ public class BluetoothProvider implements ByteArrayProvider {
         int attempts = NUMBER_OF_ATTEMPTS;
         boolean connectionSucceeded = false;
         do {
-	        try {
-	        	// Get a BluetoothSocket for a connection with the given BluetoothDevice.
-	        	socket   = device.createRfcommSocketToServiceRecord(MY_UUID);
+            try {
+                // Get a BluetoothSocket for a connection with the given BluetoothDevice.
+                socket   = device.createRfcommSocketToServiceRecord(MY_UUID);
 
-	            /* This is a blocking call and will only return on a
-	             * successful connection or an exception.
-	             */
-	            Log.d(TAG, "Trying to connect to a device through a socket...");
-	            mBluetoothAdapter.cancelDiscovery();
-	            socket.connect();
+                /* This is a blocking call and will only return on a
+                 * successful connection or an exception.
+                 */
+                Log.d(TAG, "Trying to connect to a device through a socket...");
+                mBluetoothAdapter.cancelDiscovery();
+                socket.connect();
 
-	            connectionSucceeded = true;
-	        } catch (IOException e) {
-	        	--attempts;
-	        }
+                connectionSucceeded = true;
+            } catch (IOException e) {
+                --attempts;
+            }
         } while (!connectionSucceeded && attempts > 0);
 
         if (!connectionSucceeded) {
-        	Log.e(TAG, "Device couldn't establish a connection to selected remote device.");
+            Log.e(TAG, "Device couldn't establish a connection to selected remote device.");
 
-        	throw new IOException("Couldn't establish connection to remote device.");
+            throw new IOException("Couldn't establish connection to remote device.");
         }
 
         return socket;
@@ -180,6 +185,10 @@ public class BluetoothProvider implements ByteArrayProvider {
     private byte[] downloadFile(BluetoothSocket socket) throws IOException {
         Log.d(TAG, "Begining downloading the file");
 
+        Log.d(TAG, "Sending Intent " + BLUETOOTH_TRANSMISSION);
+        Intent intent = new Intent(BLUETOOTH_TRANSMISSION);
+        MainNetInfActivity.getActivity().sendBroadcast(intent);
+
         DataInputStream inStream = null;
         byte[] buffer = null;
 
@@ -199,8 +208,8 @@ public class BluetoothProvider implements ByteArrayProvider {
 
         return buffer;
     }
-    
-     /**
+
+    /**
      * Checks if this provider can handle the locator from where to retrieve a BO.
      *
      * @param   locator     The locator from where to retrieve the BO
@@ -208,7 +217,7 @@ public class BluetoothProvider implements ByteArrayProvider {
      */
     @Override
     public boolean canHandle(String locator) {
-    	return locator.contains(BLUETOOTH_LOCATOR_INDICATOR);
+        return locator.contains(BLUETOOTH_LOCATOR_INDICATOR);
     }
 
     /**

@@ -68,13 +68,13 @@ public class NetInfRetrieve extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-        Log.d(TAG, "doInBackground()");
 
         try {
             HttpGet get = new HttpGet(getUri());
             HttpResponse httpResponse = execute(get);
             return new NetInfRetrieveResponse(httpResponse);
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP retrieve request to local node failed");
             return new NetInfRetrieveResponse();
         }
 

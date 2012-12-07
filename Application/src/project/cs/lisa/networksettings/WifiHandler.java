@@ -1,266 +1,204 @@
 /**
- * Uppsala University
+ * Copyright 2012 Ericsson, Uppsala University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * 
+ * Uppsala University
+ *
  * Project CS course, Fall 2012
  *
  * Projekt DV/Project CS, is a course in which the students develop software for
  * distributed systems. The aim of the course is to give insights into how a big
- * project is run (from planning to realization), how to construct a complex 
- * distributed system and to give hands-on experience on modern construction 
+ * project is run (from planning to realization), how to construct a complex
+ * distributed system and to give hands-on experience on modern construction
  * principles and programming methods.
  *
- * All rights reserved.
- *
- * Copyright (C) 2012 LISA team
  */
+
 package project.cs.lisa.networksettings;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import project.cs.lisa.application.MainApplicationActivity;
+import project.cs.lisa.application.dialogs.ListDialog;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+/**
+ * Handles WiFi connection
+ * 
+ * @author Paolo Boschini
+ * @author Linus
+ */
 public class WifiHandler {
-    //constants
-    public static final int WEP = 1;
-    public static final int WAP = 2;
-    public static final int OPEN_NETWORK = 3;
 
-    public static final String TAG = "LISA_Network";
+    /** The Debug TAG for this Activity. */
+    private static final String TAG = "WifiHandler";
 
-    /** dfsdfsdfsdf. */
-    WifiConfiguration wifiConf;				/* WifiConfiguration object */
+    /** The filter for choosing what actions the broadcast receiver will catch. */
+    private IntentFilter mIntentFilter;
 
-    /** dfsdfsdfsdf. */
-    WifiManager wifiMgr;							/* WifiManager object */
+    /** The list that contains the discovered wifi networks. */
+    private List<ScanResult> wifiScannedNetworks;
 
-    /** dfsdfsdfsdf. */
-    WifiInfo wifiInfo;								/* WifiInfo object */
-    
-    /** dfsdfsdfsdf. */
-    List<ScanResult> wifiScan;				/* List of ScanResult objects */
+    private ProgressDialog progressBar;
 
-    /**
-     * Constructor initializes WifiManager and WifiInfo.
-     * @param context
-     */
-    public WifiHandler(Context context) {
-        wifiMgr  = getWifiManager(context);		// gets wifiMgr in the current context 
-        wifiInfo = getWifiInfo(context);			// gets wifiInfo in the current context
-        wifiConf = getWifiConf(context);			// gets wifiConf in the current context
-        wifiScan = getWifiInRange();					// gets wifiScan in the current context
-    }
+    WifiManager wifiManager;
 
-    /**
-     * Function checkWifiEnabled checks if the WiFi connection
-     * is enabled on the device. 
-     * @param wifiMgr
-     * @return true  if the WiFi connection is enabled,
-     * 				 false if the WiFi connection is disabled
-     */
-    public boolean checkWifiEnabled() {
-        // checks if WiFi is enabled
-        return (wifiMgr != null && wifiMgr.isWifiEnabled());
-    }
+    private String currentChosenNetwork;
 
-    /**
-     * Function enableWifi enables WiFi connection on the device.
-     * @param wifiMgr
-     * @return true  if the attempt to enable WiFi succeeded,
-     * 				 false if the attempt to enable WiFi failed. 
-     */
-    public boolean enableWifi() {
-        // enables WiFi connection
-        return wifiMgr.setWifiEnabled(true);
-    }
-
-    /**
-     * Function disableWifi disables WiFi connection on the device.
-     * @param wifiMgr
-     * @return true  if WiFi connection was disabled,
-     * 				 false if attempt to disable WiFi failed.
-     */
-    public boolean disableWifi() {
-        // disables WiFi connection
-        return wifiMgr.setWifiEnabled(false);
-    }
-
-    /**
-     * Function getWifiManager gets the WiFiManager object from the device.
-     * @param context
-     * @return WifiManager object. Also sets the class variable
-     * 				 wifiMgr as the WifiManager object returned.
-     */
-    public WifiManager getWifiManager(Context context) {
-        WifiManager wifiMgr = null;
-
-        // gets WifiManager obj from the system
-        wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-
-        if (wifiMgr == null) {
-            Log.d("TAG", "WIFI_SERVICE is the wrong service name.");
+    public WifiHandler() {
+        wifiManager = (WifiManager) MainApplicationActivity.getActivity().getSystemService(Context.WIFI_SERVICE); 
+        if (!wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
         }
 
-        return wifiMgr;
+        progressBar = new ProgressDialog(MainApplicationActivity.getActivity());
+        setUpBroadcastReceiver();
     }
 
-    /**
-     * Function getWifiInfo gets the current WiFi connection information in a
-     * WifiInfo object from the device.
-     * @param context
-     * @return wifiInfo created object or
-     * 				 null 		if wifi is not enabled.
-     */
-    public WifiInfo getWifiInfo(Context context) {
-        WifiInfo wifiInfo = null;
+    public void startDiscovery() {
 
-        // gets WiFi network info of the current connection
-        if (checkWifiEnabled()) {
-            wifiInfo = (WifiInfo) wifiMgr.getConnectionInfo();	 
-        }
+        showProgressDialog("Scanning wifi networks...");
 
-        if (wifiInfo == null) {
-            Log.d("TAG", "WifiInfo object is empty.");
-        }
+        // when the wifi scanning is done, call onReceive in mReceiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        MainApplicationActivity.getActivity().registerReceiver(mReceiver, filter);
 
-        return wifiInfo;
+
+        wifiManager.startScan();
     }
 
-    /**
-     * Function that returns a WifiConfiguration object from the WifiInfo
-     * object from the class. If wifiInfo exists, then we are able to retrieve
-     * information from the current connection 
-     * @param context
-     * @return WifiConfiguration object created.
-     */
-    public WifiConfiguration getWifiConf(Context context) {
-        WifiConfiguration wifiConfiguration = new WifiConfiguration();
-
-        if (wifiInfo == null) {
-            Log.d("TAG", "WifiInfo object is empty");
-            return null;
-        }
-
-        wifiConfiguration.SSID = wifiInfo.getSSID();
-        wifiConfiguration.networkId = wifiInfo.getNetworkId();
-
-        return wifiConfiguration;
+    private void showProgressDialog(String message) {
+        // Start ProgressDialog for discovering wifi networks
+        progressBar.setCancelable(true);
+        progressBar.setMessage(message);
+        progressBar.show();
     }
 
-    /**
-     * Creates a new WifiConfiguration object for wifiConf.
-     */
-    public void clearWifiConfig() {
-        wifiConf = new WifiConfiguration();
+    public void connectToSelectedNetwork(String networkSSID) {
+        Log.d(TAG, "Yeah, let's try to connect to " + networkSSID);
+
+        showProgressDialog("Try to connect to " + networkSSID);
+
+        currentChosenNetwork = networkSSID;
+
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        int networkId = wifiManager.addNetwork(conf);
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(networkId, true);
+        wifiManager.reconnect();
     }
 
-    /**
-     * Function getWifiInRange returns all the WiFi networks that are
-     * accessible through the access point (device AP) found during the
-     * last scan.
-     * @param wifi
-     * @return List of ScanResult containing information on all WiFi networks
-     * 				 discovered in the range.
-     */
-    public List<ScanResult> getWifiInRange() {
-        // gets ~last~ list of WiFi networks accessible through the access point.
-        return (wifiScan = (List<ScanResult>) wifiMgr.getScanResults());
+    public void onDiscoveryDone(Set<String> wifis) {
+        Log.d(TAG, "onDiscoveryDone");
     }
 
+
+    BroadcastReceiver mReceiver;
     /**
-     * Function that scans for wifi networks available in the devices range.
-     * @return true  if scan started
-     * 				 false if scan could not be started 
+     * Broadcast Receiver mReceive that handles with WIFI 'signal' changes.
+     * This is used to populate the device list as well as altering the text
+     * from the variables.
      */
-    public boolean scanWifiInRange() {
-        if (!checkWifiEnabled()) {
-            return false;
-        }
+    private void setUpBroadcastReceiver() {
+        Log.d(TAG, "Set up broadcast receiver.");
 
-        if (!wifiMgr.startScan()) {
-            Log.d("TAG", "Failed to scan wifi's in range.");
-            return false;
-        }
+        mReceiver = new BroadcastReceiver() {
 
-        return true;
-    }
+            private boolean doneScanning = false;
 
-    /**
-     * Function to disconnect from the currently connected WiFi AP.
-     * @return true  if disconnection succeeded
-     * 				 false if disconnection failed
-     */
-    public boolean disconnectFromWifi() {
-        return (wifiMgr.disconnect());
-    }
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
 
-    /**
-     * Function to connect to a selected network
-     * @param networkSSID         network SSID name
-     * @param	networkPassword     network password
-     * @param networkId           network ID from WifiManager
-     * @param SecurityProtocol    network security protocol
-     * @return true  if connection to selected network succeeded
-     * 				 false if connection to selected network failed
-     */
-    public boolean connectToSelectedNetwork(String networkSSID, String networkPassword) {
-        int networkId;
-        int SecurityProtocol = WEP;
+                Log.d(TAG, action.toString());
 
-        // Clear wifi configuration variable
-        clearWifiConfig();
+                // this is called when the wifi discovery is done
+                if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
 
-        // Sets network SSID name on wifiConf 
-        wifiConf.SSID = "\"" + networkSSID + "\"";
-        Log.d(TAG, "SSID Received: " + wifiConf.SSID);
-        switch(SecurityProtocol) {
-            // WEP "security".
-            case WEP:
-                wifiConf.wepKeys[0] = "\"" + networkPassword + "\""; 
-                wifiConf.wepTxKeyIndex = 0;
-                wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                wifiConf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-                break;
+                    /*
+                     *  Prevent the scanning to show the wifi dialog several time.
+                     *  Android scans wifi networks continuously.
+                     */
+                    if (doneScanning) {
+                        return;
+                    }
 
-                // WAP security. We have to set preSharedKey.
-            case WAP:
-                wifiConf.preSharedKey = "\""+ networkPassword +"\"";
-                break;
+                    doneScanning = true;
 
-                // Network without security.
-            case OPEN_NETWORK:
-                wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                break;
-        }
+                    Log.d(TAG, "Finished scanning");
 
-        // Add WiFi configuration to list of recognizable networks
-        if ((networkId = wifiMgr.addNetwork(wifiConf)) == -1) {
-            Log.d("TAG", "Failed to add network configuration!");
-            return false;
-        }
+                    progressBar.dismiss();
 
-        // Disconnect from current WiFi connection
-        if (!disconnectFromWifi()) {
-            Log.d("TAG", "Failed to disconnect from network!");
-            return false;
-        }
+                    List<ScanResult> scanResults = wifiManager.getScanResults();
+                    Set<String> wifis = new HashSet<String>();
+                    for (ScanResult scanResult : scanResults) {
+                        wifis.add(scanResult.SSID);
+                    }
 
-        // Enable network to be connected
-        if (!wifiMgr.enableNetwork(networkId, true)) {
-            Log.d("TAG", "Failed to enable network!");
-            return false;
-        }
+                    Log.d(TAG, wifis.toString());
 
-        // Connect to network
-        if (!wifiMgr.reconnect()) {
-            Log.d("TAG", "Failed to connect!");
-            return false;
-        }
+                    onDiscoveryDone(wifis);
+                }
 
-        return true;
+
+                if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+
+                    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                    String chosenNetWork = wifiInfo.getSSID();
+                    SupplicantState state = wifiInfo.getSupplicantState();
+
+                    Log.d(TAG, "state: " + state);
+                    Log.d(TAG, "chosenNetwork: " + chosenNetWork);
+
+                    if (chosenNetWork.equals(currentChosenNetwork) && state == SupplicantState.COMPLETED) {
+                        new AlertDialog.Builder(MainApplicationActivity.getActivity())
+                        .setMessage("You have been successfully connected to " + currentChosenNetwork)
+                        .setTitle("Wifi message")
+                        .setCancelable(true)
+                        .setNeutralButton("OK", null)
+                        .show();
+                        
+                        progressBar.dismiss();
+                    }
+
+                    if (doneScanning) {
+                        MainApplicationActivity.getActivity().unregisterReceiver(mReceiver);
+                    }
+                }
+            }
+        };
     }
 }

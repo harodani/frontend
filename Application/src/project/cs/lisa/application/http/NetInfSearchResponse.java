@@ -78,15 +78,20 @@ public class NetInfSearchResponse extends NetInfResponse {
             setStatus(NetInfStatus.NO_SEARCH_RESULTS);
             return;
         }
+        
         Object resultsObj = json.get(RESULTS_KEY);
         if (!(resultsObj instanceof JSONArray)) {
             setStatus(NetInfStatus.INVALID_SEARCH_RESULTS);
             return;
         }
         mSearchResults = (JSONArray) resultsObj;
-
-        // Everything hopefully OK
-        setStatus(NetInfStatus.OK);
+        
+        if (mSearchResults.isEmpty()) {
+        	setStatus(NetInfStatus.NO_SEARCH_RESULTS);
+        } else {
+	        // Everything hopefully OK
+	        setStatus(NetInfStatus.OK);
+        }
     }
 
     /**

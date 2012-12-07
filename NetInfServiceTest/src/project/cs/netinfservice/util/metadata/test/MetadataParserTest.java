@@ -7,7 +7,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.util.metadata.MetadataParser;
 import android.test.AndroidTestCase;
@@ -42,17 +43,15 @@ public class MetadataParserTest extends AndroidTestCase {
 			String[] expectedTimestamps = {"1352797492198", "1352797502292", "1352797530712"};
 			List<String> expectedTimeStampsList = Arrays.asList(expectedTimestamps);
 			
-			JSONObject jsonObject = null;
-			try {
-				jsonObject = new JSONObject(jsonString);
-			} catch (JSONException e) {
+			Object jsonObject = JSONValue.parse(jsonString);
+			if (!(jsonObject instanceof JSONObject)) {
 				Assert.fail("Creating a jason object from String failed.");
 			}
 			
 			// Extract the meta data and check its contents
 			Map<String, Object> map = null;
 			try {
-				map = MetadataParser.toMap(jsonObject);
+				map = MetadataParser.toMap((JSONObject) jsonObject);
 			} catch (JSONException e) {
 				Assert.fail("Should not have raised an exception.");
 			}
