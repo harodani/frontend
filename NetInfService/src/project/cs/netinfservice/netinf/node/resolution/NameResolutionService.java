@@ -404,7 +404,7 @@ implements ResolutionService {
     }
 
     /**
-     * 
+     *
      * @param identifier
      * @param response
      * @return
@@ -456,7 +456,7 @@ implements ResolutionService {
             addMetadata(io.getIdentifier(), jsonObject);
             addLocators(io, jsonObject);
 
-            File file = new File(Environment.getExternalStorageDirectory() 
+            File file = new File(Environment.getExternalStorageDirectory()
             		+ "/DCIM/Shared/" + getHash(io.getIdentifier()));
             FileOutputStream fos = new FileOutputStream(file);
             multipartStream.readHeaders();
