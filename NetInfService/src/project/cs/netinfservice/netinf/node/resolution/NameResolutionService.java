@@ -130,10 +130,6 @@ implements ResolutionService {
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 2208306ab5ac5f5c94f2da59c749ecf45b62be12
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
      * @param host                 The NRS IP Address
@@ -408,7 +404,7 @@ implements ResolutionService {
     }
 
     /**
-     * 
+     *
      * @param identifier
      * @param response
      * @return
@@ -460,7 +456,7 @@ implements ResolutionService {
             addMetadata(io.getIdentifier(), jsonObject);
             addLocators(io, jsonObject);
 
-            File file = new File(Environment.getExternalStorageDirectory() 
+            File file = new File(Environment.getExternalStorageDirectory()
             		+ "/DCIM/Shared/" + getHash(io.getIdentifier()));
             FileOutputStream fos = new FileOutputStream(file);
             multipartStream.readHeaders();
