@@ -130,6 +130,10 @@ implements ResolutionService {
 	/** Key for accessing the NRS Port. */
 	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2208306ab5ac5f5c94f2da59c749ecf45b62be12
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
      * @param host                 The NRS IP Address
@@ -380,6 +384,13 @@ implements ResolutionService {
         }
     }
 
+    /**
+     * Create an IO based in an identifier and a HTTP Response.
+     * @param identifier					the IO identifier
+     * @param response						the HTTP Response
+     * @return								a new IO
+     * @throws InvalidResponseException		if the response is not correct
+     */
     private InformationObject readIo(Identifier identifier, HttpResponse response)
             throws InvalidResponseException {
         InformationObject io = mDatamodelFactory.createInformationObject();
@@ -396,6 +407,13 @@ implements ResolutionService {
         return io;
     }
 
+    /**
+     * 
+     * @param identifier
+     * @param response
+     * @return
+     * @throws InvalidResponseException
+     */
     private InformationObject readIoAndFile(Identifier identifier,
             HttpResponse response) throws InvalidResponseException {
 
@@ -418,6 +436,7 @@ implements ResolutionService {
             io.setIdentifier(identifier);
 
             String contentType = response.getHeaders("Content-Type")[0].getValue();
+
             byte[] boundary = (contentType.substring(contentType.indexOf("boundary=") + 9)).getBytes();
 
             Log.d(TAG, "Sending Intent " + NRS_TRANSMISSION);
@@ -441,7 +460,8 @@ implements ResolutionService {
             addMetadata(io.getIdentifier(), jsonObject);
             addLocators(io, jsonObject);
 
-            File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/Shared/" + getHash(io.getIdentifier()));
+            File file = new File(Environment.getExternalStorageDirectory() 
+            		+ "/DCIM/Shared/" + getHash(io.getIdentifier()));
             FileOutputStream fos = new FileOutputStream(file);
             multipartStream.readHeaders();
             multipartStream.readBodyData(fos);
