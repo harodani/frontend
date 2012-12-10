@@ -275,7 +275,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         }
         
         try {
-        	if (!URLUtil.isHttpsUrl(baseUrl)) {
+        	if (!URLUtil.isHttpUrl(baseUrl)) {
         		baseUrl = "http://" + baseUrl;
         	}
         	
