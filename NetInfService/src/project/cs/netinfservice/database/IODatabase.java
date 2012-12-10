@@ -127,18 +127,26 @@ public class IODatabase
 	 */
 	@Inject
 	public IODatabase(DatamodelFactory datamodelFactory, @Assisted Context context) {
-		
-		// We skip the curser object factory, since we don't need it
+		// We skip the cursor object factory, since we don't need it
 		super(context, DATABASE_NAME, null, 1); 
-		
+
+		// Fetch properties
 		UProperties instance = UProperties.INSTANCE;
 		mFilepathLabel = instance.getPropertyWithName("metadata.filepath");
 		mFilesizeLabel = instance.getPropertyWithName("metadata.filesize");
 		mUrlLabel = instance.getPropertyWithName("metadata.url");
 		
+		// Get data model
 		mDatamodelFactory = datamodelFactory;
 	}
 	
+	/**
+	 * Called when the database is created for the first time. This is where the creation of
+	 * tables and the initial population of the tables should happen.
+	 * 
+	 * @param db
+	 *     The SQLite database.
+	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String createIoTable = "CREATE TABLE " + TABLE_IO + "(" 
@@ -147,7 +155,6 @@ public class IODatabase
 							+ KEY_CONTENT_TYPE + " TEXT NOT NULL, "
 							+ KEY_FILEPATH + " TEXT NOT NULL, "
 							+ KEY_FILE_SIZE + " REAL NOT NULL CHECK(" + KEY_FILE_SIZE + " > 0.0))";
-
 		
 		String createUrlTable = "CREATE TABLE " + TABLE_URL + "(" 
 							+ KEY_HASH + " TEXT NOT NULL, "
@@ -157,31 +164,61 @@ public class IODatabase
 							+ "FOREIGN KEY (" + KEY_HASH + ") " 
 							+ "REFERENCES " + TABLE_IO + " ( " + KEY_HASH + ") "
 							+ "ON DELETE CASCADE )";
-									
 		
 		db.execSQL(createIoTable);
 		db.execSQL(createUrlTable);
 	}
 
+	/**
+	 * Called when the database has been opened. The implementation should check isReadOnly() 
+	 * before updating the database. This method is called after the database connection has 
+	 * been configured and after the database schema has been created, upgraded or downgraded 
+	 * as necessary. If the database connection must be configured in some way before the schema 
+	 * is created, upgraded, or downgraded, do it in onConfigure(SQLiteDatabase) instead.
+	 */
 	@Override
 	public void onOpen(SQLiteDatabase db) {
 	    super.onOpen(db);
+	    
+	    // Checks if the database is read-only or not
 	    if (!db.isReadOnly()) {
 	        // Enable foreign key constraints
 	        db.execSQL("PRAGMA foreign_keys=ON;");
 	    }
 	}
 
+	/**
+	 * Called when the database needs to be upgraded. The implementation should use this method
+	 * to drop tables, add tables, or do anything else it needs to upgrade to the new schema
+	 * version.
+	 * 
+	 * @param db
+	 *     The SQLite database.
+	 * @param oldVersion
+	 *     Old database version number.
+	 * @param newVersion
+	 *     New database version number.
+	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.d(TAG, "Upgrading database to version " + newVersion);
-		
+
+		// Drop tables to re-build them later
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_IO);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_URL);
-				
+
+		// Re-run the creation of the database
 		onCreate(db);
 	}
 
+	/**
+	 * Creates a new IODatabase object.
+	 * 
+	 * @param context
+	 *     The context where the database will be created for.
+	 * @return
+	 *     The new IO database object.
+	 */
 	@Override
 	public IODatabase create(Context context) {
 		return new IODatabase(mDatamodelFactory, context);
@@ -195,30 +232,42 @@ public class IODatabase
 	 */
 	@SuppressWarnings("unchecked")
 	public void addIO(InformationObject io) throws DatabaseException  {
-		Log.d(TAG, "Received an add information object call.");		
+		Log.d(TAG, "Received an add information object call.");
+
 		// Extract the field values for inserting them into the database tables
+		// Get the Identifier from the Information Object 
 		Identifier identifier = io.getIdentifier();
+		
+		// Get hash, hashAlgorithm and content-type
 		String hash = identifier.getIdentifierLabel(
 				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+		
 		String hashAlgorithm = identifier.getIdentifierLabel(
 				SailDefinedLabelName.HASH_ALG.getLabelName()).getLabelValue();
+		
 		String contentType = identifier.getIdentifierLabel(
 				SailDefinedLabelName.CONTENT_TYPE.getLabelName()).getLabelValue();
 		
 		// Extract meta data 
 		String metadata = identifier.getIdentifierLabel(
 						SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
+		
+		// Extract the metadata to a map
 		Map<String, Object> metadataMap = extractMetaData(metadata);
+		
+		// TODO: Remove this line?
 		System.out.println("Metadata: adding " + metadata);
 		
 		String filePath = (String) metadataMap.get(mFilepathLabel);
 		String fileSize = (String) metadataMap.get(mFilesizeLabel);
 		
-		//Create list of URLs
+		// Create list of URLs
 		Object urlJsonObject = metadataMap.get(mUrlLabel);
 		
-		//Populate urlList with one or several URLs
+		// Populate urlList with one or several URLs
 		List<String> urlList;
+		
+		// TODO: Ask Kim for input on what this does.
 		if (urlJsonObject instanceof ArrayList) {
 			urlList  = (ArrayList<String>) urlJsonObject;
 		} else {
@@ -226,32 +275,36 @@ public class IODatabase
 			urlList = new ArrayList<String>();
 			urlList.add(url);
 		}
-			
+
+		// If the objects hash is not in the database, insert it
 		if (!containsIO(hash)) {
 			Log.d(TAG, "New information object will be inserted into database.");
-			//Insert the IO
+			// Insert the IO
 			ContentValues ioEntry = 
 					createIOEntry(hash, hashAlgorithm, contentType, filePath, fileSize);
-			
+			// TODO: Better to use Log.d?
 			System.out.println("New information object: " + urlList.toString());
 			insert(TABLE_IO, ioEntry);
 		} else {
 			Log.d(TAG, "Information object already exists in database.");
-			//Check if the URLs that we want to insert already exist
+			// Check if the URLs that we want to insert already exist
 			List<String> storedUrls = getURLs(hash);
 			urlList.removeAll(storedUrls);	
 		}
 				
 		Log.d(TAG, "Inserting the following URLs:");
-		//Insert the URLs
+		
+		// Insert the URLs
 		for (String url : urlList) {
+		    // Log the URL to be inserted
 			Log.d(TAG, url);
+			// Create a ContentValues object, which is recognized by ContentResolver
 			ContentValues urlEntry = createUrlEntry(hash, url);
 			insert(TABLE_URL, urlEntry);
-		}	
-
+		}
 	}
 	
+	// TODO: Maybe this should raise an exception? Writing might not be available.
 	/**
 	 * Inserts a value in the database.
 	 * 
@@ -259,10 +312,13 @@ public class IODatabase
 	 * @param values	the values that will be inserted
 	 */
 	private void insert(String table, ContentValues values) {
-		SQLiteDatabase db = this.getWritableDatabase();
+		// Get database
+	    SQLiteDatabase db = this.getWritableDatabase();
 		
+		// Insert value into table
 		db.insert(table, null, values);	
 		
+		// Close connection
 		db.close();
 	}
 
@@ -288,8 +344,6 @@ public class IODatabase
 		
 		return urlList;
 	}
-	
-	
 	
 	/**
 	 * Returns the information object specified by the hash value, if existent.
