@@ -284,13 +284,12 @@ implements ResolutionService {
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
             throw new InvalidResponseException("Entity is null.");
-            // TODO seems like content-type is not set
-//        } else if (response.getEntity().getContentType() == null) {
-//            throw new InvalidResponseException("Content-Type is null.");
-//        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
-//            throw new InvalidResponseException("Content-Type is "
-//                    + response.getEntity().getContentType().getValue()
-//                    + ", expected \"application/json\"");
+        } else if (response.getEntity().getContentType() == null) {
+            throw new InvalidResponseException("Content-Type is null.");
+        } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
+            throw new InvalidResponseException("Content-Type is "
+                    + response.getEntity().getContentType().getValue()
+                    + ", expected \"application/json\"");
         }
         try {
             String jsonString = streamToString(response.getEntity().getContent());
@@ -554,8 +553,10 @@ implements ResolutionService {
         try {
             HttpPost post = createPublish(io);
             HttpResponse response = mClient.execute(post);
-            Log.d(TAG, "statusCode = "
-                    + Integer.toString(response.getStatusLine().getStatusCode()));
+            int status = response.getStatusLine().getStatusCode();
+            if (status != HttpStatus.SC_CREATED) {
+                Log.e(TAG, "Publish to NRS failed, status code: " + status);
+            }
 
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);
