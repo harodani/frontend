@@ -21,4 +21,11 @@
             android:title="@string/bluetooth_title" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/database_category" >
+        <Preference
+            android:key="pref_key_clear_database"
+            android:title="@string/clear_database_title" >
+        </Preference>
+    </PreferenceCategory>
+    
 </PreferenceScreen>

@@ -28,10 +28,14 @@ package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
 import project.cs.netinfservice.util.UProperties;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
@@ -43,15 +47,18 @@ import android.preference.PreferenceManager;
  *
  */
 public class SettingsFragment extends PreferenceFragment
-		implements OnSharedPreferenceChangeListener {
+implements OnSharedPreferenceChangeListener {
 
-	/** Key for accessing the NRS IP. */
-	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+    /** Log Tag. */
+    private static final String TAG = "SettingsFragment";
 
-	/** Key for accessing the NRS Port. */
-	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+    /** Key for accessing the NRS IP. */
+    private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
 
-	@Override
+    /** Key for accessing the NRS Port. */
+    private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -76,36 +83,56 @@ public class SettingsFragment extends PreferenceFragment
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
+        findPreference("pref_key_clear_database").setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+
+                        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                        .setTitle("Do you really want to delete the database?")    
+                        .setCancelable(false)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {  
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getActivity().deleteDatabase("IODatabase");
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                        dialog.show();
+                        return false;
+                    }
+                });
+
         // Set default summaries
         findPreference(PREF_KEY_NRS_IP).setSummary(prefs.getString(PREF_KEY_NRS_IP, ""));
         findPreference(PREF_KEY_NRS_PORT).setSummary(prefs.getString(PREF_KEY_NRS_PORT, ""));
 
     }
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+            String key) {
+        if (key.equals(PREF_KEY_NRS_IP) || key.equals(PREF_KEY_NRS_PORT))  {
+            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
 
-		if (key.equals(PREF_KEY_NRS_IP) || key.equals(PREF_KEY_NRS_PORT))  {
-			findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+        }
 
-		}
+    }
 
-	}
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences()
+        .registerOnSharedPreferenceChangeListener(this);
+    }
 
-	@Override
-	public void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		getPreferenceScreen().getSharedPreferences()
-				.registerOnSharedPreferenceChangeListener(this);
-	}
-
-	@Override
-	public void onPause() {
-	    super.onPause();
-	    getPreferenceScreen().getSharedPreferences()
-	            .unregisterOnSharedPreferenceChangeListener(this);
-	}
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences()
+        .unregisterOnSharedPreferenceChangeListener(this);
+    }
 
 }

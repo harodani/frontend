@@ -181,7 +181,6 @@ public class IODatabase
 				
 		onCreate(db);
 	}
-	
 
 	@Override
 	public IODatabase create(Context context) {

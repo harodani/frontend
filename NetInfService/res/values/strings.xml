@@ -14,5 +14,7 @@
     <string name="bluetooth_title">Bluetooth Server</string>
     <string name="bluetooth_summary_on">Sends files using Bluetooth</string>
     <string name="bluetooth_summary_off">Does not send files using Bluetooth</string>
+    <string name="database_category">Database Settings</string>
+    <string name="clear_database_title">!!!~~~Clear Database~~~!!!</string>
 
 </resources>
