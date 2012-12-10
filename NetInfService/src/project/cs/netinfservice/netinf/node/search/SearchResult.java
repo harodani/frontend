@@ -35,7 +35,6 @@ import project.cs.netinfservice.util.metadata.Metadata;
  *
  */
 public interface SearchResult {
-	
 	/**
 	 * Returns the meta data of this entity associated with the search result.
 	 * 
@@ -50,12 +49,10 @@ public interface SearchResult {
 	 */
 	String getHash();
 	
-	
 	/**
 	 * Returns the hash algorithm used for hashing the content.
 	 * 
 	 * @return The hash algorithm
 	 */
 	String getHashAlgorithm();
-
 }
