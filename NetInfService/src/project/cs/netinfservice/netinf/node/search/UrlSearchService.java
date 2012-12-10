@@ -46,45 +46,56 @@ import com.google.inject.name.Named;
 
 /**
  * Enables search for a URL in the local SQLite DB and remote NRS.
+ * 
  * @author Linus Sunde
  * @author Thiago Costa Porto
  */
 public class UrlSearchService implements SearchService {
-
     /** Log Tag. */
     private static final String TAG = "UrlSearchService";
 
     /** Key for accessing the NRS IP. */
     private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+
     /** Key for accessing the NRS Port. */
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+
     /** Message ID random value max. */
     public static final int MSG_ID_MAX = 100000000;
 
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
+
     /** NRS IP address. **/
     private String mDefaultHost;
+
     /** NRS port. **/
     private String mDefaultPort;
 
     /** DatamodelFactory used to create identifiers. */
     private DatamodelFactory mDatamodelFactory;
+
     /** The identity of a certain instance of this class. */
     private SearchServiceIdentityObject mIdentityObject;
+
     /** The local SQLite DB. */
     private IODatabase mDatabase;
+
     /** Random number generator used to create message IDs. */
     private final Random mRandomGenerator = new Random();
+
     /** HTTP Client. **/
     private HttpClient mClient;
 
     /**
      * Creates a new instance of this class.
+     * 
      * @param host
-     *      Default NRS Address
+     *      Default NRS Address from property file
      * @param port
-     *      Default NRS Port
+     *      Default NRS Port from property file
+     * @param timeout,
+     *      Default NRS timeout from property file
      * @param datamodelFactory
      *      The DatamodelFactory to use when creating identifiers
      * @param databaseFactory
@@ -97,25 +108,34 @@ public class UrlSearchService implements SearchService {
             @Named("nrs.http.search.timeout") int timeout,
             final DatamodelFactory datamodelFactory,
             IODatabaseFactory databaseFactory) {
+        // Initialize private variables
         mDefaultHost = host;
         mDefaultPort = Integer.toString(port);
         mDatamodelFactory = datamodelFactory;
+
+        // Grabs Android's SQLite database
         mDatabase = databaseFactory.create(MainNetInfApplication.getAppContext());
 
+        // HTTP Params
         HttpParams params = new BasicHttpParams();
+        
+        // Sets timeout accordingly
         HttpConnectionParams.setConnectionTimeout(params, timeout);
         HttpConnectionParams.setSoTimeout(params, timeout);
+        
+        // Create a new HTTP Client 
         mClient = new DefaultHttpClient(params);
     }
 
     /**
      * Searches for a URL.
+     * 
      * @param type
      *      Should be DefinedQueryTemplate.URL
      * @param urls
      *      A list of exactly one element containing the URL to search for
      * @param searchId
-     *      The id of the search
+     *      The id of the current search
      * @param searchIdentity
      *      The identity object of the search service
      * @param searchController
@@ -124,21 +144,23 @@ public class UrlSearchService implements SearchService {
     @Override
     public void getByQueryTemplate(String type, List<String> urls, int searchId,
             SearchServiceIdentityObject searchIdentity, SearchController searchController) {
-        // TODO Make sure metadata is correctly added
-
+        // Loads url from list of urls with exactly one url
         String url = urls.get(0);
 
         // Search in the database
         try {
+            // Do database search
             Set<Identifier> results = searchDatabase(url);
             Log.d(TAG, "Search found the url in database (" + url + ")");
 
-            // If we found something, don't ask the NRS
+            // Send search results to search controller 
             searchController.handleSearchEvent(new SearchServiceResultEvent(
                     "search result of " + getIdentityObject().getName(),
                     searchId,
                     searchIdentity,
                     results));
+
+            // If we found something, don't ask the NRS.
             return;
         } catch (DatabaseException e) {
             Log.e(TAG, "Search in local db didn't find anything or failed");
@@ -148,16 +170,23 @@ public class UrlSearchService implements SearchService {
         Set<Identifier> results = new HashSet<Identifier>();
 
         try {
+            // Creates a HTTP post for search
             HttpPost search = createSearch(url);
-            HttpResponse response = mClient.execute(search);
-            results = handleResponse(response);
-            
-            Log.d(TAG, "Search found the url in the NRS (" + url + ")");
 
+            // Executes HTTP post
+            HttpResponse response = mClient.execute(search);
+
+            // Handles HTTP response
+            results = handleResponse(response);
+
+            Log.d(TAG, "Search found the url in the NRS (" + url + ")");
         } catch (Exception e) {
             Log.e(TAG, "Search in NRS didn't find anything or failed");
         }
 
+        // This sends the search results to the search controller, covering two scenarios:
+        //  1 Failed search in database and failed search in NRS
+        //  2 Failed search in database and successful search in NRS
         searchController.handleSearchEvent(new SearchServiceResultEvent(
                 "search result of " + getIdentityObject().getName(),
                 searchId,
@@ -167,6 +196,7 @@ public class UrlSearchService implements SearchService {
 
     /**
      * Reads the search results from a HttpResponse.
+     * 
      * @param response
      *      The HttpResponse
      * @return
@@ -176,24 +206,37 @@ public class UrlSearchService implements SearchService {
      */
     private Set<Identifier> handleResponse(HttpResponse response)
             throws Exception {
-
+        // Make a new set of identifiers for handling the results
         Set<Identifier> resultSet = new HashSet<Identifier>();
 
+        // Get status code from HTTP response
         int statusCode = response.getStatusLine().getStatusCode();
+
+        // If the status code is '200' or HTTP OK
         if (statusCode == HttpStatus.SC_OK) {
-            // 200 returns a JSON
+            // Get the JSON returned (200 always returns a JSON)
             String jsonString = EntityUtils.toString(response.getEntity());
+
+            // Parse String to JSON Object
             JSONObject json = (JSONObject) JSONValue.parseWithException(jsonString);
+
+            // Go inside the results
             JSONArray results = (JSONArray) json.get("results");
 
+            // Iterate through the results from the NRS search 
             for (Object result : results) {
                 JSONObject jsonResult = (JSONObject) result;
 
-                // TODO: Un-hardcode this.
-                String hash = getHashFromResults((String) jsonResult.get("ni"));
-                String hashAlg = getHashAlgFromResults((String) jsonResult.get("ni"));
-                String meta = getMetadataFromResults((JSONObject) jsonResult.get("meta"));
+                // Get the 'ni' field and the metadata from Results
+                String niField = (String) jsonResult.get("ni");
+                JSONObject metaField = (JSONObject) jsonResult.get("meta"); 
 
+                // Extract HASH, HASH ALGORITHM and METADATA from the search results
+                String hash = getHashFromResults(niField);
+                String hashAlg = getHashAlgFromResults(niField);
+                String meta = getMetadataFromResults(metaField);
+
+                // Create a new Identifier with the information extracted 
                 Identifier identifier =
                         new IdentifierBuilder(mDatamodelFactory)
                 .setHash(hash)
@@ -201,47 +244,58 @@ public class UrlSearchService implements SearchService {
                 .setMetadata(meta)
                 .build();
 
+                // Add result to the set
                 resultSet.add(identifier);
             }
         }
 
+        // Return set with all results retrieved from the NRS
         return resultSet;
-    }
-
-    private void logIdentifierContent(Identifier identifier) {
-        List<IdentifierLabel> labels = identifier.getIdentifierLabels();
-        for (IdentifierLabel label : labels) {
-            Log.d(TAG, "Label: " + label.getLabelName());
-            Log.d(TAG, "Content: " + label.getLabelValue());
-        }
     }
 
     /**
      * Gets hash algorithm type from the ni field in the JSON result from NRS.
-     * @param ni The ni field value
-     * @return A string with the Hash algorithm
+     * 
+     * @param ni
+     *      The ni field value
+     * @return
+     *      A string with the Hash algorithm
      */
     private String getHashAlgFromResults(String ni) {
+        // ni://hash_alg;HASH
         int end = ni.indexOf(";");
+
+        // Cut the original string
         String substring = ni.substring(0, end);
+
+        // Walk in the new string
         int start = substring.lastIndexOf("/");
+
+        // Return the 'hash_alg'
         return substring.substring(start+1);
     }
 
     /**
      * Gets hash from the ni field in the JSON result from NRS.
-     * @param ni The ni field value
-     * @return A string with the Hash
+     * 
+     * @param ni
+     *      The ni field value
+     * @return
+     *      A string with the Hash
      */
     private String getHashFromResults(String ni) {
+        // ni://hash_alg;HASH
         int start = ni.indexOf(";");
         return ni.substring(start+1);
     }
 
     /**
      * Gets the metadata from the metadata field in the JSON result from NRS.
-     * @param meta The metadata field value
-     * @return String with the metadata from the metadata field
+     * 
+     * @param meta
+     *      The metadata field value
+     * @return
+     *      String with the metadata from the metadata field
      */
     private String getMetadataFromResults(JSONObject meta) {
         return meta.toString();
@@ -249,6 +303,7 @@ public class UrlSearchService implements SearchService {
 
     /**
      * Function that sends a search request to the database.
+     * 
      * @param url
      *      URL to be searched
      * @return
@@ -257,9 +312,10 @@ public class UrlSearchService implements SearchService {
      *      In case search fails
      */
     private Set<Identifier> searchDatabase(String url) throws DatabaseException {
-
+        // Make a database query for the URL
         SearchResult searchResult = mDatabase.searchIO(url);
 
+        // Create a new Identifier with the results 
         Identifier identifier =
                 new IdentifierBuilder(mDatamodelFactory)
         .setHash(searchResult.getHash())
@@ -267,14 +323,19 @@ public class UrlSearchService implements SearchService {
         .setMetadata(searchResult.getMetaData().convertToString())
         .build();
 
+        // We must return a set of identifiers
         Set<Identifier> resultSet = new HashSet<Identifier>();
-        resultSet.add(identifier);
-        return resultSet;
 
+        // Add the Identifier created above to the set
+        resultSet.add(identifier);
+
+        // Return the set of identifiers
+        return resultSet;
     }
 
     /**
      * Creates the search request that is going to be sent to the NRS.
+     * 
      * @param url
      *      URL that is going to be searched for
      * @return
@@ -283,29 +344,35 @@ public class UrlSearchService implements SearchService {
      *      In case UTF-8 is not supported
      */
     private HttpPost createSearch(String url) throws UnsupportedEncodingException {
-
-        // POST
+        // Create URI to look like http://host:port/netinfproto/search
         String uri = HTTP + getHost() + ":" + getPort() + "/netinfproto/search";
+
+        // Create the HTTP Post object with the uri from above
         HttpPost post = new HttpPost(uri);
 
-        // URI
+        // Build additional URI
         StringBuilder query = new StringBuilder();
+
+        // Add msgId
         query.append("?msgid=");
         query.append(Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX)));
+
+        // Add tokens
         query.append("&tokens=");
-        query.append(URLEncoder.encode(url, "UTF-8"));
+        query.append(URLEncoder.encode(url, "UTF-8")); // URL must be encoded to work
+
+        // Add ext
         query.append("&ext=");
         query.append("empty");
 
-        // Encode the URL
-        String encodeUrl = query.toString();
-        //encodeUrl = URLEncoder.encode(query.toString(), "UTF-8");
+        // Put the full url in its own object. Should look like this:
+        // http://host:port/netinfproto/search/?msgid=MSGID&tokens=TOKENS&ext=EXT
+        String fullUrl = query.toString();
 
         // Create new entity
-        HttpEntity newEntity =
-                new InputStreamEntity(
-                        new ByteArrayInputStream(encodeUrl.getBytes()),
-                        encodeUrl.getBytes().length);
+        HttpEntity newEntity = new InputStreamEntity(
+                new ByteArrayInputStream(fullUrl.getBytes()),
+                fullUrl.getBytes().length);
 
         // Add header
         post.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -313,31 +380,59 @@ public class UrlSearchService implements SearchService {
         // set post entity
         post.setEntity(newEntity);
 
+        // return HTTP POST object with search
         return post;
     }
 
     /**
      * Get the NRS Address.
-     * @return the IP Address of the NRS
+     * 
+     * @return
+     *      The IP Address of the NRS
      */
     private String getHost() {
+        // Get shared preferences from Android phone
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
-        return sharedPreferences.getString(PREF_KEY_NRS_IP, mDefaultHost);
 
+        // Returns NRS IP. If the IP is not stored into the shared preferences,
+        // the function returns mDefaultHost, which is the NRS IP stored in this class.
+        return sharedPreferences.getString(PREF_KEY_NRS_IP, mDefaultHost);
     }
 
     /**
      * Get the NRS port.
-     * @return the port of the NRS
+     * 
+     * @return
+     *      The port of the NRS
      */
     private int getPort() {
+        // Get shared preferences from Android phone
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+        
+        // Returns NRS PORT. If the PORT is not stored into the shared preferences,
+        // the function returns mDefaultPort, which is the NRS PORT stored in this class.
         return Integer.parseInt(sharedPreferences.getString(PREF_KEY_NRS_PORT, mDefaultPort));
-
     }
 
+    /**
+     * Function not supported but required to be implemented to comply with the Search Service
+     * interface. We do not implement the RDF database (our project runs on SQLite), thus turning
+     * SPARQL irrelevant.
+     *
+     * In theory, this function should do a SPARQL query to a RDF database.
+     *
+     * @param query
+     *      Query to be supported
+     * @param searchId
+     *      Id of the search
+     * @param searchIdentity
+     *      The identity object of the search service
+     * @param searchController
+     *      The controller that initiated the search
+     *
+     */
     @Override
     public void getBySPARQL(String query, int searchId,
             SearchServiceIdentityObject searchIdentity, SearchController searchController) {
@@ -349,31 +444,52 @@ public class UrlSearchService implements SearchService {
                 new HashSet<Identifier>()));
     }
 
-    // TODO Make sure we can always return true here. Is the DB really ready?
-    // We think it should be
+    /**
+     * Returns if the search service is ready to perform a search request.
+     * 
+     * @return
+     *      false, if no database was loaded.
+     *      true   if a database was loaded.
+     */
     @Override
     public boolean isReady() {
-        return true;
+        // If no database was loaded, false. Otherwise, true.
+        return (mDatabase == null) ? false : true;
     }
 
+    /**
+     * Gets the Search Service Identity Object associated with this Search Service.
+     * 
+     * @return
+     *      Identity Object associated with this Search Service.
+     */
     @Override
     public SearchServiceIdentityObject getIdentityObject() {
+        // Identity Object should always exist. If there isnt one, create a new one.
         if (mIdentityObject == null) {
             mIdentityObject = createIdentityObject();
         }
+        
+        // Return the Identity Object associated with this Search Service
         return mIdentityObject;
     }
 
     /**
      * Creates a new IdentityObject.
+     * 
      * @return
      *      The created IdentityObject
      */
     private SearchServiceIdentityObject createIdentityObject() {
+        // Creates a new Search Service Identity Object
         SearchServiceIdentityObject idO = mDatamodelFactory.createSearchServiceIdentityObject();
+        
+        // Set the object attributes
         idO.setIdentifier(mDatamodelFactory.createIdentifier());
         idO.setName("SearchServiceSQLLite");
-        idO.setDescription("This Search Service can be used to search in the local SQLLite DB.");
+        idO.setDescription("This Search Service can be used to search in the local SQLite DB.");
+        
+        // Returns the created Identity Object.
         return idO;
     }
 
