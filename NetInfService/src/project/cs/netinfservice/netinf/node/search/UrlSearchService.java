@@ -448,13 +448,13 @@ public class UrlSearchService implements SearchService {
      * Returns if the search service is ready to perform a search request.
      * 
      * @return
-     *      false, if no database was loaded.
-     *      true   if a database was loaded.
+     *      {@value}true Always, as a search can always be executed. If no service is working
+     *                   (NRS or database), then it fails, but we should not prevent the search
+     *                   request from happening.  
      */
     @Override
     public boolean isReady() {
-        // If no database was loaded, false. Otherwise, true.
-        return (mDatabase == null) ? false : true;
+        return true;
     }
 
     /**
