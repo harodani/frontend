@@ -49,11 +49,11 @@ public class RESTAccessServer implements AccessServer {
     private Component mComponent;
 
     /**
-      * Constructor that creates a new RESTful server.
-      * @param port the connection port (is injected)
-      * @param connection the connection to the node 
-      * @param factory creates different objects necessary in the NetInf model
-      */
+     * Constructor that creates a new RESTful server.
+     * @param port the connection port (is injected)
+     * @param connection the connection to the node 
+     * @param factory creates different objects necessary in the NetInf model
+     */
     @Inject
     public RESTAccessServer(@Named("access.http.port") int port,
             LocalNodeConnection connection, DatamodelFactory factory) {
@@ -62,21 +62,21 @@ public class RESTAccessServer implements AccessServer {
         Application application = new RESTApplication(connection, factory);
         mComponent.getDefaultHost().attach(application);
     }
-	   
+
     /**
-      * Starts the RESTAccessServer.
-      */
+     * Starts the RESTAccessServer.
+     */
     public void start() {
         try {
             mComponent.start();
         } catch (Exception e) {
-	        e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
     /**
-      * Stops the RESTAccessServer.
-      */  
+     * Stops the RESTAccessServer.
+     */  
     public void stop() {
         try {
             mComponent.stop();

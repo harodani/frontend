@@ -27,9 +27,6 @@
 package project.cs.netinfservice.application;
 
 import java.io.IOException;
-import java.util.List;
-
-import org.restlet.resource.Post;
 
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.provider.bluetooth.BluetoothDiscovery;
@@ -83,7 +80,7 @@ public class MainNetInfActivity extends Activity {
 
     /** Activity. */
     private static MainNetInfActivity sMainNetInfActivity;
-    
+
     /** Handles the Bluetooth discovery interval. */
     private Handler mHandler;
 
@@ -105,7 +102,6 @@ public class MainNetInfActivity extends Activity {
         }
     };
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +110,7 @@ public class MainNetInfActivity extends Activity {
         sMainNetInfActivity = this;
 
         PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .registerOnSharedPreferenceChangeListener(mListener);
+        .registerOnSharedPreferenceChangeListener(mListener);
 
         // Turn on the Bluetooth server if Bluetooth is enabled
         startBluetoothServer();
@@ -130,47 +126,37 @@ public class MainNetInfActivity extends Activity {
         // Display the settings fragment as the main content.
         // setContentView(R.layout.activity_main);
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();
-        
+        .replace(android.R.id.content, new SettingsFragment())
+        .commit();
+
         //Initialize a handler
         mHandler = new Handler();
-        
+
         runBluetoothDiscoveryBackground();
-
-        /*
-         * Set up some notification depending on the connection: colors.
-         * Ask Paolo, he knows.
-         */
-
     }
-    
-    
 
     /**
      * Creates and run a thread that is run every interval ms
      * that runs the Bluetooth Discovery in background.
      */
     private void runBluetoothDiscoveryBackground() {
-		// TODO Auto-generated method stub
-    	Runnable bluetoothTask = new Runnable() {
-			
-			@Override
-			public void run() {
-				Log.d(TAG, "Discovering bluetooth. ");
-				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
-		        btDiscovery.startBluetoothDiscovery();
-		        int interval = Integer.parseInt(UProperties.INSTANCE
-		        		.getPropertyWithName("bluetooth.interval"));
-		        mHandler.postDelayed(this, interval);
-			}
-		};
-		new Thread(bluetoothTask).start();
-	}
+        // TODO Auto-generated method stub
+        Runnable bluetoothTask = new Runnable() {
 
+            @Override
+            public void run() {
+                Log.d(TAG, "Discovering bluetooth. ");
+                BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
+                btDiscovery.startBluetoothDiscovery();
+                int interval = Integer.parseInt(UProperties.INSTANCE
+                        .getPropertyWithName("bluetooth.interval"));
+                mHandler.postDelayed(this, interval);
+            }
+        };
+        new Thread(bluetoothTask).start();
+    }
 
-
-	/**
+    /**
      * Stops the Bluetooth server.
      */
     private void stopBluetoothServer() {

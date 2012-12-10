@@ -125,8 +125,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initializing the browser.");
 
-        Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
-        startActivity(LaunchIntent);
+//        Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
+//        startActivity(LaunchIntent);
 
         setContentView(R.layout.activity_main);
 
@@ -341,7 +341,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
                     String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
                     mEditText.setText(newUrl);
-                    startFetchingWebPage();                    
+                    startFetchingWebPage();
 
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
@@ -352,7 +352,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
-                    
+
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using Bluetooth");
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_blue));
@@ -362,12 +362,12 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     Log.d(TAG, "Trasferring resource using local file system");
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_green));
                     mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_green));
-                    
+
                 } else if (action.equals(UPLINK_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using uplink");
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_red));
                     mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_red));
-                    
+
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using nrs cache");
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_black));
