@@ -97,7 +97,10 @@ public enum BluetoothDiscovery {
         // Initiate a new list every time we start a discovery
         mAvailableDevices = new ArrayList<String>();
 
-        mBluetoothAdapter.startDiscovery();
+        if (mBluetoothAdapter != null) mBluetoothAdapter.startDiscovery();
+        else {
+        	
+        }
 
         // Wait for the discover to finish within n seconds
         try {
