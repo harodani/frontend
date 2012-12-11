@@ -40,6 +40,10 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
     private static final int TIMEOUT = 
     		Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("httprequest.timeout"));
 
+    /** Encoding. */
+    public static final String ENCODING = 
+            UProperties.INSTANCE.getPropertyWithName("httprequest.encode");
+
     /** Target Host. */
     private String mHost;
 

@@ -48,10 +48,6 @@ public class NetInfPublish extends NetInfRequest {
     /** Log Tag. */
     public static final String TAG = "NetInfPublish";
 
-    /** Encoding. */
-    public static final String ENCODING = 
-    		UProperties.INSTANCE.getPropertyWithName("httprequest.encode");
-
     /** Locators. */
     private Set<Locator> mLocators;
 

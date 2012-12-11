@@ -30,6 +30,7 @@ import java.io.IOException;
 
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.provider.bluetooth.BluetoothDiscovery;
+import project.cs.netinfservice.netinf.provider.bluetooth.exceptions.BluetoothAdapterNotAvailableException;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import project.cs.netinfservice.util.UProperties;
 import android.app.Activity;
@@ -132,6 +133,16 @@ public class MainNetInfActivity extends Activity {
         //Initialize a handler
         mHandler = new Handler();
 
+        
+        
+        runBluetoothDiscoveryBackground();
+        
+        /*
+         * Set up some notification depending on the connection: colors.
+         * Ask Paolo, he knows.
+         */
+
+
         runBluetoothDiscoveryBackground();
     }
 
@@ -140,23 +151,34 @@ public class MainNetInfActivity extends Activity {
      * that runs the Bluetooth Discovery in background.
      */
     private void runBluetoothDiscoveryBackground() {
-        // TODO Auto-generated method stub
-        Runnable bluetoothTask = new Runnable() {
 
-            @Override
-            public void run() {
-                Log.d(TAG, "Discovering bluetooth. ");
-                BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
-                btDiscovery.startBluetoothDiscovery();
-                int interval = Integer.parseInt(UProperties.INSTANCE
-                        .getPropertyWithName("bluetooth.interval"));
-                mHandler.postDelayed(this, interval);
-            }
-        };
-        new Thread(bluetoothTask).start();
-    }
+    	Runnable bluetoothTask = new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d(TAG, "Discovering bluetooth. ");
+				
+				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
+				btDiscovery.startBluetoothDiscovery();
+				int interval = Integer.parseInt(UProperties.INSTANCE
+		        		.getPropertyWithName("bluetooth.interval"));
+		        mHandler.postDelayed(this, interval);
+				
+		        
+			}
+		};
+		if (BluetoothAdapter.getDefaultAdapter() == null) {
+			showToast(""); 
+			Log.w(TAG, "No Bluetooh adapter available. Bluetooth discovery canceled.");
+		}		
+		else new Thread(bluetoothTask).start();
+    		
+		
+	}
 
-    /**
+
+
+	/**
      * Stops the Bluetooth server.
      */
     private void stopBluetoothServer() {

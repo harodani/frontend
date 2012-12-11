@@ -54,6 +54,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -190,23 +191,20 @@ public class MainApplicationActivity extends BaseMenuActivity {
         });
 
         mWebView = (WebView) findViewById(R.id.webView);
-        // mWebView: enable pinch zooming
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setAppCacheEnabled(true);
-        mWebView.getSettings().setBuiltInZoomControls(true);
-        mWebView.getSettings().setSupportZoom(true);
-        mWebView.getSettings().setUseWideViewPort(true);
-        mWebView.getSettings().setLoadWithOverviewMode(true);
+        WebSettings settings = mWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setAppCacheEnabled(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(true);
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
+        
         mWebView.setWebViewClient(new NetInfWebViewClient());
 
         mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
         mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
         mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
         mSpinningBar.setVisibility(View.INVISIBLE);
-
-        //        showDialog(new ShareDialog());
-
-
     }
 
     private class WifiDialogListener implements DialogInterface.OnClickListener {
