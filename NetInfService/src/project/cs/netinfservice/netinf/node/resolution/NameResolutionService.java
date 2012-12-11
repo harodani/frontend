@@ -86,12 +86,9 @@ import com.google.inject.name.Named;
  * @author Linus Sunde
  * @author Harold Martinez
  * @author Thiago Costa Porto
- *
  */
-public class NameResolutionService
-extends AbstractResolutionServiceWithoutId
-implements ResolutionService {
-
+public class NameResolutionService extends AbstractResolutionServiceWithoutId
+    implements ResolutionService {
     /** Debug tag. **/
     public static final String TAG = "NameResolutionService";
 
@@ -132,9 +129,12 @@ implements ResolutionService {
 
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
-     * @param host                 The NRS IP Address
-     * @param port                 The NRS Port
-     * @param datamodelFactory     Creates different objects necessary in the NetInf model
+     * @param host
+     *      The NRS IP Address
+     * @param port
+     *      The NRS Port
+     * @param datamodelFactory
+     *      Creates different objects necessary in the NetInf model
      */
     @Inject
     public NameResolutionService(
@@ -147,150 +147,197 @@ implements ResolutionService {
         HttpConnectionParams.setSoTimeout(params, TIMEOUT);
         mClient = new DefaultHttpClient(params);
 
+        // Setup other private variables
         mHost = host;
         mPort = port;
         mDatamodelFactory = datamodelFactory;
     }
 
-
-
     /**
      * Get the NRS Address.
-     * @return the IP Address of the NRS
+     * 
+     * @return
+     *      <p>The IP Address of the NRS.
      */
     private String getHost() {
+        // Shared preferences
     	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+    	
+    	// Host is set to NRS IP that is set in the shared preferences. If none is set, uses
+    	// default value stored in mHost (set by constructor)
     	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
+
+        // Returns NRS IP.
     	return mHost;
-
 	}
-
-
 
     /**
      * Get the NRS port.
-     * @return the port of the NRS
+     * 
+     * @return
+     *      <p>The port of the NRS
      */
     private int getPort() {
+        // Shared preferences
     	SharedPreferences sharedPreferences =
     			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+    	
+    	// Port is set to the NRS PORT that is set in the shared preferences. If none is set,
+    	// uses the default value stored in mPort (set by constructor)
 		mPort = Integer.parseInt(sharedPreferences
 				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
+		
+		// Returns NRS PORT
 		return mPort;
-
 	}
-
-
-
-    @Override
-    public void delete(Identifier arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String describe() {
-        return "backend NRS";
-    }
 
     /**
      * Gets the hash algorithm from an identifier.
-     * @param identifier   The identifier
-     * @return             The hash algorithm
+     * 
+     * @param identifier
+     *      The identifier
+     * @return
+     *      The hash algorithm
      */
     private String getHashAlg(Identifier identifier) {
+        // Extract hash algorithm
         String hashAlg = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_ALG.getLabelName()).getLabelValue();
+        
+        // Return the hash algorithm used to hash the object
         return hashAlg;
     }
 
     /**
      * Gets the hash from an identifier.
-     * @param identifier   The identifier
-     * @return             The hash
+     * 
+     * @param identifier
+     *      The identifier
+     * @return
+     *      The hash
      */
     private String getHash(Identifier identifier) {
+        // Extracts hash
         String hash = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+        
+        // Returns object's hash
         return hash;
     }
 
     /**
      * Gets the content-type from an identifier.
-     * @param identifier   The identifier
-     * @return             The content-type
+     * 
+     * @param identifier
+     *      The identifier
+     * @return
+     *      The content-type
      */
     private String getContentType(Identifier identifier) {
+        // Extracts content-type
         String contentType = identifier.getIdentifierLabel(
                 SailDefinedLabelName.CONTENT_TYPE.getLabelName()).getLabelValue();
+        
+        // Returns MIME content-type
         return contentType;
     }
 
     /**
      * Gets the metadata from an identifier.
-     * @param identifier   The identifier
-     * @return             The metadata
+     * 
+     * @param identifier
+     *      The identifier
+     * @return
+     *      The metadata
      */
     private String getMetadata(Identifier identifier) {
+        // Extracts metadata
         String metadata = identifier.getIdentifierLabel(
                 SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
+        
+        // Returns extracted metadata (in STRING form)
         return metadata;
     }
 
     /**
      * Gets the file path from an InformationObject.
+     * 
      * @param io
      *      The information object
      * @return
      *      The file path
      */
     private String getFilePath(InformationObject io) {
+        // Created a new attribute (as defined on datamodel factory)
         Attribute filepathAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
+        
+        // Extract filepath
         String filepath = null;
         if (filepathAttribute != null) {
             filepath = filepathAttribute.getValueRaw();
             filepath = filepath.substring(filepath.indexOf(":") + 1);
         }
+        
+        // Returns file path
         return filepath;
     }
 
     /**
-     * Gets the first bluetooth locator from an InformationObject.
+     * Gets the <b>first</b> bluetooth locator from an InformationObject.
+     * 
      * @param io
      *      The information object
      * @return
      *      The bluetooth locator
      */
     private String getBluetoothMac(InformationObject io) {
+        // Creates a new attribute to extract information from IO
         Attribute bluetoothAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI());
+        
+        // Extract bluetooth locator from IO
         String bluetoothLocator = null;
+        
         if (bluetoothAttribute != null) {
             bluetoothLocator = bluetoothAttribute.getValueRaw();
             bluetoothLocator = bluetoothLocator.substring(bluetoothLocator.indexOf(":") + 1);
         }
+        
+        // Returns FIRST bluetooth locator
         return bluetoothLocator;
     }
 
     /**
      * Reads the next content stream from a HTTP response, expecting it to be JSON.
-     * @param response                     The HTTP response
-     * @return                             The read JSON
-     * @throws InvalidResponseException    In case reading the JSON failed
+     * 
+     * @param response
+     *      The HTTP response
+     * @return
+     *      The read JSON
+     * @throws InvalidResponseException
+     *      In case reading the JSON failed
      */
     private String readJson(HttpResponse response) throws InvalidResponseException {
+        // Sanity check of the HTTP response received
         if (response == null) {
+            // null response
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
+            // No entity attached with the HTTP response
             throw new InvalidResponseException("Entity is null.");
         } else if (response.getEntity().getContentType() == null) {
+            // No content-type with the response
             throw new InvalidResponseException("Content-Type is null.");
         } else if (!response.getEntity().getContentType().getValue().equals("application/json")) {
+            // We did not receive a JSON back
             throw new InvalidResponseException("Content-Type is "
                     + response.getEntity().getContentType().getValue()
                     + ", expected \"application/json\"");
         }
+        
+        // Try to convert HTTP response to a JSON String
         try {
             String jsonString = streamToString(response.getEntity().getContent());
             return jsonString;
@@ -301,113 +348,161 @@ implements ResolutionService {
 
     /**
      * Converts the JSON String returned in the HTTP response into a JSONObject.
-     * @param jsonString                   The JSON String from the HTTP response
-     * @return                             The JSONObject
-     * @throws InvalidResponseException    In case the JSON String is invalid
+     * 
+     * @param jsonString
+     *      The JSON String from the HTTP response
+     * @return
+     *      The JSONObject
+     * @throws InvalidResponseException
+     *      In case the JSON String is invalid
      */
     private JSONObject parseJson(String jsonString) throws InvalidResponseException {
+        // Creates a JSON Object from the JSON String passed as parameter
         JSONObject json = (JSONObject) JSONValue.parse(jsonString);
+        
+        // If we were unable to get a JSON Object from the JSON String, throw exception.
         if (json == null) {
             Log.e(TAG, "Unable to parse JSON");
             Log.e(TAG, "jsonString = " + jsonString);
             throw new InvalidResponseException("Unable to parse JSON.");
         }
+        
+        // Return JSON Object
         return json;
     }
 
     /**
      * If the JSON contains a content-type, extract it and set the content-type of the identifier.
-     * @param identifier       The identifier
-     * @param json             The JSON
+     * 
+     * @param identifier
+     *      The identifier
+     * @param json
+     *      The JSON
      */
     private void addContentType(Identifier identifier, JSONObject json) {
-
         // Check that the content-type is a string
         Object object = json.get("ct");
+        
         if (!(object instanceof String)) {
             Log.w(TAG, "Content-Type NOT added.");
             return;
         }
+        
+        // Converts JSON value to a string
         String contentType = (String) object;
 
-        // Add the content-type
+        // Create a new identifier label and get the content-type
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.CONTENT_TYPE.getLabelName());
         label.setLabelValue(contentType);
+        
+        // Attach it to the identifier
         identifier.addIdentifierLabel(label);
     }
 
     /**
      * If the JSON contains metadata, extract it and set the metadata of the identifier.
-     * @param identifier       The identifier
-     * @param json             The JSON
+     * 
+     * @param identifier
+     *      The identifier
+     * @param json
+     *      The JSON
      */
     private void addMetadata(Identifier identifier, JSONObject json) {
-
         // Check that the metadata is an JSONObject
         Object object = json.get("metadata");
+
         if (!(object instanceof JSONObject)) {
             Log.w(TAG, "Metadata NOT added.");
         }
+        
+        // Extract metadata from JSON Value
         JSONObject metadata = (JSONObject) object;
 
-        // Add the metadata
+        // Create identifierlabel and add the metadata to it
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.META_DATA.getLabelName());
         label.setLabelValue(metadata.toJSONString());
+        
+        // Attach metadata to identifier
         identifier.addIdentifierLabel(label);
     }
 
     /**
      * If the JSON contains locators, extract them and add them to the InformationObject.
-     * @param io               The InformationObject
-     * @param json             The JSON
+     * 
+     * @param io
+     *      The InformationObject
+     * @param json
+     *      The JSON
      */
     private void addLocators(InformationObject io, JSONObject json) {
+        // Get locators from JSON object
         JSONArray locators = (JSONArray) json.get("loc");
 
+        // Iterate through locators list and add them to the IO
         for (Object locator : locators) {
-
-            String loc = (String) locator;
-
+            // Create a new attribute and add the locator to it
             Attribute newLocator = mDatamodelFactory.createAttribute();
             newLocator.setAttributePurpose(DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString());
             newLocator.setIdentification(SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI());
             newLocator.setValue(locator);
 
+            // Attach locator to the IO
             io.addAttribute(newLocator);
         }
     }
 
     /**
      * Create an IO based in an identifier and a HTTP Response.
-     * @param identifier					the IO identifier
-     * @param response						the HTTP Response
-     * @return								a new IO
-     * @throws InvalidResponseException		if the response is not correct
+     * 
+     * @param identifier
+     *      The IO identifier
+     * @param response
+     *      The HTTP Response
+     * @return
+     *      A new IO
+     * @throws InvalidResponseException
+     *      If the response is not correct
      */
     private InformationObject readIo(Identifier identifier, HttpResponse response)
             throws InvalidResponseException {
+        // Creates a new InformationObject
         InformationObject io = mDatamodelFactory.createInformationObject();
+        
+        // Set the IO identifier to the one passed with the function
         io.setIdentifier(identifier);
-        Log.w(TAG, "reading json");
+        
+        // Reads JSON Object
+        Log.d(TAG, "Reading JSON");
         String jsonString = readJson(response);
-        Log.w(TAG, jsonString);
-        Log.w(TAG, "parsing json");
+        Log.d(TAG, "JSON read:\n" + jsonString);
+
+        // Parses JSON Object
+        Log.d(TAG, "Parsing JSON");
         JSONObject json = parseJson(jsonString);
-        Log.w(TAG, json.toString());
+        Log.d(TAG, "JSON parsed:\n" + json.toString());
+        
+        // Add content-type, metadata and locators
         addContentType(identifier, json);
         addMetadata(identifier, json);
         addLocators(io, json);
+        
+        // Returns new Information Object with content-type, metadata and locators.
         return io;
     }
 
     /**
-     *
+     * Reads Information Object and file.
+     * 
      * @param identifier
+     * 
      * @param response
+     * 
      * @return
+     * 
      * @throws InvalidResponseException
+     * 
      */
     private InformationObject readIoAndFile(Identifier identifier,
             HttpResponse response) throws InvalidResponseException {
@@ -691,4 +786,18 @@ implements ResolutionService {
         byte[] bytes = str.getBytes();
         return new ByteArrayInputStream(bytes);
     }
+    
+    /**
+     * Not supported.
+     */
+    @Override
+    public void delete(Identifier arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String describe() {
+        return "backend NRS";
+    }
+
 }
