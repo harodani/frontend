@@ -30,7 +30,6 @@ import java.io.IOException;
 
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.provider.bluetooth.BluetoothDiscovery;
-import project.cs.netinfservice.netinf.provider.bluetooth.exceptions.BluetoothAdapterNotAvailableException;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
 import project.cs.netinfservice.util.UProperties;
 import android.app.Activity;
