@@ -7,38 +7,38 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
+/**
+ * Base menu to attach to whatever activity.
+ * @author Paolo Boschini
+ * @author Harold Martinez
+ *
+ */
 public class BaseMenuActivity extends Activity {
-	
-	/** Debugging tag. */
+
+    /** Debugging tag. */
     private static final String TAG = "BaseMenuActivity";
-    
-    /** The menu. */
-    private Menu menu;
-	
-	@Override
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu()");
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        this.menu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-	        case R.id.menu_settings:
-	        	Intent settingsIntent = new Intent(this,SettingsActivity.class);
-	        	startActivity(settingsIntent);
-	        	break;
-	        case R.id.menu_help:
-	        	Intent helpActivity = new Intent(this,HelpActivity.class);
-	        	startActivity(helpActivity);
-	        	break;
-	        default:
-	            break;
-	        }
+        case R.id.menu_settings:
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            break;
+        case R.id.menu_help:
+            Intent helpActivity = new Intent(this, HelpActivity.class);
+            startActivity(helpActivity);
+            break;
+        default:
+            break;
+        }
         return true;
     }
-
 }

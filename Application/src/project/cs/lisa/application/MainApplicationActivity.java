@@ -38,6 +38,7 @@ import project.cs.lisa.application.html.transfer.FetchWebPageTask;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.networksettings.WifiHandler;
 import project.cs.lisa.util.UProperties;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
@@ -83,7 +84,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
     public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
 
     /** Bluetooth transmission used to transfer a resource. */
-    public static final String BLUETOOTH_TRANSMISSION = "project.cs.netinfservice.BLUETOOTH_TRANSMISSION";
+    public static final String BLUETOOTH_TRANSMISSION =
+            "project.cs.netinfservice.BLUETOOTH_TRANSMISSION";
 
     /** Local File system (database) transmission used to transfer a resource. */
     public static final String LOCAL_TRANSMISSION = "project.cs.netinfservice.LOCAL_TRANSMISSION";
@@ -116,7 +118,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     private EditText mEditText;
 
     /** Icon imageview for the url search bar. */
-    private ImageView img;
+    private ImageView mImg;
 
     /** Spinning progress bar, shown when loading a page. */
     private ProgressBar mSpinningBar;
@@ -151,37 +153,51 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(NRS_TRANSMISSION);
         registerReceiver(mBroadcastReceiver, mIntentFilter);
 
+        // sets up UI stuff
+        setUpEditTextUrl();
+        setUpLoadPageIcon();
+        setUpWebView();
+        setUpSpinningBar();
+    }
 
+    /**
+     * Sets up the edit text for the url. 
+     */
+    private void setUpEditTextUrl() {
         // Get the input address
         mEditText = (EditText) findViewById(R.id.url);
         mEditText.setText(UProperties.INSTANCE.getPropertyWithName("default.webpage"));
         mEditText.setOnKeyListener(new OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     startFetchingWebPage();
                     return true;
                 }
                 return false;
             }
         });
+    }
 
-
-        img = (ImageView) findViewById(R.id.imageView);
-        img.setImageResource(R.drawable.refresh);
-        img.setTag(R.drawable.refresh);
-        img.setOnClickListener(new OnClickListener() {
+    /**
+     * Sets up the load page icon.
+     */
+    private void setUpLoadPageIcon() {
+        mImg = (ImageView) findViewById(R.id.imageView);
+        mImg.setImageResource(R.drawable.refresh);
+        mImg.setTag(R.drawable.refresh);
+        mImg.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                int tag = (Integer)img.getTag();
+                int tag = (Integer) mImg.getTag();
                 switch (tag) {
                 case R.drawable.refresh:
-                    img.setImageResource(R.drawable.cancel);
-                    img.setTag(R.drawable.cancel);
+                    mImg.setImageResource(R.drawable.cancel);
+                    mImg.setTag(R.drawable.cancel);
                     startFetchingWebPage();
                     break;
                 case R.drawable.cancel:
-                    img.setImageResource(R.drawable.refresh);
-                    img.setTag(R.drawable.refresh);
+                    mImg.setImageResource(R.drawable.refresh);
+                    mImg.setTag(R.drawable.refresh);
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mWebView.stopLoading();
                 default:
@@ -189,7 +205,23 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 }
             }
         });
+    }
 
+    /**
+     * Sets up the spinning bar.
+     */
+    private void setUpSpinningBar() {
+        mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
+        mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
+        mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
+        mSpinningBar.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Sets up the web view.
+     */
+    @SuppressLint("SetJavaScriptEnabled")
+    private void setUpWebView() {
         mWebView = (WebView) findViewById(R.id.webView);
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -198,13 +230,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         settings.setSupportZoom(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        
         mWebView.setWebViewClient(new NetInfWebViewClient());
-
-        mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
-        mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
-        mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
-        mSpinningBar.setVisibility(View.INVISIBLE);
     }
 
     private class WifiDialogListener implements DialogInterface.OnClickListener {
@@ -346,8 +372,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
                     mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
                     mSpinningBar.setVisibility(View.INVISIBLE);
-                    img.setImageResource(R.drawable.refresh);
-                    img.setTag(R.drawable.refresh);
+                    mImg.setImageResource(R.drawable.refresh);
+                    mImg.setTag(R.drawable.refresh);
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
