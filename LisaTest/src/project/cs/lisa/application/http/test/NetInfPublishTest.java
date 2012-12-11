@@ -26,7 +26,6 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
     private static final String mHash = "hashThatExists";
 
-    private static final String mHost = "localhost";
     private static final String mHashAlg = "sha-256";
     private static final String mBluetoothMac = "11:22:33:44:55:66";
     private static final String mMetaKey = "metaKey";
@@ -90,7 +89,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
 
         HashSet<Locator> locators = null;
 
-        final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
+        final NetInfPublish publish = new NetInfPublish(mHashAlg, mHash, locators) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);
@@ -102,7 +101,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
                 signal.countDown();
             }
         };
-
+        
         // Run on UI thread
         runTestOnUiThread(new Runnable() {
             @Override
@@ -126,7 +125,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         Locator locator = new Locator(Locator.Type.BLUETOOTH, mBluetoothMac);
         locators.add(locator);
 
-        final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
+        final NetInfPublish publish = new NetInfPublish(mHashAlg, mHash, locators) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);
@@ -164,7 +163,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         locators.add(locator1);
         locators.add(locator2);
 
-        final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
+        final NetInfPublish publish = new NetInfPublish(mHashAlg, mHash, locators) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);
@@ -201,7 +200,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         Locator locator = new Locator(Locator.Type.BLUETOOTH, mBluetoothMac);
         locators.add(locator);
 
-        final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.WRONG_PORT), mHashAlg, mHash, locators) {
+        final NetInfPublish publish = new NetInfPublish(mHashAlg, mHash, locators) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);
@@ -237,7 +236,7 @@ public class NetInfPublishTest extends InstrumentationTestCase {
         Locator locator = new Locator(Locator.Type.BLUETOOTH, mBluetoothMac);
         locators.add(locator);
 
-        final NetInfPublish publish = new NetInfPublish(mHost, Integer.toString(MockServer.PORT), mHashAlg, mHash, locators) {
+        final NetInfPublish publish = new NetInfPublish(mHashAlg, mHash, locators) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);

@@ -26,21 +26,11 @@ public class NetInfSearchTest extends InstrumentationTestCase {
 
     private static final int TIMEOUT_SECONDS = 5;
 
-    // Correct Host
-    private static final String mHost = "localhost";
-
     private static final String mMsgId = "189371278363-123893712";
     private static final String mTokens = "lingus";
     private static final String mExt = "";
 
     private MockServer mMockServer;
-
-    /* TEST SPECIFIC STRINGS */
-    // Wrong Host
-    private static final String mWrongHost = "LINUS-host";
-
-    // Wrong Port
-    private static final String mWrongPort = "8172";
 
     /**
      * Mock Server. SuppressedWarnings because... I can.
@@ -99,8 +89,7 @@ public class NetInfSearchTest extends InstrumentationTestCase {
         final CountDownLatch signal = new CountDownLatch(1);
 
         // Create search
-        final NetInfSearch search = new NetInfSearch(mHost,
-                Integer.toString(MockServer.PORT), mTokens, mExt) {
+        final NetInfSearch search = new NetInfSearch(mTokens, mExt) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
 
@@ -138,8 +127,7 @@ public class NetInfSearchTest extends InstrumentationTestCase {
         final CountDownLatch signal = new CountDownLatch(1);
 
         // Create search
-        final NetInfSearch search = new NetInfSearch(mHost,
-                Integer.toString(MockServer.PORT), "BADDYBAO", mExt) {
+        final NetInfSearch search = new NetInfSearch("BADDYBAO", mExt) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);
@@ -172,8 +160,7 @@ public class NetInfSearchTest extends InstrumentationTestCase {
         final CountDownLatch signal = new CountDownLatch(1);
 
         // Create search
-        final NetInfSearch search = new NetInfSearch(mWrongHost,
-                Integer.toString(MockServer.PORT), mTokens, mExt) {
+        final NetInfSearch search = new NetInfSearch(mTokens, mExt) {
             @Override
             protected void onPostExecute(NetInfResponse response) {
                 assertNotNull("Should always receive a response", response);

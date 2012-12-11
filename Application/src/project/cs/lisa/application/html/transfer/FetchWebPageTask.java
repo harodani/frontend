@@ -1,9 +1,36 @@
+/**
+ * Copyright 2012 Ericsson, Uppsala University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Uppsala University
+ *
+ * Project CS course, Fall 2012
+ *
+ * Projekt DV/Project CS, is a course in which the students develop software for
+ * distributed systems. The aim of the course is to give insights into how a big
+ * project is run (from planning to realization), how to construct a complex
+ * distributed system and to give hands-on experience on modern construction
+ * principles and programming methods.
+ *
+ */
 package project.cs.lisa.application.html.transfer;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Locale;
 
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
@@ -32,12 +59,22 @@ import android.webkit.WebView;
  * Loads the web page asynchronously.
  * @author Paolo Boschini
  * @author Linus Sunde
+ * @author Kim-Anh Tran
  *
  */
 public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
     /** Debugging tag. */
     private static final String TAG = "FetchWebPageTask";
+    
+    /** ISO encoding indicator. */
+    private static final String ISO_ENCODING = "iso-8859-1";
+    
+    /** UTF encoding indicator. */
+    private static final String UTF8_ENCODING = "utf-8";
+    
+    /** Tags that help to find the encoding within an HTML page. */
+	private static final String[] ENCODING_TAGS = {"encoding=", "charset="};
 
     /** NetInf Restlet Address. */
     private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
@@ -48,7 +85,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
     /** Hash Algorithm. */
     private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
 
-    /** Web view to disply the web page. */
+    /** Web view to display the web page. */
     private WebView mWebView;
     
     /**
@@ -79,10 +116,12 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         return null;
     }
 
+    
     private boolean shouldPublish() {
         // Check for publish
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+                PreferenceManager.getDefaultSharedPreferences(
+                		MainApplicationActivity.getActivity().getApplicationContext());
         return prefs.getBoolean("pref_key_publish", false);
     }
 
@@ -136,10 +175,11 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 try {
                     // Assume retrieve succedded, display page and publish
-                    displayWebpage(retrieve.getFile(), url.getHost());
+                    displayWebpage(retrieve.getFile(), url.getHost(), retrieve.getContentType());
                     try {
                         if (shouldPublish()) {
-                            publish(retrieve.getFile(), url, hash, retrieve.getContentType()).execute();
+                            publish(retrieve.getFile(), url, hash, retrieve.getContentType())
+                            	.execute();
                         }
                     } catch (IOException e) {
                         MainApplicationActivity.showToast(e.getMessage());
@@ -166,7 +206,8 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             protected void onPostExecute(WebObject webObject) {
 
                 if (webObject == null) {
-                    MainApplicationActivity.showToast("Download failed. Check internet connection.");
+                    MainApplicationActivity.showToast(
+                    		"Download failed. Check internet connection.");
             		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
             		MainApplicationActivity.getActivity().sendBroadcast(intent);
                     return;
@@ -178,7 +219,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                 String hash = webObject.getHash();
                 String contentType = webObject.getContentType();
 
-                displayWebpage(file, url.getHost());
+                displayWebpage(file, url.getHost(), contentType);
                 try {
                     publish(file, url, hash, contentType).execute();
                 } catch (IOException e) {
@@ -235,7 +276,8 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             publishRequest.setMetadata(metadata);
 
             // Check for fullput
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(
+            		MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
             Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
 
@@ -264,10 +306,11 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
     /**
      * Show a HTML in the web view.
+     * 
      * @param webPage
      *      The web page
      */
-    private void displayWebpage(File webPage, String baseUrl) {
+    private void displayWebpage(File webPage, String baseUrl, String contentType) {
         if (webPage == null) {
             Log.d(TAG, "webPage == null");
             MainApplicationActivity.showToast("Could not download web page.");
@@ -278,11 +321,80 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         	if (!URLUtil.isHttpUrl(baseUrl)) {
         		baseUrl = "http://" + baseUrl;
         	}
+  
+        	// Detect encoding
+        	String html;
+        	String encoding;
+        	String encodingIndicator = ";";
+        	if (contentType.contains(encodingIndicator)) { 
+        		int encodingIndicatorIndex = contentType.indexOf(encodingIndicator);
+        		
+        		String encodingStartIndicator = "=";
+        		int startIndex = contentType.indexOf(encodingStartIndicator, encodingIndicatorIndex)
+        				+ encodingIndicator.length();
+        		encoding = contentType.substring(startIndex);        		
+                html = FileUtils.readFileToString(webPage, encoding);
+        		
+        	} else {
+            	/*
+            	 *  Read in webpage. First assume iso-8859-1 encoding 
+            	 *  and then detect encoding from String
+            	 */
+                html = FileUtils.readFileToString(webPage, ISO_ENCODING);
+
+        		encoding = getEncoding(html);
+        		if (!encoding.isEmpty() 
+        				&& !encoding.toLowerCase(Locale.ENGLISH).equals(ISO_ENCODING)) {
+        			html = FileUtils.readFileToString(webPage, encoding);
+        		}
+
+        		Log.d(TAG, "From HTML encoding: " + encoding);
+
+        	}
         	
-            String result = FileUtils.readFileToString(webPage);
-            mWebView.loadDataWithBaseURL(baseUrl, result, "text/html", "UTF-8", null);
+            /*
+             *  Independent on the actual encoding, we need to specify 
+             *  utf-8 within the load webpage call.
+             */
+            mWebView.loadDataWithBaseURL(baseUrl, html, "text/html", UTF8_ENCODING, null);
         } catch (IOException e) {
             MainApplicationActivity.showToast("Could not load web page.");
         }
     }
+
+    /**
+     * Returns the encoding of the webpage based on the html code, if existent.
+     * Returns an empty String if no encoding indicator was found.
+     * 
+     * @param html	The html String
+     * @return		The encoding, if found
+     */
+	private String getEncoding(String html) {
+		/* Check for: 
+		 * <?xml version="1.0" encoding="UTF-8"?>
+		 * <meta charset="UTF-8"> 
+		 * <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+		 */
+		
+		String encoding = "";
+		char encodingDelimiter = '\"';
+		int startIndex;
+		int endIndex;
+		
+		for (String indicator : ENCODING_TAGS) {
+			if (html.contains(indicator)) {
+				startIndex = html.indexOf(indicator) + indicator.length();
+				
+				if (html.charAt(startIndex) == encodingDelimiter) {
+					++startIndex;
+				}
+				
+				endIndex = html.indexOf(encodingDelimiter, startIndex);
+				encoding = html.substring(startIndex, endIndex);
+			}
+		}
+		
+		return encoding;
+
+	}
 }
