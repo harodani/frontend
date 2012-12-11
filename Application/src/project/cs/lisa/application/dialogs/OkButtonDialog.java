@@ -6,6 +6,12 @@ import android.app.DialogFragment;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
+/**
+ * 
+ * @author Paolo Boschini
+ * @author Linus Sunde
+ *
+ */
 public class OkButtonDialog extends DialogFragment {
 
     OnClickListener mOkListener;
