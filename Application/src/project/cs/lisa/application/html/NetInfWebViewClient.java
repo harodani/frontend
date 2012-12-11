@@ -1,3 +1,29 @@
+/**
+ * Copyright 2012 Ericsson, Uppsala University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Uppsala University
+ *
+ * Project CS course, Fall 2012
+ *
+ * Projekt DV/Project CS, is a course in which the students develop software for
+ * distributed systems. The aim of the course is to give insights into how a big
+ * project is run (from planning to realization), how to construct a complex
+ * distributed system and to give hands-on experience on modern construction
+ * principles and programming methods.
+ *
+ */
 package project.cs.lisa.application.html;
 
 import java.io.File;
@@ -55,7 +81,8 @@ public class NetInfWebViewClient extends WebViewClient {
 	
 	/** Timeout for downloading a Web Object. */
 	private static final int DOWNLOAD_TIMEOUT = 
-			Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfdownload.webobject"));
+			Integer.parseInt(UProperties.INSTANCE.getPropertyWithName(
+					"timeout.netinfdownload.webobject"));
 
 	/** Message indicator for a URL change (i.e. a link was clicked). */
 	public static final String URL_WAS_UPDATED = "new_url";
@@ -95,14 +122,6 @@ public class NetInfWebViewClient extends WebViewClient {
 
 		Log.d(TAG, "Intercepting resource.");
 
-		/*
-		 * Ignore hashing raw data
-		 * String raw = "iVBORw0KGgoAAAANSUhEUgAAAFQAAABUCAYAAAAcaxDBAAADIUlEQVR42u3cwW3bMBQG4IygETSCNqgGKFAfe6sOvTcbxPce4g3iDeoNrA2sAQrYG1AbKFTyBDAySfFJpGlTf4D/EMSxrS8kRT7Seeq67gnxFyAAFKAARQAKUIAiAAUoQBGAAhSgAEUAClCAIgAFKEARgAIUoAhAAQpQgCIAvboYxlf1938l08pcZAqX3wGoHbRTcgCoX9AaoA6gEmpPYI1M5goqv9/QcNCnAugnSjlC+4JqAqWxVf1ZC9BPmGIEM6AWJlANZp8zQM2traNuPMauDY8V6gwANyU7qu37K0yATqPaInRzU4DOQxWmib4XUJ9fNHbVM1IyXmNLq5/Oc/obWnlvoI3mje4JYchedzGMP1gXMG1QULqAUkk20XJ0b7KcmD8O2d4BqAgG2uNpXnBjeGw50ZXU7t1YHps7oL7QOOgb8+S9y/cXpLTG7zJ/Rvk5arFDfss8e4jp+adSMG5MbfCbEnWlJnB3Cp0LrdFno3oBJcz2wTG/DEsaVOGC6gv0kBDmR0ul63JZerbel56JYQ7JGMWRSwqgZ5mjEt/PXzLKd+JRQXu4X6a5LI3lr56mRKVDgVlQqkcDPTOXlhnBBgMNugVyg1aZzVzGbha01jLaJl1ITIeWWDgsNcVM0Ip+93zTbeSA3TzTAPUrsZ1m3tuoY9nCWmfHGWJCgH4LkNxy8MAGURv+ENzXz6KdHBmV1nxks7CVNQZUznvIY4J6X/ppujl3abvXgJ44XT4ZUMthBG5yx3pr0qAnDejcwsuWUXNNFrR2KFK75gDQa9Ai0nOlCao5EsPJDi1UOXilQNSeZgvVKu/y42UercnZK62Fs4WkQHcajH9Llo50c2vXCtpqDr9mjEJyxdjzXwWotpU67KkfdVWhmSut5EA7U/WIkH4Q7gvt9+eWEt+c7e0kQa2ojpX7uTuyyYI6nVkyFJaXHLxIGnQ41VE5QOYLiimrAlVnAAe6az/THHVLVXyfR4FWA3qrRAUVqYFG/fCspzHrnnKMDZoxtxfuOR8fSIgKqsz53h64+wt6/3nwT6LgnwYAFKAARQAKUIAiAI2Qd1wqN+Bu1/KlAAAAAElFTkSuQmCC";
-		 * byte [] array_raw = Base64.decode(raw_, Base64.DEFAULT);
-		 * resource = new WebResourceResponse("image/jpg", "base64",
-                    new ByteArrayInputStream(array_raw));
-		 */
-
 		if (!URLUtil.isHttpUrl(url)) {
 			Log.d(TAG, "Resource, raw data: " + url);
 			super.shouldInterceptRequest(view, url);
@@ -133,8 +152,9 @@ public class NetInfWebViewClient extends WebViewClient {
 				Log.e(TAG, "Request for resource failed. Downloading from uplink.");
 				
 				resource = downloadResource(url);
-				if (resource == null)
+				if (resource == null) {
 					return null;
+				}
 				
 				file = resource.getFile();
 				contentType = resource.getContentType();
@@ -153,7 +173,8 @@ public class NetInfWebViewClient extends WebViewClient {
 			// Creating the resource that will be used by the webview
 			WebResourceResponse response = null;
 			try {
-				response = new WebResourceResponse(contentType, "base64", FileUtils.openInputStream(file));
+				response = new WebResourceResponse(
+						contentType, "base64", FileUtils.openInputStream(file));
 			} catch (IOException e) {
 				Log.e("TAG", "Could not open file");
 			}
@@ -189,9 +210,10 @@ public class NetInfWebViewClient extends WebViewClient {
 	}
 
 	/**
-	 * Search for a URL and return a selected hash if one was found or null.
+	 * Searches for a URL and returns a selected hash if one was found or null.
 	 * @param url The URL pointing to the resource in a web view.
 	 * @return The hash corresponding to the URL.
+	 * @throws Exception Can throw several exceptions, but all belong to a search problem
 	 */
 	private NetInfSearchResponse search(String url) throws Exception {
 		NetInfSearchResponse response;
@@ -203,6 +225,14 @@ public class NetInfWebViewClient extends WebViewClient {
 
 	}
 
+	/**
+	 * Returns the response to a retrieve request that tries to get the
+	 * IO corresponding to the specified hash.
+	 * 
+	 * @param hash			The hash identifying the IO we want to retrieve.
+	 * @return				The response containing the IO
+	 * @throws Exception	Throws an exception that belongs to a retrieve process problem.
+	 */
 	private NetInfRetrieveResponse retrieve(String hash) throws Exception {
 
 		NetInfRetrieveResponse response = null;
@@ -214,6 +244,17 @@ public class NetInfWebViewClient extends WebViewClient {
 		return response;
 	}
 
+	/**
+	 * Returns a NetInfPublish request object that can be used in order
+	 * to publish an IO.
+	 * 
+	 * @param file			The file corresponding to the IO
+	 * @param url			The url where that file was downloaded from
+	 * @param hash			The hash identifying the file
+	 * @param contentType	The content type of the file
+	 * @return				Returns a publish request object
+	 * @throws IOException	Thrown, if Bluetooth is not available
+	 */
 	private NetInfPublish createPublishRequest(File file, URL url, String hash, String contentType)
 			throws IOException {
 
@@ -243,7 +284,9 @@ public class NetInfWebViewClient extends WebViewClient {
 			publishRequest.setMetadata(metadata);
 
 			// Check for fullput
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainApplicationActivity.getActivity().getApplicationContext());
+            SharedPreferences sharedPref = 
+            		PreferenceManager.getDefaultSharedPreferences(
+            				MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
 			if (isFullPutAvailable) {
 				publishRequest.setFile(file);
@@ -255,10 +298,11 @@ public class NetInfWebViewClient extends WebViewClient {
 
 	/**
 	 * Executes a NetInf publish request.
-	 * @param file
-	 * @param url
-	 * @param hash
-	 * @param contentType
+	 * 
+	 * @param file			The file that needs to be published
+	 * @param url			The url where the file can be downloaded
+	 * @param hash			The hash identifying the file
+	 * @param contentType	The content type of the file
 	 */
 	private void publish(File file, URL url, String hash, String contentType) {
 		NetInfPublish publish;
