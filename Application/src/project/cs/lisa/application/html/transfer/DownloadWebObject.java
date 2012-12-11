@@ -73,7 +73,6 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
      */
     private WebObject downloadWebObject(URL url) throws IOException {
 
-    	Log.d(TAG, "1");
         if (!isNetworkConnected()) {
         	Log.e(TAG, "No network connection.");
             return null;
@@ -87,6 +86,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         if (contentType == null) {
         	contentType = "unknown";
         }
+
         /*
         Representation representation = null;
         try {
@@ -112,7 +112,6 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         if (is == null) {
             return null;
 		}
-    	Log.d(TAG, "3");
         
         byte[] bytes = null;
         try {
@@ -123,7 +122,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         	e.printStackTrace();
         	throw new IOException("Error occured. Could not find the resource.");
         }
-    	Log.d(TAG, "4");
+
         String hash = hashContent(bytes);
         File file = new File(mSharedFolder + hash);
         FileUtils.writeByteArrayToFile(file, bytes);
