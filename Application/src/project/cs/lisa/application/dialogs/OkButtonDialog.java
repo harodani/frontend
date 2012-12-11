@@ -7,6 +7,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
 /**
+ * Creates a dialog with only a OK button.
  * 
  * @author Paolo Boschini
  * @author Linus Sunde
@@ -14,10 +15,22 @@ import android.os.Bundle;
  */
 public class OkButtonDialog extends DialogFragment {
 
-    OnClickListener mOkListener;
-    String mMessage;
-    String mTitle;
+    /** Listener to attach to this dialog. */ 
+    private OnClickListener mOkListener;
     
+    /** The message to show on this dialog. */
+    private String mMessage;
+
+    /** The title of this dialog. */
+    private String mTitle;
+    
+    /**
+     * Default constructor.
+     * 
+     * @param title         the title for the dialog
+     * @param message       the message for the dialog 
+     * @param okListener    the listener to attach to the dialog
+     */
     public OkButtonDialog(String title, String message, OnClickListener okListener) {
         mOkListener = okListener;
         mMessage = message;
