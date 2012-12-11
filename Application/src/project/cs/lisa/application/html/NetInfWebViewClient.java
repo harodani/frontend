@@ -32,6 +32,14 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+/**
+ * The web view client that intercepts the web view in order
+ * to use NetInf services when downloading web pages.
+ * 
+ * @author Paolo Boschini
+ * @author Kim-Anh Tran
+ *
+ */
 public class NetInfWebViewClient extends WebViewClient {
 
 	/** Debugging tag. */
