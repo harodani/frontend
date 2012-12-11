@@ -87,35 +87,15 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         	contentType = "unknown";
         }
 
-        /*
-        Representation representation = null;
-        try {
-            representation = new ClientResource(url.toString()).get();
-        } catch (ResourceException e) {
-            Log.e(TAG, "Failed connecting to the Internet!");
-            return null;
-        }r
-
-    	Log.d(TAG, "2");
-        // Returns null when the content of the page is empty
-        if (representation == null || representation.getMediaType() == null) {
-			return null;
-		}
-        String contentType = representation.getMediaType().toString();
-        */
-
         // Returns null when the the page is not found
         //InputStream is = representation.getStream();
-
         InputStream is = connection.getInputStream();
-
         if (is == null) {
             return null;
 		}
 
         byte[] bytes = null;
         try {
-//        	bytes = IOUtils.toByteArray(is);
         	bytes = extract(is);
         } catch (IOException e) {
         	Log.e(TAG, "Error occured. Could not find the resource.");
