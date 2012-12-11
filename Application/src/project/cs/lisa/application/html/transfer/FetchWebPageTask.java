@@ -56,7 +56,7 @@ import android.webkit.URLUtil;
 import android.webkit.WebView;
 
 /**
- * Loads the web page asynchronously.
+ * Loads web pages asynchronously.
  * @author Paolo Boschini
  * @author Linus Sunde
  * @author Kim-Anh Tran
@@ -90,6 +90,8 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
     
     /**
      * Default constructor.
+     * 
+     * @param   webView     The web view used for displaying web content.
      */
     public FetchWebPageTask(WebView webView) {
         mWebView = webView;
