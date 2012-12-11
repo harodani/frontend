@@ -26,7 +26,6 @@
  */
 package project.cs.netinfservice.netinf.node.resolution;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import netinf.common.datamodel.DatamodelFactory;
@@ -38,106 +37,161 @@ import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.util.UProperties;
 import android.util.Log;
 
 import com.google.inject.Inject;
 
 /**
- * A local resolution service that provides access to the local
- * database.
+ * A local resolution service that provides access to the local database.
  *
  * @author Kim-Anh Tran
  *
  */
 public class LocalResolutionService
-		extends AbstractResolutionServiceWithoutId {
+extends AbstractResolutionServiceWithoutId {
 
-	/** The debug tag. */
-	private static final String TAG = "LocalResolutionService";
+    /** The debug tag. */
+    private static final String TAG = "LocalResolutionService";
 
-	/** The factory creating the database. */
-	@Inject
-	private IODatabaseFactory mDatabaseFactory;
+    /** The factory creating the database. */
+    @Inject
+    private IODatabaseFactory mDatabaseFactory;
 
-	/** The local database used for storing information objects. */
-	private IODatabase mDatabase;
+    /** The local database used for storing information objects. */
+    private IODatabase mDatabase;
 
-	/** Datamodel Factory. **/
-	private DatamodelFactory mDatamodelFactory;
+    /** DataModel Factory. **/
+    private DatamodelFactory mDatamodelFactory;
 
-	/**
-	 * Creates a new local resolution service.
-	 *
-	 * @param databaseFactory	The factory used for creating the database.
-	 * @param datamodelFactory	The factory used fo creating information objects
-	 */
-	@Inject
-	public LocalResolutionService(IODatabaseFactory databaseFactory,
-			DatamodelFactory datamodelFactory) {
-		mDatabaseFactory = databaseFactory;
-		mDatabase = mDatabaseFactory.create(MainNetInfApplication.getAppContext());
-		mDatamodelFactory = datamodelFactory;
-	}
+    /**
+     * Creates a new local resolution service.
+     *
+     * @param databaseFactory
+     *     	The factory used for creating the database.
+     * @param datamodelFactory
+     *     	The factory used for creating information objects.
+     */
+    @Inject
+    public LocalResolutionService(IODatabaseFactory databaseFactory,
+            DatamodelFactory datamodelFactory) {
+        // Database factory
+        mDatabaseFactory = databaseFactory;
 
-	@Override
-	public void delete(Identifier identifier) {
-		Log.d(TAG, "Deleting IO from database.");
-		String hash = identifier.getIdentifierLabel(
-				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-		mDatabase.deleteIO(hash);
-	}
+        // DataModel Factory
+        mDatamodelFactory = datamodelFactory;
 
-	@Override
-	public String describe() {
-		return "Database Service";
-	}
+        // Database
+        mDatabase = mDatabaseFactory.create(MainNetInfApplication.getAppContext());
+    }
 
-	@Override
-	public InformationObject get(Identifier identifier) {
-		Log.d(TAG, "Get an IO from the database.");
-		String hash = identifier.getIdentifierLabel(
-				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+    /**
+     * Deletes an identifier from database.
+     * 
+     * @param identifier
+     *      Identifier to be deleted.
+     */
+    @Override
+    public void delete(Identifier identifier) {
+        Log.d(TAG, "Deleting IO from database.");
 
-		InformationObject io = null;
-		try {
-			io = mDatabase.getIO(hash);
-		} catch (DatabaseException e) {
-			Log.e(TAG, "Couldn't retrieve the information object associated with the hash = "
-					+ hash);
-			return null;
-		}
+        // Extract hash
+        String hash = identifier.getIdentifierLabel(
+                SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
 
-		return io;
-	}
+        Log.d(TAG, "IO hash to be deleted: " + hash);
 
-	@Override
-	public void put(InformationObject io) {
-	    Log.d(TAG, "put()");
-		try {
-			mDatabase.addIO(io);
-		} catch (DatabaseException e) {
-			Log.e(TAG, "Failed adding the information object into the database.");
-		}
-	}
+        // Calls deleteIO function
+        mDatabase.deleteIO(hash);
+    }
+    
+    /**
+     * Tries to retrieve an IO from the database using an identifier.
+     * 
+     * @param identifier
+     *      Identifier with the information about the object to be retrieved.
+     * @return
+     *      Information Object retrieved from the Database.
+     *      <p>null if get procedure failed.
+     */
+    @Override
+    public InformationObject get(Identifier identifier) {
+        Log.d(TAG, "Get an IO from the database.");
+        
+        // Extracts hash from the identifier
+        String hash = identifier.getIdentifierLabel(
+                SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
 
-	@Override
-	protected ResolutionServiceIdentityObject createIdentityObject() {
-	    ResolutionServiceIdentityObject identity = mDatamodelFactory
-	            .createDatamodelObject(ResolutionServiceIdentityObject.class);
-	    identity.setName(TAG);
-	    int priority = Integer.parseInt(UProperties.INSTANCE
-	    		.getPropertyWithName("lrs.priority"));
-	    identity.setDefaultPriority(priority);
-	    identity.setDescription(describe());
-	    return identity;
-	}
+        InformationObject io = null;
+        
+        // Tries to fetch the IO from the database using the hash
+        try {
+            io = mDatabase.getIO(hash);
+        } catch (DatabaseException e) {
+            Log.e(TAG, "Couldn't retrieve the information object associated with the hash = "
+                    + hash);
+            
+            // If it fails, return null
+            return null;
+        }
 
-	@Override
-	public List<Identifier> getAllVersions(Identifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        // Returns IO
+        return io;
+    }
 
+    /**
+     * Adds an Information Object to the IO.
+     * 
+     * @param io
+     *      Information Object to be added.
+     */
+    @Override
+    public void put(InformationObject io) {
+        Log.d(TAG, "put()");
+        
+        Log.d(TAG, "Trying to put an IO into the database");
+        
+        // Tries to add IO using the addIO function from the IODatabase class
+        try {
+            mDatabase.addIO(io);
+        } catch (DatabaseException e) {
+            Log.e(TAG, "Failed adding the information object into the database.");
+        }
+    }
+
+    /**
+     * Creates an Identity Object for the Local Resolution Service.
+     *
+     * @return
+     *      The IdentityObject that was created for this Resolution Service.
+     */
+    @Override
+    protected ResolutionServiceIdentityObject createIdentityObject() {
+        // Create an Identity Object using the datamodel factory
+        ResolutionServiceIdentityObject identity = mDatamodelFactory
+                .createDatamodelObject(ResolutionServiceIdentityObject.class);
+        
+        // Set attributes
+        identity.setName(TAG);
+        int priority = Integer.parseInt(UProperties.INSTANCE
+                .getPropertyWithName("lrs.priority"));
+        identity.setDefaultPriority(priority);
+        identity.setDescription(describe());
+        
+        // Return the new Identity Object
+        return identity;
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public List<Identifier> getAllVersions(Identifier arg0) {
+        return null;
+    }
+
+    @Override
+    public String describe() {
+        return "Database Service";
+    }
 }

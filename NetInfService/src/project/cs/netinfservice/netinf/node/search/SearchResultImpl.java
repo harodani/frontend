@@ -58,16 +58,34 @@ public class SearchResultImpl implements SearchResult {
 		mMetadata = metadata;
 	}
 
+	/**
+	 * Returns a Metadata class object that contains the metadata.
+	 * 
+	 * @return
+	 *     Metadata object with metadata.
+	 */
 	@Override
 	public Metadata getMetaData() {
 		return mMetadata;
 	}
 
+	/**
+	 * Returns the Hash from the search result.
+	 * 
+	 * @return
+	 *     The hash.
+	 */
 	@Override
 	public String getHash() {
 		return mHash;
 	}
 
+	/**
+	 * Returns the Hash Algorithm used to hash the object from the search result.
+	 * 
+	 * @return
+	 *     The hash algorithm used to hash the object.
+	 */
 	@Override
 	public String getHashAlgorithm() {
 		return mHashAlg;
