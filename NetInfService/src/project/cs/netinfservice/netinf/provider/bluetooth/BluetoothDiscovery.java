@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.cs.netinfservice.application.MainNetInfApplication;
+import project.cs.netinfservice.netinf.provider.bluetooth.exceptions.BluetoothAdapterNotAvailableException;
 import project.cs.netinfservice.util.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -98,6 +99,7 @@ public enum BluetoothDiscovery {
         mAvailableDevices = new ArrayList<String>();
 
         mBluetoothAdapter.startDiscovery();
+        
 
         // Wait for the discover to finish within n seconds
         try {
@@ -152,4 +154,5 @@ public enum BluetoothDiscovery {
 		return new ArrayList<String>(mAvailableDevices);
 
 	}
+    
 }

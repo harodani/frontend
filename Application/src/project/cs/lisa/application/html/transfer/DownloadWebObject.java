@@ -27,7 +27,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
     /** The directory containing the published files. */
     private String mSharedFolder;
-    
+
     /** Uplink transmission used to transfer a resource. */
     public static final String UPLINK_TRANSMISSION = "project.cs.lisa.UPLINK_TRANSMISSION";
 
@@ -43,7 +43,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         try {
             webObject = downloadWebObject(url);
         } catch (IOException e) {
-            Log.e(TAG, "Could not download web page from uplink.");
+            Log.e(TAG, "Could NOT download URL from uplink: " + url);
         }
         return webObject;
     }
@@ -80,7 +80,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
         Intent intent = new Intent(UPLINK_TRANSMISSION);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
-        
+
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String contentType = connection.getContentType();
         if (contentType == null) {
@@ -103,16 +103,16 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 		}
         String contentType = representation.getMediaType().toString();
         */
-        
+
         // Returns null when the the page is not found
         //InputStream is = representation.getStream();
-        
+
         InputStream is = connection.getInputStream();
-       
+
         if (is == null) {
             return null;
 		}
-        
+
         byte[] bytes = null;
         try {
 //        	bytes = IOUtils.toByteArray(is);
@@ -131,17 +131,17 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         return webObject;
     }
 
-    private byte[] extract(InputStream inputStream) throws IOException {	
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();				
+    private byte[] extract(InputStream inputStream) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
 		int read = 0;
 		while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
 			baos.write(buffer, 0, read);
-		}		
-		baos.flush();		
+		}
+		baos.flush();
 		return baos.toByteArray();
 	}
-    
+
     /**
      * Hashes data.
      * @param bytes
@@ -159,5 +159,5 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
         return result;
     }
-    
+
 }
