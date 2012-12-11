@@ -88,13 +88,13 @@ import com.google.inject.name.Named;
  * @author Thiago Costa Porto
  */
 public class NameResolutionService extends AbstractResolutionServiceWithoutId
-    implements ResolutionService {
+implements ResolutionService {
     /** Debug tag. **/
     public static final String TAG = "NameResolutionService";
 
     /** Message ID random value max. **/
     public static final int MSG_ID_MAX = Integer
-    		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.max_messsage"));
+            .parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.max_messsage"));
 
     /** HTTP Scheme. */
     private static final String HTTP = "http://";
@@ -107,7 +107,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
 
     /** HTTP connection timeout. **/
     private static final int TIMEOUT = Integer
-    		.parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.timeout"));
+            .parseInt(UProperties.INSTANCE.getPropertyWithName("nrs.timeout"));
 
     /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
     private final DatamodelFactory mDatamodelFactory;
@@ -122,10 +122,10 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
     private HttpClient mClient;
 
     /** Key for accessing the NRS IP. */
-	private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
+    private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
 
-	/** Key for accessing the NRS Port. */
-	private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
+    /** Key for accessing the NRS Port. */
+    private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
@@ -161,16 +161,16 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
      */
     private String getHost() {
         // Shared preferences
-    	SharedPreferences sharedPreferences =
-    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
-    	
-    	// Host is set to NRS IP that is set in the shared preferences. If none is set, uses
-    	// default value stored in mHost (set by constructor)
-    	mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+
+        // Host is set to NRS IP that is set in the shared preferences. If none is set, uses
+        // default value stored in mHost (set by constructor)
+        mHost = sharedPreferences.getString(PREF_KEY_NRS_IP, mHost);
 
         // Returns NRS IP.
-    	return mHost;
-	}
+        return mHost;
+    }
 
     /**
      * Get the NRS port.
@@ -180,17 +180,17 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
      */
     private int getPort() {
         // Shared preferences
-    	SharedPreferences sharedPreferences =
-    			PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
-    	
-    	// Port is set to the NRS PORT that is set in the shared preferences. If none is set,
-    	// uses the default value stored in mPort (set by constructor)
-		mPort = Integer.parseInt(sharedPreferences
-				.getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
-		
-		// Returns NRS PORT
-		return mPort;
-	}
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(MainNetInfActivity.getActivity());
+
+        // Port is set to the NRS PORT that is set in the shared preferences. If none is set,
+        // uses the default value stored in mPort (set by constructor)
+        mPort = Integer.parseInt(sharedPreferences
+                .getString(PREF_KEY_NRS_PORT, Integer.toString(mPort)));
+
+        // Returns NRS PORT
+        return mPort;
+    }
 
     /**
      * Gets the hash algorithm from an identifier.
@@ -204,7 +204,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Extract hash algorithm
         String hashAlg = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_ALG.getLabelName()).getLabelValue();
-        
+
         // Return the hash algorithm used to hash the object
         return hashAlg;
     }
@@ -221,7 +221,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Extracts hash
         String hash = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-        
+
         // Returns object's hash
         return hash;
     }
@@ -238,7 +238,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Extracts content-type
         String contentType = identifier.getIdentifierLabel(
                 SailDefinedLabelName.CONTENT_TYPE.getLabelName()).getLabelValue();
-        
+
         // Returns MIME content-type
         return contentType;
     }
@@ -255,7 +255,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Extracts metadata
         String metadata = identifier.getIdentifierLabel(
                 SailDefinedLabelName.META_DATA.getLabelName()).getLabelValue();
-        
+
         // Returns extracted metadata (in STRING form)
         return metadata;
     }
@@ -272,14 +272,14 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Created a new attribute (as defined on datamodel factory)
         Attribute filepathAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
-        
+
         // Extract filepath
         String filepath = null;
         if (filepathAttribute != null) {
             filepath = filepathAttribute.getValueRaw();
             filepath = filepath.substring(filepath.indexOf(":") + 1);
         }
-        
+
         // Returns file path
         return filepath;
     }
@@ -296,15 +296,15 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         // Creates a new attribute to extract information from IO
         Attribute bluetoothAttribute =
                 io.getSingleAttribute(SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI());
-        
+
         // Extract bluetooth locator from IO
         String bluetoothLocator = null;
-        
+
         if (bluetoothAttribute != null) {
             bluetoothLocator = bluetoothAttribute.getValueRaw();
             bluetoothLocator = bluetoothLocator.substring(bluetoothLocator.indexOf(":") + 1);
         }
-        
+
         // Returns FIRST bluetooth locator
         return bluetoothLocator;
     }
@@ -336,7 +336,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
                     + response.getEntity().getContentType().getValue()
                     + ", expected \"application/json\"");
         }
-        
+
         // Try to convert HTTP response to a JSON String
         try {
             String jsonString = streamToString(response.getEntity().getContent());
@@ -359,14 +359,14 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
     private JSONObject parseJson(String jsonString) throws InvalidResponseException {
         // Creates a JSON Object from the JSON String passed as parameter
         JSONObject json = (JSONObject) JSONValue.parse(jsonString);
-        
+
         // If we were unable to get a JSON Object from the JSON String, throw exception.
         if (json == null) {
             Log.e(TAG, "Unable to parse JSON");
             Log.e(TAG, "jsonString = " + jsonString);
             throw new InvalidResponseException("Unable to parse JSON.");
         }
-        
+
         // Return JSON Object
         return json;
     }
@@ -382,12 +382,12 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
     private void addContentType(Identifier identifier, JSONObject json) {
         // Check that the content-type is a string
         Object object = json.get("ct");
-        
+
         if (!(object instanceof String)) {
             Log.w(TAG, "Content-Type NOT added.");
             return;
         }
-        
+
         // Converts JSON value to a string
         String contentType = (String) object;
 
@@ -395,7 +395,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.CONTENT_TYPE.getLabelName());
         label.setLabelValue(contentType);
-        
+
         // Attach it to the identifier
         identifier.addIdentifierLabel(label);
     }
@@ -415,7 +415,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         if (!(object instanceof JSONObject)) {
             Log.w(TAG, "Metadata NOT added.");
         }
-        
+
         // Extract metadata from JSON Value
         JSONObject metadata = (JSONObject) object;
 
@@ -423,7 +423,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         IdentifierLabel label = mDatamodelFactory.createIdentifierLabel();
         label.setLabelName(SailDefinedLabelName.META_DATA.getLabelName());
         label.setLabelValue(metadata.toJSONString());
-        
+
         // Attach metadata to identifier
         identifier.addIdentifierLabel(label);
     }
@@ -469,10 +469,10 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
             throws InvalidResponseException {
         // Creates a new InformationObject
         InformationObject io = mDatamodelFactory.createInformationObject();
-        
+
         // Set the IO identifier to the one passed with the function
         io.setIdentifier(identifier);
-        
+
         // Reads JSON Object
         Log.d(TAG, "Reading JSON");
         String jsonString = readJson(response);
@@ -482,31 +482,32 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         Log.d(TAG, "Parsing JSON");
         JSONObject json = parseJson(jsonString);
         Log.d(TAG, "JSON parsed:\n" + json.toString());
-        
+
         // Add content-type, metadata and locators
         addContentType(identifier, json);
         addMetadata(identifier, json);
         addLocators(io, json);
-        
+
         // Returns new Information Object with content-type, metadata and locators.
         return io;
     }
 
     /**
-     * Reads Information Object and file.
+     * Creates an Information Object and file from a previous HTTP request.
      * 
      * @param identifier
-     * 
+     *      The identifier
      * @param response
-     * 
+     *      HTTP response
      * @return
-     * 
+     *      New Information Object created from the response.
+     *      <p>A side-effect is the new file created.</p>
      * @throws InvalidResponseException
-     * 
+     *      Thrown if the response had an invalid information object.
      */
     private InformationObject readIoAndFile(Identifier identifier,
             HttpResponse response) throws InvalidResponseException {
-
+        // Sanity checks the response.
         if (response == null) {
             throw new InvalidResponseException("Response is null.");
         } else if (response.getEntity() == null) {
@@ -519,42 +520,63 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
                     + ", expected to start with \"multipart/form-data\"");
         }
 
+        // Reads IO and File
         try {
-
             // Create IO
             InformationObject io = mDatamodelFactory.createInformationObject();
             io.setIdentifier(identifier);
 
+            // Extract Content-type from header
             String contentType = response.getHeaders("Content-Type")[0].getValue();
 
+            // Get boundary bytes
             byte[] boundary = (contentType.substring(contentType.indexOf("boundary=") + 9)).getBytes();
 
+            // Raises intent
             Log.d(TAG, "Sending Intent " + NRS_TRANSMISSION);
             Intent intent = new Intent(NRS_TRANSMISSION);
             MainNetInfActivity.getActivity().sendBroadcast(intent);
 
+            // Start multipart
             @SuppressWarnings("deprecation")
             MultipartStream multipartStream =
-                    new MultipartStream(response.getEntity().getContent(), boundary);
+            new MultipartStream(response.getEntity().getContent(), boundary);
 
+            // Skip multipart preamble
             multipartStream.skipPreamble();
+            
             // TODO Dependant on order used by NRS
             // Read JSON
             ByteArrayOutputStream jsonStream = new ByteArrayOutputStream();
+            
+            // Move on multipart stream
             multipartStream.readHeaders();
             multipartStream.readBodyData(jsonStream);
             multipartStream.readBoundary();
+            
+            // Parse JSON Object
             JSONObject jsonObject = parseJson(jsonStream.toString());
+            
+            // Close stream used to read JSON
             jsonStream.close();
+            
+            // Add attributes to the new Information Object
             addContentType(io.getIdentifier(), jsonObject);
             addMetadata(io.getIdentifier(), jsonObject);
             addLocators(io, jsonObject);
 
+            // Create the new file
             File file = new File(Environment.getExternalStorageDirectory()
-            		+ "/DCIM/Shared/" + getHash(io.getIdentifier()));
+                    + "/DCIM/Shared/" + getHash(io.getIdentifier()));
+            
+            // Write file in disk
             FileOutputStream fos = new FileOutputStream(file);
+            
+            // move on Multipart
             multipartStream.readHeaders();
             multipartStream.readBodyData(fos);
+            
+            // Close file stream
             fos.flush();
             fos.close();
 
@@ -563,18 +585,20 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
             locator.setAttributePurpose(DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString());
             locator.setIdentification(SailDefinedAttributeIdentification.FILE_PATH.getURI());
             locator.setValue(file.getAbsoluteFile());
+            
+            // Add atributes
             io.addAttribute(locator);
 
+            // Return new Information Object created
             return io;
-
         } catch (IOException e) {
             throw new InvalidResponseException("Failed to read InformationObject from response", e);
         }
-
     }
 
     /**
      * Create an InformationObject given an identifier and the HTTP response to the NetInf GET.
+     * 
      * @param identifier
      *     The Identifier used for the NetInf GET
      * @param response
@@ -586,35 +610,45 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
      */
     private InformationObject handleResponse(Identifier identifier, HttpResponse response)
             throws InvalidResponseException {
-
+        // Get status code from response
         int statusCode = response.getStatusLine().getStatusCode();
 
+        // Go through possible responses
         switch (statusCode) {
-        case HttpStatus.SC_NON_AUTHORITATIVE_INFORMATION:
-            Log.d(TAG, statusCode + ": Response that should contain locators");
-            // Just locators
-            return readIo(identifier, response);
+            // HTTP 203
+            case HttpStatus.SC_NON_AUTHORITATIVE_INFORMATION:
+                Log.d(TAG, statusCode + ": Response that should contain locators");
+                // Just locators
+                return readIo(identifier, response);
 
-        case HttpStatus.SC_OK:
-            Log.d(TAG, statusCode + ": Response that should contain locators and data");
-            return readIoAndFile(identifier, response);
+            // HTTP 200
+            case HttpStatus.SC_OK:
+                Log.d(TAG, statusCode + ": Response that should contain locators and data");
+                // Read IO and the File
+                return readIoAndFile(identifier, response);
 
-        default:
-            Log.w(TAG, statusCode + ": Unexpected Response Code");
-            throw new InvalidResponseException("Unexpected Response Code = " + statusCode);
+            // Everything else
+            default:
+                Log.w(TAG, statusCode + ": Unexpected Response Code");
+                throw new InvalidResponseException("Unexpected Response Code = " + statusCode);
         }
     }
 
     /**
      * Performs a NetInf GET request using the HTTP convergence layer.
-     * @param identifier       Identifier describing the InformationObject to get
-     * @return                 The InformationObject resulting from the NetInf GET
-     *                         or null if the get failed.
+     * 
+     * @param identifier
+     *      Identifier describing the InformationObject to get
+     * @return
+     *      The InformationObject resulting from the NetInf GET or null if the get failed.
+     *      <p><b>null</b> if get() fails.
      */
     @Override
     public InformationObject get(Identifier identifier) {
+        Log.d(TAG, "get()");
+        
         try {
-            // Create NetInf GET request
+            // Create NetInf GET request. Request looks like ni:///hash-alg;hash
             String uri = "ni:///" + getHashAlg(identifier) + ";" + getHash(identifier);
             HttpPost getRequest = createGet(uri);
 
@@ -623,8 +657,9 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
 
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
+            
+            // Returns Information Object found
             return io;
-
         } catch (InvalidResponseException e) {
             Log.e(TAG, "InvalidResponseException: " + (e.getMessage() != null ? e.getMessage() : ""));
         } catch (UnsupportedEncodingException e) {
@@ -632,27 +667,44 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
         } catch (IOException e) {
             Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
+        
         Log.e(TAG, "get() failed. Returning null");
+        
+        // Fails
         return null;
     }
 
+    /**
+     * Not supported.
+     */
     @Override
     public List<Identifier> getAllVersions(Identifier arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * Publishes an object to the NRS.
+     * 
+     * @param io
+     *      The Information Object to be published
+     */
     @Override
     public void put(InformationObject io) {
-
+        // Try to publish to the NRS
         try {
+            // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
+            
+            // Execute HTTP request
             HttpResponse response = mClient.execute(post);
+            
+            // Get status code
             int status = response.getStatusLine().getStatusCode();
+            
+            // Check if object was created
             if (status != HttpStatus.SC_CREATED) {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
             }
-
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);
         } catch (IOException e) {
@@ -662,6 +714,7 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
 
     /**
      * Creates an HTTP POST representation of a NetInf PUBLISH message.
+     * 
      * @param io
      *     The information object to publish
      * @return
@@ -671,36 +724,42 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
      */
     private HttpPost createPublish(InformationObject io)
             throws UnsupportedEncodingException {
-
-        // Extracting values from IO's identifier
-        String hashAlg      = getHashAlg(io.getIdentifier());
-        String hash         = getHash(io.getIdentifier());
-        String contentType  = getContentType(io.getIdentifier());
-        String meta         = getMetadata(io.getIdentifier());
+        // Extracting attributes from IO's identifier
+        String hashAlg = getHashAlg(io.getIdentifier());
+        String hash = getHash(io.getIdentifier());
+        String contentType = getContentType(io.getIdentifier());
+        String meta = getMetadata(io.getIdentifier());
         String bluetoothMac = getBluetoothMac(io);
-        String filePath     = getFilePath(io);
+        String filePath = getFilePath(io);
 
+        // Creates a new post. Looks like http://host:port/netinfproto/publish
         HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/publish");
 
+        // Create a multipart entity
         MultipartEntity entity = new MultipartEntity();
 
+        // ni:///hashAlgorithm;hash?ct=CONTENT_TYPE
         StringBody uri = new StringBody("ni:///" + hashAlg + ";" + hash + "?ct=" + contentType);
         entity.addPart("URI", uri);
 
+        // Create a new message id
         StringBody msgid =
                 new StringBody(Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX)));
         entity.addPart("msgid", msgid);
 
+        // Add a locator
         if (bluetoothMac != null) {
             StringBody l = new StringBody(bluetoothMac);
             entity.addPart("loc1", l);
         }
 
+        // Add metadata (ext)
         if (meta != null) {
             StringBody ext = new StringBody(meta.toString());
             entity.addPart("ext", ext);
         }
 
+        // Add fullput and octets
         if (filePath != null) {
             StringBody fullPut = new StringBody("true");
             entity.addPart("fullPut", fullPut);
@@ -708,69 +767,102 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
             entity.addPart("octets", octets);
         }
 
+        // Add form type
         StringBody rform = new StringBody("json");
         entity.addPart("rform", rform);
 
-        /* Used to print the message sent to the NRS
-        try {
-            entity.writeTo(System.out);
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to write MultipartEntity to System.out");
-        } */
+        //        // Used to print the message sent to the NRS
+        //        try {
+        //            entity.writeTo(System.out);
+        //        } catch (IOException e) {
+        //            Log.e(TAG, "Failed to write MultipartEntity to System.out");
+        //        }
+
+        // Set attributes to HTTP Post object
         post.setEntity(entity);
+
+        // Return HTTP Post object with all attributes
         return post;
     }
 
     /**
      * Creates an HTTP Post request to get an IO from the NRS.
-     * @param uri                              the NetInf format URI for getting IOs
-     * @return                                 The HTTP Post request
-     * @throws UnsupportedEncodingException    In case UTF-8 is not supported
+     * 
+     * @param uri
+     *      The NetInf format URI for getting IOs
+     * @return
+     *      The HTTP Post request
+     * @throws UnsupportedEncodingException
+     *      In case UTF-8 is not supported
      */
     private HttpPost createGet(String uri) throws UnsupportedEncodingException {
-
+        // Create a new post, with url = http://host:port/netinfproto/get
         HttpPost post = new HttpPost(HTTP + getHost() + ":" + getPort() + "/netinfproto/get");
 
+        // Get message id and ext
         String msgid = Integer.toString(mRandomGenerator.nextInt(MSG_ID_MAX));
         String ext = "no extension";
 
+        // Finishes the URI
         String completeUri = "URI=" + uri + "&msgid=" + msgid  + "&ext=" + ext;
 
+        // TODO: Check if this is really necessary.
+        // Encodes the URL
         String encodeUrl = null;
 
         encodeUrl = URLEncoder.encode(completeUri, "UTF-8");
 
+        // New HTTP entity
         HttpEntity newEntity =
                 new InputStreamEntity(fromString(encodeUrl), encodeUrl.getBytes().length);
 
+        // Add header to the HTTP Entity
         post.addHeader("Content-Type", "application/x-www-form-urlencoded");
         post.setEntity(newEntity);
 
+        // Return HTTP post created
         return post;
     }
 
+    /**
+     * Identity Object creator for this resolution service.
+     * 
+     * @return
+     *      The Identity Object for this class.
+     */
     @Override
     protected ResolutionServiceIdentityObject createIdentityObject() {
+        // Creates identity object
         ResolutionServiceIdentityObject identity = mDatamodelFactory
                 .createDatamodelObject(ResolutionServiceIdentityObject.class);
+
+        // Sets the attributes
         identity.setName(TAG);
         int priority = Integer.parseInt(UProperties.INSTANCE
-	    		.getPropertyWithName("nrs.priority"));
+                .getPropertyWithName("nrs.priority"));
         identity.setDefaultPriority(priority);
         identity.setDescription(describe());
+
+        // Returns the new identity object.
         return identity;
     }
 
     /**
      * Converts an InputStream into a String.
      * TODO Move to Util class, probably use the better commented version from NetInfRequest
-     * @param input A input stream
-     * @return String representation of the input stream
+     * 
+     * @param input
+     *      A input stream
+     * @return String
+     *      Rrepresentation of the input stream
      */
     private String streamToString(InputStream input) {
+        Log.d(TAG, "streamToString()");
+
         try {
             return new Scanner(input).useDelimiter("\\A").next();
         } catch (NoSuchElementException e) {
+            Log.d(TAG, "NoSuchElementException found. String returned is \"\"");
             return "";
         }
     }
@@ -778,21 +870,22 @@ public class NameResolutionService extends AbstractResolutionServiceWithoutId
     /**
      * Converts a string to a type ByteArrayInputStream.
      *
-     * @param str string to be converted
+     * @param str
+     *      String to be converted
      *
-     * @return ByteArrayInputStream
+     * @return 
+     *      A new ByteArrayInputStream with the bytes from the string
      */
     private static InputStream fromString(String str) {
         byte[] bytes = str.getBytes();
         return new ByteArrayInputStream(bytes);
     }
-    
+
     /**
      * Not supported.
      */
     @Override
     public void delete(Identifier arg0) {
-        // TODO Auto-generated method stub
     }
 
     @Override
