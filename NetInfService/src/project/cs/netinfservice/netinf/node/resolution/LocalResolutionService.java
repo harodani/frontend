@@ -61,7 +61,7 @@ extends AbstractResolutionServiceWithoutId {
     /** The local database used for storing information objects. */
     private IODatabase mDatabase;
 
-    /** Datamodel Factory. **/
+    /** DataModel Factory. **/
     private DatamodelFactory mDatamodelFactory;
 
     /**
