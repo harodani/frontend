@@ -136,11 +136,9 @@ public class NetInfWebViewClient extends WebViewClient {
 			// Get and publish resource
 			try {
 
-				Log.d(TAG, "Searching");
 				// Search for url
 				NetInfSearchResponse searchResponse = search(url);
 
-				Log.d(TAG, "Retrieving");
 				// Get url data
 				hash = selectHash(searchResponse);
 
@@ -162,7 +160,6 @@ public class NetInfWebViewClient extends WebViewClient {
 			}         
 
 
-			Log.d(TAG, "Publishing");
 			// Publish
 			try {
 				publish(file, new URL(url), hash, contentType);
@@ -185,8 +182,6 @@ public class NetInfWebViewClient extends WebViewClient {
 			Log.e(TAG, "Unexpected url while intercepting resources.");
 			return super.shouldInterceptRequest(view, url);
 		}
-		
-
 	}
 
 	/**
@@ -271,8 +266,10 @@ public class NetInfWebViewClient extends WebViewClient {
 		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if (adapter == null) {
 			throw new IOException("Error: Bluetooth not supported");
+		
 		} else if (!adapter.isEnabled()) {
 			throw new IOException("Error: Bluetooth not enabled");
+		
 		} else {
 			// Create Locator set to be used in the publish
 			HashSet<Locator> locators = new HashSet<Locator>();
@@ -283,7 +280,7 @@ public class NetInfWebViewClient extends WebViewClient {
 			publishRequest.setContentType(contentType);
 			publishRequest.setMetadata(metadata);
 
-			// Check for fullput
+			// Check for full put
             SharedPreferences sharedPref = 
             		PreferenceManager.getDefaultSharedPreferences(
             				MainApplicationActivity.getActivity().getApplicationContext());
@@ -328,5 +325,4 @@ public class NetInfWebViewClient extends WebViewClient {
 		String address = (String) firstResult.get("ni");
 		return address.split(";")[1];
 	}
-
 }

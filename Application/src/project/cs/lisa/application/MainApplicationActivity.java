@@ -219,7 +219,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 public void onDiscoveryDone(Set<String> wifis) {
                     // This is run when the WIFI discovery is done
                     // Create a ListDialog that shows the networks
-                    ListDialog listDialog = new ListDialog(wifis) {
+                    ListDialog listDialog = new ListDialog(wifis,
+                            sMainNetInfActivity.getString(R.string.dialog_wifi_title)) {
                         @Override
                         public void onConfirm(String wifi) {
 

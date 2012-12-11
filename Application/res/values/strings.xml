@@ -3,9 +3,6 @@
     <string name="app_name">Elephant</string>
     <string name="title_activity">Elephant</string>
     
-    <string name="dialog_share_msg">To improve your browsing experience, we recommend you to share the content
-        you are browsing. This will require Bluetooth connectivity. Do you want to turn Bluetooth on?</string>
-    <string name="dialog_share_title">Share content?</string>
     <string name="dialog_wifi_msg">This application requires WiFi connection. Please select a network:</string>
     <string name="dialog_wifi_title">Select WiFi connection</string>
     <string name="yes">YES</string>

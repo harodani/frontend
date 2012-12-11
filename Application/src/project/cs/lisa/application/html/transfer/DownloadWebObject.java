@@ -20,7 +20,14 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
+/**
+ * Downloads a web resource from the web via uplink.
+ * @author Paolo Boschini
+ * @author Linus Sunde
+ * @author Kim-Anh Tran
+ *
+ */
+public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
 
     /** Debugging tag. */
     private static final String TAG = "DownloadWebObject";
@@ -31,6 +38,13 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
     /** Uplink transmission used to transfer a resource. */
     public static final String UPLINK_TRANSMISSION = "project.cs.lisa.UPLINK_TRANSMISSION";
 
+    /** Buffer size for reading the input stream. */
+    public static final int BUFFER_SIZE = 1024;
+
+    /**
+     * Default constructor.
+     * Gets the shared folder to save files to.
+     */
     public DownloadWebObject() {
         String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
         mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
@@ -50,7 +64,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
     /**
      * Checks for Internet connection.
-     * @return
+     * @return If Internet is available or not
      */
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) MainApplicationActivity.getActivity().
@@ -58,8 +72,8 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if (ni == null) {
             return false;
-        } else
-            return true;
+        }
+        return true;
     }
 
     /**
@@ -111,9 +125,15 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
         return webObject;
     }
 
+    /**
+     * Extracts bytes from an input stream.
+     * @param inputStream   the input stream
+     * @return              the bytes from the input stream
+     * @throws IOException  Thrown if something goes wrong with the extraction
+     */
     private byte[] extract(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
+		byte[] buffer = new byte[BUFFER_SIZE];
 		int read = 0;
 		while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
 			baos.write(buffer, 0, read);
@@ -124,10 +144,8 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
     /**
      * Hashes data.
-     * @param bytes
-     *      The data
-     * @return
-     *      The hash
+     * @param bytes     The data
+     * @return          The hash
      */
     private String hashContent(byte[] bytes) {
         Hash hash = null;
@@ -139,5 +157,4 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject>{
 
         return result;
     }
-
 }
