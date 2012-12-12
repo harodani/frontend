@@ -102,8 +102,6 @@ public class MainNetInfActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate()");
-
         sMainNetInfActivity = this;
 
         PreferenceManager.getDefaultSharedPreferences(getActivity())
@@ -202,7 +200,7 @@ public class MainNetInfActivity extends Activity {
                     mBluetoothServer = new BluetoothServer();
                     mBluetoothServer.start();
                 } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
+                    Log.e(TAG, "Something went wrong when trying to start Bluetooth Server. " + e.getMessage());
                 }
             }
         }
@@ -212,8 +210,6 @@ public class MainNetInfActivity extends Activity {
      * Initialize and run the StarterNodeThread.
      */
     private void setupNode() {
-        Log.d(TAG, "setupNode()");
-
         mStarterNodeThread = new StarterNodeThread();
         mStarterNodeThread.start();
     }

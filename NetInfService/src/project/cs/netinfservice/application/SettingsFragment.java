@@ -49,9 +49,6 @@ import android.preference.PreferenceManager;
 public class SettingsFragment extends PreferenceFragment
 implements OnSharedPreferenceChangeListener {
 
-    /** Log Tag. */
-    private static final String TAG = "SettingsFragment";
-
     /** Key for accessing the NRS IP. */
     private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
 
