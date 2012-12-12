@@ -133,14 +133,21 @@ public class MainApplicationActivity extends BaseMenuActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initializing the browser.");
-
-//        Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
-//        startActivity(LaunchIntent);
-
         setContentView(R.layout.activity_main);
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
+        
+        // sets up property reader
+        AssetManager assets = getApplicationContext().getResources().getAssets();
+        InputStream is = null;
+		try {
+			is = assets.open(PROPERTIES_FILE);
+	        UProperties.INSTANCE.init(is);
+	        is.close();
+		} catch (IOException e) {
+			Log.e(TAG, "Failed initializing the properties reader.");
+		}
 
         //        setupWifi();
         setupBluetoothAvailability();
@@ -164,17 +171,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpLoadPageIcon();
         setUpWebView();
         setUpSpinningBar();
-        
-        // sets up property reader
-        AssetManager assets = getApplicationContext().getResources().getAssets();
-        InputStream is = null;
-		try {
-			is = assets.open(PROPERTIES_FILE);
-	        UProperties.INSTANCE.init(is);
-	        is.close();
-		} catch (IOException e) {
-			Log.e(TAG, "Failed initializing the properties reader.");
-		}
         
     }
 

@@ -60,9 +60,6 @@ public class MainNetInfActivity extends Activity {
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
 
-    /** Preference file. */
-    private static final String PREF_FILE = "NetInfServicePrefsFile";
-
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";
 
