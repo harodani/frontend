@@ -46,10 +46,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -108,9 +108,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** Toast for this activity. */
     private static Toast sToast;
 
-    /** The menu. */
-    private Menu mMenu;
-
     /** The main web view. */
     private WebView mWebView;
 
@@ -126,23 +123,36 @@ public class MainApplicationActivity extends BaseMenuActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Initializing the browser.");
-
-//        Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("project.cs.netinfservice");
-//        startActivity(LaunchIntent);
-
         setContentView(R.layout.activity_main);
+
+        /* This starts the netinf service.
+        Intent LaunchIntent = getPackageManager().
+                getLaunchIntentForPackage("project.cs.netinfservice");
+        startActivity(LaunchIntent);
+        */
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
 
-        //        setupWifi();
+        // setupWifi();
         setupBluetoothAvailability();
-        /*
-         * TODO: Make sure that nothing happens when Netinf node doesn't start.
-         * Find a way to communicate between this activity and the netinf activity.
-         */
+
+        // broadcast receiver stuff
         setupBroadcastReceiver();
+        setupBroadcastReceiverFilter();
+        registerReceiver(mBroadcastReceiver, mIntentFilter);
+
+        // sets up UI stuff
+        setUpEditTextUrl();
+        setUpLoadPageIcon();
+        setUpWebView();
+        setUpSpinningBar();
+    }
+
+    /**
+     * Sets up filters to intercept by the broadcast receiver.
+     */
+    private void setupBroadcastReceiverFilter() {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(NODE_STARTED_MESSAGE);
         mIntentFilter.addAction(NetInfWebViewClient.URL_WAS_UPDATED);
@@ -151,13 +161,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
-        registerReceiver(mBroadcastReceiver, mIntentFilter);
-
-        // sets up UI stuff
-        setUpEditTextUrl();
-        setUpLoadPageIcon();
-        setUpWebView();
-        setUpSpinningBar();
     }
 
     /**
@@ -171,7 +174,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN)
                         && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    startFetchingWebPage();
+                    startFetchingWebPage(mEditText.getText().toString());
                     return true;
                 }
                 return false;
@@ -193,7 +196,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 case R.drawable.refresh:
                     mImg.setImageResource(R.drawable.cancel);
                     mImg.setTag(R.drawable.cancel);
-                    startFetchingWebPage();
+                    startFetchingWebPage(mEditText.getText().toString());
                     break;
                 case R.drawable.cancel:
                     mImg.setImageResource(R.drawable.refresh);
@@ -233,11 +236,12 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mWebView.setWebViewClient(new NetInfWebViewClient());
     }
 
+    /**
+     * Listener for connecting to a Wifi network. 
+     */
     private class WifiDialogListener implements DialogInterface.OnClickListener {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Log.d(TAG, "doPositiveClickWifiInfoMessage()");
-
             // This is run when OK is clicked
             // Create a WifiHandler
             WifiHandler wifiHandler = new WifiHandler() {
@@ -262,25 +266,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
         }
     }
 
-    // TODO Please don't delete yet
-    //    public void debug() {
-    //        // DEBUG
-    //        NetInfSearch search = null;
-    //            search = new NetInfSearch("localhost", "8080", "http://support.google.com/richmedia/bin/answer.py?hl=en&answer=1100953&ctx=cb&src=cb&cbid=100pnperzakdj&cbrank=5", "empty") {
-    //                @Override
-    //                protected void onPostExecute(NetInfResponse response) {
-    //                     NetInfSearchResponse searchResponse = (NetInfSearchResponse) response;
-    //                     Log.d("DEBUG", searchResponse.getStatus().toString());
-    //                     try {
-    //                        Log.d("DEBUG", searchResponse.getSearchResults().toString());
-    //                    } catch (RequestFailedException e) {
-    //                        Log.d("DEBUG", "Search failed :(");
-    //                    }
-    //                }
-    //            };
-    //        search.execute();
-    //    }
-
     /**
      * Set up the WiFi connection.
      */
@@ -289,7 +274,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 "Wifi Information",
                 getString(R.string.dialog_wifi_msg),
                 new WifiDialogListener()));
-
     }
 
     /**
@@ -304,15 +288,14 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /**
      * Try to fetch the requested web page.
      * Called when the user opens a web page.
-     * @param v The view that triggered this method
+     * @param   newUrl  The url to fetch
      */
-    public final void startFetchingWebPage() {
+    public final void startFetchingWebPage(String newUrl) {
 
         // get the web page address
         URL url = null;
         try {
-            String inputUrl = mEditText.getText().toString();
-            url = new URL(URLUtil.guessUrl(inputUrl));
+            url = new URL(URLUtil.guessUrl(newUrl));
             mEditText.setText(url.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -353,24 +336,27 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Receives messages from the StarterNodeThread when the node is starter.
-     * Right now it does not do anything. Just log
+     * Receives messages from different transmissions
+     * to update the progress bar color.
+     * 
+     * Receives messages from web view to start downloading
+     * new web content.
+     * 
+     * Receives messages from the NRS node to notify it was
+     * started.
      */
     private void setupBroadcastReceiver() {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                Log.d(TAG, "action was: " + action);
 
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
                     String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
-                    mEditText.setText(newUrl);
-                    startFetchingWebPage();
+                    startFetchingWebPage(newUrl);
 
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
-                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
-                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
+                    updateSpinningBarColor(R.drawable.progress_grey);
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
@@ -380,30 +366,37 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using Bluetooth");
-                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_blue));
-                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_blue));
+                    updateSpinningBarColor(R.drawable.progress_blue);
 
                 } else if (action.equals(LOCAL_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using local file system");
-                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_green));
-                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_green));
+                    updateSpinningBarColor(R.drawable.progress_green);
 
                 } else if (action.equals(UPLINK_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using uplink");
-                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_red));
-                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_red));
+                    updateSpinningBarColor(R.drawable.progress_red);
 
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using nrs cache");
-                    mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_black));
-                    mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_black));
+                    updateSpinningBarColor(R.drawable.progress_black);
                 }
             }
         };
     }
+    
+    /**
+     * Updates the spinning bar with a new drawable. 
+     * @param drawable  The new drawable.
+     */
+    private void updateSpinningBarColor(int drawable) {
+        mSpinningBar.setIndeterminateDrawable(
+                getResources().getDrawable(drawable));
+        mSpinningBar.setProgressDrawable(
+                getResources().getDrawable(drawable));
+    }
 
     /**
-     * Function to frceably initialize Bluetooth and enable discoverability option.
+     * Function to forceably initialize Bluetooth and enable discoverability option.
      */
     private void setupBluetoothAvailability() {
         BTHandler bt = new BTHandler();
@@ -436,9 +429,4 @@ public class MainApplicationActivity extends BaseMenuActivity {
         Log.d(TAG, "cancelToast()");
         sToast.cancel();
     }
-
-    public Menu getMenu() {
-        return mMenu;
-    }
-
 }
