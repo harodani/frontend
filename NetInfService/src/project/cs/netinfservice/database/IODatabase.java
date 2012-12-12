@@ -26,7 +26,6 @@
  */
 package project.cs.netinfservice.database;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,15 +37,16 @@ import netinf.common.datamodel.InformationObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.netinf.node.search.SearchResultImpl;
 import project.cs.netinfservice.util.IOBuilder;
-import project.cs.netinfservice.util.UProperties;
-import project.cs.netinfservice.util.metadata.Metadata;
-import project.cs.netinfservice.util.metadata.MetadataParser;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
+import project.cs.netinfutilities.metadata.MetadataParser;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;

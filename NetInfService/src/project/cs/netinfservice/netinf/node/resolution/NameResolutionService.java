@@ -71,7 +71,7 @@ import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;

@@ -26,9 +26,6 @@
  */
 package project.cs.netinfservice.util;
 
-import java.util.List;
-import java.util.Set;
-
 import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.DefinedAttributePurpose;
 import netinf.common.datamodel.Identifier;
@@ -37,12 +34,11 @@ import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
 
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
 
 /**
  * A Builder that makes it easier to create information objects.

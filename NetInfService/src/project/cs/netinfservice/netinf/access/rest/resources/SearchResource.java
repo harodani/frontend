@@ -13,8 +13,8 @@ import org.json.simple.JSONObject;
 import org.restlet.resource.Get;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.util.UProperties;
-import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
 import android.util.Log;
 
 public class SearchResource extends LisaServerResource {

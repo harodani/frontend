@@ -13,8 +13,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import project.cs.lisa.util.UProperties;
-
+import project.cs.netinfutilities.UProperties;
 import android.os.AsyncTask;
 import android.util.Log;
 

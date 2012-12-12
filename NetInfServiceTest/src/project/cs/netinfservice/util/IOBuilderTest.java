@@ -8,14 +8,13 @@ import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.impl.DatamodelFactoryImpl;
 
-import org.json.JSONException;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.util.metadata.Metadata;
-import project.cs.netinfservice.util.metadata.MetadataParser;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 
 
@@ -115,7 +114,7 @@ public class IOBuilderTest extends AndroidTestCase {
 		Map<String, Object>  map = null;
 		try {
 			map = MetadataParser.toMap((JSONObject) jsonMeta);
-		} catch (JSONException e) {
+		} catch (ParseException e) {
 			Assert.fail("Should not have thrown an exception.");
 		}
 		String actualFilepath = (String) map.get(LABEL_FILEPATH);
