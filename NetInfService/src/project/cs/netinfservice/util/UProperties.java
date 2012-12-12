@@ -35,14 +35,13 @@ import android.content.res.AssetManager;
 import android.util.Log;
 
 /**
- * Singleton utility class for loading properties and
- * providing methods for getting the property values.
+ * Singleton utility class for loading properties and providing methods for getting the property
+ * values.
  * 
- * author Paolo Boschini
+ * @author Paolo Boschini
  * 
  */
 public enum UProperties {
-
     /** The unique reference for this singleton. */
     INSTANCE;
 
@@ -56,16 +55,21 @@ public enum UProperties {
     private Properties mProperties;
 
     /**
-     * Initiates the singleton.
+     * Constructor that initiates the singleton.
      */
     private UProperties() {
+        // Load properties from file
         loadProperties(PROPERTIES_FILE);
     }
 
     /**
      * Returns the value of a property given the correct key.
-     * @param propertyName The property key
-     * @return The property value that was requested
+     * 
+     * @param propertyName
+     *      The property key
+     * @return
+     *      The property <i>value</i> that was requested<br>
+     *      <i>null</i> if it fails.
      */
     public String getPropertyWithName(String propertyName) {
         return mProperties.getProperty(propertyName);
@@ -73,7 +77,9 @@ public enum UProperties {
 
     /**
      * Returns the property reference.
-     * @return the property
+     * 
+     * @return
+     *      The property object.
      */
     public Properties getProperty() {
         return mProperties;
@@ -81,16 +87,28 @@ public enum UProperties {
 
     /**
      * Loads properties from the passed property file.
-     * @param property the property file to be loaded
+     * 
+     * @param property
+     *      The property file to be loaded
      */
     private void loadProperties(String property) {
         Log.d(TAG, "loadProperties()");
+        
+        // Initiate a new Property object
         mProperties = new Properties();
+        
+        // Try to add the properties (assets)
         try {
+            // Get assets
             AssetManager assets = MainNetInfApplication.getAppContext().getResources().getAssets();
+
+            // Open stream
             InputStream is = assets.open(property);
+            
+            // Load properties
             mProperties.load(is);
         } catch (IOException e) {
+            Log.e(TAG, "Failed to load property file.");
             Log.e(TAG, e.toString(), e);
         }
     }

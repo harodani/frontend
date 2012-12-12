@@ -39,27 +39,38 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
- * Provides and API to the local NetInf node. 
+ * Provides and API to the local NetInf node.
+ * 
  * @author Linus Sunde
  *
  */
 public class RESTAccessServer implements AccessServer {
-
     /** The component handling the RESTApplication. **/
     private Component mComponent;
 
     /**
      * Constructor that creates a new RESTful server.
-     * @param port the connection port (is injected)
-     * @param connection the connection to the node 
-     * @param factory creates different objects necessary in the NetInf model
+     * 
+     * @param port
+     *      The connection port (is injected)
+     * @param connection
+     *      The connection to the node 
+     * @param factory
+     *      Creates different objects necessary in the NetInf model
      */
     @Inject
     public RESTAccessServer(@Named("access.http.port") int port,
             LocalNodeConnection connection, DatamodelFactory factory) {
+        // Component
         mComponent = new Component();
+        
+        // Get the component servers
         mComponent.getServers().add(Protocol.HTTP, port);
+        
+        // Get the application
         Application application = new RESTApplication(connection, factory);
+        
+        // Get Default Host
         mComponent.getDefaultHost().attach(application);
     }
 
@@ -67,6 +78,7 @@ public class RESTAccessServer implements AccessServer {
      * Starts the RESTAccessServer.
      */
     public void start() {
+        // Start component
         try {
             mComponent.start();
         } catch (Exception e) {
@@ -78,6 +90,7 @@ public class RESTAccessServer implements AccessServer {
      * Stops the RESTAccessServer.
      */  
     public void stop() {
+        // Stop the server
         try {
             mComponent.stop();
         } catch (Exception e) {

@@ -24,12 +24,13 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.util.metadata;
+package project.cs.netinfutilities.metadata;
+
+import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import android.util.Log;
 
 /**
  * Implementation of Metadata support class.
@@ -37,8 +38,8 @@ import android.util.Log;
  */
 public class Metadata {
 
-    /* Debug Tag */
-    private final String TAG = "MetadataClass";
+    /** The Logger. */
+    private final static Logger LOGGER = Logger.getLogger(Metadata.class.getName()); 
 
     /* Metadata JSON object */
     private JSONObject mJSONObject;
@@ -56,17 +57,12 @@ public class Metadata {
      * @param _JSONString Formatted JSON String
      */
     public Metadata(String _JSONString) {
-        Log.d(TAG, "Metadata received:\n" + _JSONString);
-
         mJSONObject = new JSONObject();
         mJSONObject = (JSONObject) JSONValue.parse(_JSONString);
 
         // TODO: Maybe raise a 'malformed json string exception'
-        if (mJSONObject != null) {
-            Log.d(TAG, "Metadata created:\n" + mJSONObject);
-            Log.d(TAG, "" + mJSONObject.keySet().toString());
-        } else {
-            Log.d(TAG, "Invalid JSON String received. new object was created, but its NULL.");
+        if (mJSONObject == null) {
+        	LOGGER.info("Invalid JSON String received. new object was created, but its NULL.");
         }
     }
 
@@ -94,15 +90,14 @@ public class Metadata {
         mJSONObject = new JSONObject();
 
         if (key.length != value.length) {
-            // Different size arrays
-            Log.d(TAG, "The JSON Object was created, but you gave me two arrays of "
+            LOGGER.warning("The JSON Object was created, but you gave me two arrays of "
                     + "different sizes!");
-            // Null or lost values
+            
             if (key.length > value.length) {
-                Log.d(TAG, "The JSON Object created has null values.");
+                LOGGER.warning("The JSON Object created has null values.");
             }
             else {
-                Log.d(TAG, "The JSON Object created has lost values.");
+                LOGGER.warning("The JSON Object created has lost values.");
             }
         }
 
@@ -122,7 +117,7 @@ public class Metadata {
     @SuppressWarnings("unchecked")
     public boolean insert(String key, Object value) {
         if (key == null) {
-            Log.d(TAG, "Tried to use a null key on insert()");
+            LOGGER.warning("Tried to use a null key on insert()");
             return false;
         }
 
@@ -140,7 +135,7 @@ public class Metadata {
      */
     public String get(String key) {
         if (key == null) {
-            Log.d(TAG, "Tried to use a null key on get()");
+            LOGGER.warning("Tried to use a null key on get()");
             return null;
         }
 

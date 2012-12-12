@@ -34,19 +34,19 @@ import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 
-import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.netinf.node.search.SearchResultImpl;
 import project.cs.netinfservice.util.IOBuilder;
-import project.cs.netinfservice.util.UProperties;
-import project.cs.netinfservice.util.metadata.Metadata;
-import project.cs.netinfservice.util.metadata.MetadataParser;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
+import project.cs.netinfutilities.metadata.MetadataParser;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -69,7 +69,6 @@ import com.google.inject.assistedinject.Assisted;
 public class IODatabase 
 		extends SQLiteOpenHelper
 		implements IODatabaseFactory {
-
 	/** The current database version. */
 	public static final int DATABASE_VERSION = 1;
 	
@@ -374,8 +373,10 @@ public class IODatabase
         Log.d(TAG, "Sending Intent " + LOCAL_TRANSMISSION);
         
         // Create and send an intent for local transmission
-        Intent intent = new Intent(LOCAL_TRANSMISSION);        
-        MainNetInfActivity.getActivity().sendBroadcast(intent);
+        if (MainNetInfActivity.getActivity() != null) {
+        	Intent intent = new Intent(LOCAL_TRANSMISSION);        
+        	MainNetInfActivity.getActivity().sendBroadcast(intent);
+        }
 
         // Build a new IO to host the result
 		IOBuilder builder = new IOBuilder(mDatamodelFactory);
@@ -508,8 +509,7 @@ public class IODatabase
 		// Parse metadata again, this time adding objects to the map to reflect "String" : "Value" 
 		try {
 			metadataMap = MetadataParser.toMap((JSONObject) jsonObject);
-		} catch (JSONException e) {
-		    // TODO: Uses JSON Exception which is deprecated
+		} catch (ParseException e) {
 			Log.e(TAG, "Error extracting metadata");
 			throw new DatabaseException("The IO cannot be inserted into the database. "
 					+ "Because the meta-data could not be extracted.", e);

@@ -37,7 +37,7 @@ import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.util.Log;
 
 import com.google.inject.Inject;

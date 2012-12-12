@@ -68,11 +68,11 @@ import android.util.Log;
 
 /**
  * Handles NetInf Publish and Get requests.
+ * 
  * @author Linus Sunde
  *
  */
 public class IOResource extends LisaServerResource {
-
     /** Debug tag. **/
     public static final String TAG = "IOResource";
 
@@ -100,24 +100,31 @@ public class IOResource extends LisaServerResource {
     /** Node Connection, used to access the local NetInf node. **/
     private NetInfNodeConnection mNodeConnection;
 
+    /**
+     * Initiates the IO Resource.
+     */
     @Override
     protected void doInit() {
         super.doInit();
 
-        mHashAlg           = getQuery().getFirstValue("hashAlg", true);
-        mHash              = getQuery().getFirstValue("hash", true);
-        mContentType       = getQuery().getFirstValue("ct", true);
-        mBluetoothMac      = getQuery().getFirstValue("btmac", true);
-        mMeta              = getQuery().getFirstValue("meta", true);
-        mFilePath          = getQuery().getFirstValue("filePath", true);
-
+        // Set all private attributes
+        mHashAlg = getQuery().getFirstValue("hashAlg", true);
+        mHash = getQuery().getFirstValue("hash", true);
+        mContentType = getQuery().getFirstValue("ct", true);
+        mBluetoothMac = getQuery().getFirstValue("btmac", true);
+        mMeta = getQuery().getFirstValue("meta", true);
+        mFilePath = getQuery().getFirstValue("filePath", true);
+        
+        // Get data model and node information
         mDatamodelFactory = getDatamodelFactory();
         mNodeConnection   = getNodeConnection();
     }
 
     /**
      * Debug.
-     * @throws NetInfCheckedException Thrown when publish fails
+     * 
+     * @throws NetInfCheckedException
+     *      Thrown when publish fails
      */
     @Post
     public void handlePost() throws NetInfCheckedException {
@@ -145,7 +152,8 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Publish an IO.
-     * @throws NetInfCheckedException thrown when publish fails
+     * @throws NetInfCheckedException
+     *      Thrown when publish fails
      */
     @Put
     public void putIO() throws NetInfCheckedException {
@@ -155,7 +163,8 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Publish an IO.
-     * @throws NetInfCheckedException thrown when publish fails
+     * @throws NetInfCheckedException
+     *      Thrown when publish fails
      */
     private void publish() throws NetInfCheckedException {
         publish(new IOBuilder(mDatamodelFactory));
@@ -163,30 +172,35 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Publish an IO.
-     * @param builder 					An IOBuilder
-     * @throws NetInfCheckedException	Thrown when putIO fails
+     * 
+     * @param builder
+     *  	An IOBuilder
+     * @throws NetInfCheckedException
+     *  	Thrown when putIO fails
      */
     private void publish(IOBuilder builder) throws NetInfCheckedException {
-
+        // Set hash and hash algorithm
         builder.setHash(mHash).setHashAlgorithm(mHashAlg);
 
+        // Set content type
         if (mContentType != null) {
             builder.setContentType(mContentType);
         }
 
+        // Set bluetooth mac address
         if (mBluetoothMac != null) {
             builder.addBluetoothLocator(mBluetoothMac);
         }
 
+        // Create metadata holder if metadata does not exist.
         if (mMeta == null) {
             // Create empty meta data
             mMeta = "{\"meta\":{}}";
         }
+        
         builder.setMetaData(mMeta);
 
+        // Build IO and put it up for publishing
         mNodeConnection.putIO(builder.build());
-
     }
-
-
 }

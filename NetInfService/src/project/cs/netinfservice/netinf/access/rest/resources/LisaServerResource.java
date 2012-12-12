@@ -70,13 +70,11 @@ import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
  * @author PG NetInf 3, University of Paderborn
  */
 public abstract class LisaServerResource extends ServerResource {
-
     /**
      * Yields a connection to a NetInfNode.
      * 
      * @return A NetInfNodeConnection of the parent application
      */
-
     protected NetInfNodeConnection getNodeConnection() {
         return ((RESTApplication) getApplication()).getNodeConnection();
     }
@@ -94,64 +92,65 @@ public abstract class LisaServerResource extends ServerResource {
      * Creates a NetInf Identifier given a number of plain Strings.
      * 
      * @param hashAlg
-     * 			Hash Algorithm
+     * 		Hash Algorithm
      * @param hash
-     * 			Hash
+     * 		Hash
      * @param contentType
-     *          Content Type
-     * @return NetInf Identifier
+     *      Content Type
+     * @return
+     *      NetInf Identifier
      */
     protected Identifier createIdentifier(String hashAlg, String hash, String contentType) {
-      
+        // Creates the NetInf Identifier
         Identifier identifier = getDatamodelFactory().createIdentifier();
-      
+
         //Creating the HASH_ALG label
         IdentifierLabel identifierLabel = getDatamodelFactory().createIdentifierLabel();
         identifierLabel.setLabelName(SailDefinedLabelName.HASH_ALG.getLabelName());
         identifierLabel.setLabelValue(hashAlg);
         identifier.addIdentifierLabel(identifierLabel);
-    
+
         //Creating the HASH_CONTENT label
         IdentifierLabel identifierLabel2 = getDatamodelFactory().createIdentifierLabel();
         identifierLabel2.setLabelName(SailDefinedLabelName.HASH_CONTENT.getLabelName());
         identifierLabel2.setLabelValue(hash);
         identifier.addIdentifierLabel(identifierLabel2);
-        
+
         //Creating the CONTENT_TYPE label
         IdentifierLabel identifierLabel3 = getDatamodelFactory().createIdentifierLabel();
         identifierLabel3.setLabelName(SailDefinedLabelName.CONTENT_TYPE.getLabelName());
         identifierLabel3.setLabelValue(contentType);
         identifier.addIdentifierLabel(identifierLabel3);
-        
+
         return identifier;
-   }
-    
+    }
+
     /**
      * Creates a NetInf Identifier given a number of plain Strings.
      * 
      * @param hashAlg
-     *          Hash Algorithm
+     *      Hash Algorithm
      * @param hash
-     *          Hash
-     * @return NetInf Identifier
+     *      Hash
+     * @return
+     *      NetInf Identifier
      */
     protected Identifier createIdentifier(String hashAlg, String hash) {
-      
+        // Creates the identifier
         Identifier identifier = getDatamodelFactory().createIdentifier();
-      
+
         //Creating the HASH_ALG label
         IdentifierLabel identifierLabel = getDatamodelFactory().createIdentifierLabel();
         identifierLabel.setLabelName(SailDefinedLabelName.HASH_ALG.getLabelName());
         identifierLabel.setLabelValue(hashAlg);
         identifier.addIdentifierLabel(identifierLabel);
-    
+
         //Creating the HASH_CONTENT label
         IdentifierLabel identifierLabel2 = getDatamodelFactory().createIdentifierLabel();
         identifierLabel2.setLabelName(SailDefinedLabelName.HASH_CONTENT.getLabelName());
         identifierLabel2.setLabelValue(hash);
         identifier.addIdentifierLabel(identifierLabel2);
-        
-        return identifier;
-   }
 
+        return identifier;
+    }
 }

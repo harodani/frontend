@@ -24,26 +24,28 @@
  * principles and programming methods.
  *
  */
-package project.cs.netinfservice.database;
 
-import android.content.Context;
+/////////////////
+// General
 
-/**
- * The IODatabaseFactory is used for assisted injection of
- * the IODatabse.
- * 
- * @author Kim-Anh Tran
- *
- */
-public interface IODatabaseFactory {
-	
-	/**
-	 * Returns an IODatabase.
-	 * 
-	 * @param context
-	 *      The Application context
-	 * @return
-	 * 		The IODatabase
-	 */
-	IODatabase create(Context context);
-}
+
+The jar file contains the following utility java classes:
+
+- UProperties.java
+- metadata/MetadataParser.java
+- metadata/Metadata.java
+
+The UProperties is used for reading from a properties file
+of an application.
+
+The Metadata classes handle Metadata that are based
+on json simple libraries.
+
+
+/////////////////
+// Dependencies
+
+In order for these classes to work, you need
+to include following jar files:
+
+- json-simple-1.1.1.jar

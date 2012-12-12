@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.cs.netinfservice.application.MainNetInfApplication;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;

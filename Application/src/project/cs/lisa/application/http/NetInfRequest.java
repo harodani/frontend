@@ -40,8 +40,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import project.cs.lisa.util.UProperties;
-
+import project.cs.netinfutilities.UProperties;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -54,9 +53,6 @@ import android.util.Log;
  *
  */
 public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse> {
-
-    /** Debug Log Tag. */
-    private static final String TAG = "NetInfRequest";
 
     /** HTTP Scheme. */
     private static final String HTTP = 
@@ -96,8 +92,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      The start of the path
      */
     protected NetInfRequest(String pathPrefix) {
-
-        Log.d(TAG, "NetInfRequest()");
 
         mHost = UProperties.INSTANCE.getPropertyWithName("access.http.host");
         mPort = UProperties.INSTANCE.getPropertyWithName("access.http.port");;
@@ -157,8 +151,6 @@ public abstract class NetInfRequest extends AsyncTask<Void, Void, NetInfResponse
      *      In case the HTTP request failed
      */
     protected HttpResponse execute(HttpUriRequest request) throws IOException {
-        Log.d(TAG, "uri = " + request.getURI());
-
         // Execute the HTTP request
         return mClient.execute(request);
     }

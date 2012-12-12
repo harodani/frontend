@@ -26,7 +26,7 @@
  */
 package project.cs.netinfservice.netinf.node.search;
 
-import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfutilities.metadata.Metadata;
 
 /**
  * Each search result entry is encoded as a SearchResult object.

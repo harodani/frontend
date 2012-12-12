@@ -28,6 +28,7 @@
 package project.cs.lisa.application.html.transfer;
 
 import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +39,9 @@ import org.apache.commons.io.FileUtils;
 
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.hash.Hash;
-import project.cs.lisa.util.UProperties;
+
+import project.cs.netinfutilities.UProperties;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -179,8 +182,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         String result = null;
 
         hash = new Hash(bytes);
-        Log.d(TAG, "The generated hash is: " + hash.encodeResult());
-        result = hash.encodeResult(); // Use 0 for using the whole hash
+        result = hash.encodeResult(); 
 
         return result;
     }

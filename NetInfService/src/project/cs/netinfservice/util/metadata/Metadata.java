@@ -33,38 +33,45 @@ import android.util.Log;
 
 /**
  * Implementation of Metadata support class.
+ * 
  * @author Thiago Costa Porto
  */
 public class Metadata {
-
-    /* Debug Tag */
+    /** Debug Tag */
     private final String TAG = "MetadataClass";
 
-    /* Metadata JSON object */
+    /** Metadata JSON object */
     private JSONObject mJSONObject;
 
     /**
-     * Empty Constructor
+     * Default Constructor.
      */
     public Metadata() {
+        // Initializes SIMPLEJSON JSON Object
         mJSONObject = new JSONObject();
     }
 
     /**
      * Constructor that takes in a already formatted JSON String
      *
-     * @param _JSONString Formatted JSON String
+     * @param jsonString
+     *      Formatted JSON String
      */
-    public Metadata(String _JSONString) {
-        Log.d(TAG, "Metadata received:\n" + _JSONString);
+    public Metadata(String jsonString) {
+        Log.d(TAG, "Metadata(string) Constructor");
+        Log.d(TAG, "JSON String received:\n" + jsonString);
 
+        // Initializes new SimpleJson object
         mJSONObject = new JSONObject();
-        mJSONObject = (JSONObject) JSONValue.parse(_JSONString);
+        
+        // Parse JSON String into a new Object
+        mJSONObject = (JSONObject) JSONValue.parse(jsonString);
 
-        // TODO: Maybe raise a 'malformed json string exception'
+        // TODO: Maybe raise a 'malformed json string exception'?
+        // Check if Metadata was created.
         if (mJSONObject != null) {
             Log.d(TAG, "Metadata created:\n" + mJSONObject);
-            Log.d(TAG, "" + mJSONObject.keySet().toString());
+            Log.d(TAG, "Keys present in the created JSON:\n" + mJSONObject.keySet().toString());
         } else {
             Log.d(TAG, "Invalid JSON String received. new object was created, but its NULL.");
         }
@@ -73,11 +80,16 @@ public class Metadata {
     /**
      * Constructor for (key, value)
      *
-     * @param key String with the key
-     * @param value String with the value
+     * @param key
+     *      String with the key
+     * @param value
+     *      String with the value
      */
     public Metadata(String key, String value) {
+        // New SimpleJson object
         mJSONObject = new JSONObject();
+        
+        // Add "key" : "value" to JSON Object
         insert(key, value);
     }
 
@@ -85,18 +97,25 @@ public class Metadata {
      * Constructor for string arrays. It is the developer responsibility to
      * pass arrays with the correct sizes. They are corresponding, meaning
      * key[0] goes with value[0].
+     * 
      * Read it as: metadata[key(i)] = value(i)
      *
-     * @param key   Array of keys
-     * @param value Array of values
+     * @param key
+     *      Array of keys
+     * @param value
+     *      Array of values
      */
     public Metadata(String[] key, String[] value) {
+        // New SimpleJson object
         mJSONObject = new JSONObject();
 
+        // Check if both arrays have the same size
         if (key.length != value.length) {
             // Different size arrays
             Log.d(TAG, "The JSON Object was created, but you gave me two arrays of "
                     + "different sizes!");
+
+            // TODO: HANDLE this. Urgently.
             // Null or lost values
             if (key.length > value.length) 
                 Log.d(TAG, "The JSON Object created has null values.");
@@ -104,37 +123,47 @@ public class Metadata {
                 Log.d(TAG, "The JSON Object created has lost values.");
         }
 
+        // Add keys
         for (int i = 0; i < key.length; i++) {
             insert(key[i], value[i]);
         }
     }
 
     /**
-     * Inserts a (key,value) to the JSON Object
+     * Inserts a (key,value) to the JSON Object.
      *
-     * @param key    String with key
-     * @param value  Object with value
-     * @return       true  if value was inserted
-     *               false if value was not inserted
+     * @param key
+     *      String with key
+     * @param value
+     *      Object with value
+     * @return
+     *      <i>true</i>  if value was inserted<br>
+     *      <i>false</i> if value was not inserted
      */
     @SuppressWarnings("unchecked")
     public boolean insert(String key, Object value) {
+        // Sanity check!
         if (key == null) {
             Log.d(TAG, "Tried to use a null key on insert()");
+            // Fails
             return false;
         }
 
         // actual insert
         mJSONObject.put(key, value);
 
+        // Success!
         return true;
     }
 
     /**
-     * Get a value corresponding to the key
-     * @param key String with the key
-     * @return Value if it exists
-     *         null  if things go wrong
+     * Get a value corresponding to the key.
+     * 
+     * @param key
+     *      String with the key
+     * @return
+     *      <i>Value<i> if it exists<br>
+     *      <i>null</i>  if things go wrong
      */
     public String get(String key) {
         if (key == null) {
@@ -142,31 +171,35 @@ public class Metadata {
             return null;
         }
 
+        // Sanity check
         if (mJSONObject == null)
             return null;
 
+        // Returns the key (if it is there)
         return mJSONObject.get(key).toString();
     }
 
     // TODO: Beautify printing of JSON String.
     /**
-     * Converts JSON Object to a FORMATTED string
-     * @return Formatted string
+     * Converts JSON Object to a FORMATTED string.
+     * 
+     * @return
+     *      JSON Object as a string.
      */
     public String convertToString() {
         return mJSONObject.toString();
     }
 
     /**
-     * Creates a JSON string with the key "meta"
-     * set to the JSON string representation of the metadata.
+     * Creates a JSON string with the key "meta" set to the JSON string representation of the
+     * metadata.
      *
-     * @return The JSON string
+     * @return
+     *      The JSON Object as a string.
      */
     @SuppressWarnings("unchecked")
     public String convertToMetadataString() {
         JSONObject meta = new JSONObject();
-        // TODO: check if this still works under json.simple
         meta.put("meta", mJSONObject);
 
         return meta.toString();
@@ -179,6 +212,12 @@ public class Metadata {
         mJSONObject.clear();
     }
 
+    /**
+     * Returns the JSON Object.
+     * 
+     * @return
+     *      JSON Object.
+     */
     public JSONObject getJSONObject() {
         return mJSONObject;
     }

@@ -46,8 +46,8 @@ import project.cs.lisa.application.http.NetInfRetrieveResponse;
 import project.cs.lisa.application.http.NetInfSearch;
 import project.cs.lisa.application.http.NetInfSearchResponse;
 import project.cs.lisa.application.http.RequestFailedException;
-import project.cs.lisa.util.UProperties;
-import project.cs.lisa.util.metadata.Metadata;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -102,7 +102,6 @@ public class NetInfWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         super.shouldOverrideUrlLoading(view, url);
-        Log.d(TAG, "Url was updated. Sending intent.");
         Intent intent = new Intent(URL_WAS_UPDATED);
         intent.putExtra(URL, url);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
@@ -120,15 +119,11 @@ public class NetInfWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view,
             String url) {
 
-        Log.d(TAG, "Intercepting resource.");
-
         if (!URLUtil.isHttpUrl(url)) {
-            Log.d(TAG, "Resource, raw data: " + url);
             super.shouldInterceptRequest(view, url);
             return null;
 
         } else if (URLUtil.isHttpUrl(url)) {
-            Log.d(TAG, "Try to retrieve resource from url: " + url);
             WebObject resource = null;
             File file = null;
             String contentType = null;
@@ -217,7 +212,6 @@ public class NetInfWebViewClient extends WebViewClient {
         NetInfSearch search = new NetInfSearch(url.toString(), "empty");
         search.execute();
         response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
-        Log.d(TAG, "Search response: " + response.toString());
         return response;
 
     }
@@ -261,8 +255,6 @@ public class NetInfWebViewClient extends WebViewClient {
         metadata.insert("filepath", file.getAbsolutePath());
         metadata.insert("time", Long.toString(System.currentTimeMillis()));
         metadata.insert("url", url.toString());
-
-        Log.d(TAG, "Trying to publish a new file.");
 
         // Try to get the Bluetooth MAC
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();

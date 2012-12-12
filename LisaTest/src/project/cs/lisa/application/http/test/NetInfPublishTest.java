@@ -15,7 +15,7 @@ import project.cs.lisa.application.http.NetInfPublishResponse;
 import project.cs.lisa.application.http.NetInfResponse;
 import project.cs.lisa.application.http.NetInfStatus;
 import project.cs.lisa.mock.MockServer;
-import project.cs.lisa.util.metadata.Metadata;
+import project.cs.netinfutilities.metadata.Metadata;
 import android.test.InstrumentationTestCase;
 
 public class NetInfPublishTest extends InstrumentationTestCase {

@@ -36,8 +36,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import project.cs.lisa.util.UProperties;
-import android.util.Log;
+import project.cs.netinfutilities.UProperties;
 
 /**
  * Represents a response to a NetInfSearch.
@@ -45,8 +44,6 @@ import android.util.Log;
  */
 public class NetInfSearchResponse extends NetInfResponse {
 
-    /** Log Tag. */
-    private static final String TAG = "NetInfSearchResponse";
     /** Search results JSON Key used by the RESTful API. */
     private static final String RESULTS_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.search.results");
@@ -92,7 +89,6 @@ public class NetInfSearchResponse extends NetInfResponse {
             setStatus(NetInfStatus.NO_CONTENT);
             return;
         }
-        Log.d(TAG, "jsonString = " + jsonString);
         Object obj = JSONValue.parse(jsonString);
         if (!(obj instanceof JSONObject)) {
             setStatus(NetInfStatus.INVALID_CONTENT);

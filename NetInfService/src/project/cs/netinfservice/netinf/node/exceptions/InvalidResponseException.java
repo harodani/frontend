@@ -28,13 +28,15 @@ package project.cs.netinfservice.netinf.node.exceptions;
 
 /**
  * Thrown when the response to a NetInf message can't be parsed.
+ * 
  * @author Linus Sunde
- *
  */
 public class InvalidResponseException extends Exception {
     /**
      * Constructs a InvalidResponseException with the specified detail message.
-     * @param message   the detail message.
+     * 
+     * @param message
+     *      The detail message.
      */
     public InvalidResponseException(String message) {
         super(message);
@@ -42,8 +44,11 @@ public class InvalidResponseException extends Exception {
 
     /**
      * Constructs a new exception with the specified detail message and cause.
-     * @param message   the detail message
-     * @param cause     the cause
+     * 
+     * @param message   
+     *      The detail message
+     * @param cause     
+     *      The cause
      */
     public InvalidResponseException(String message, Throwable cause) {
         super(message, cause);

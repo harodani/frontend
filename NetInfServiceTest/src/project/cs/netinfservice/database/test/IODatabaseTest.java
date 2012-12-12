@@ -12,18 +12,18 @@ import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.impl.DatamodelFactoryImpl;
 
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.search.SearchResult;
 import project.cs.netinfservice.util.IOBuilder;
-import project.cs.netinfservice.util.UProperties;
-import project.cs.netinfservice.util.metadata.Metadata;
-import project.cs.netinfservice.util.metadata.MetadataParser;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
+import project.cs.netinfutilities.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
@@ -143,7 +143,7 @@ public class IODatabaseTest extends AndroidTestCase {
 		Map<String, Object> metadataMap = new HashMap<String, Object>();
 		try {
 			metadataMap = MetadataParser.toMap((JSONObject) jsonMetadata);
-		} catch (JSONException e) {
+		} catch (ParseException e) {
 			Assert.fail("Should not have thrown an exception.");
 		}
 		assertEquals(FILE_PATH, (String)metadataMap.get(LABEL_FILEPATH));
@@ -255,7 +255,7 @@ public class IODatabaseTest extends AndroidTestCase {
     	Map<String, Object> map = null;
 		try {
 			map = MetadataParser.toMap((JSONObject) jsonMetadata);
-		} catch (JSONException e) {
+		} catch (ParseException e) {
 			Assert.fail("Should not have raised an exception");
 		}
     	

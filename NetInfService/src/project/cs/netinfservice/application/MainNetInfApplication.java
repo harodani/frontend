@@ -26,9 +26,14 @@
  */
 package project.cs.netinfservice.application;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import project.cs.netinfservice.netinf.node.module.Module;
+import project.cs.netinfutilities.UProperties;
 import android.app.Application;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.Log;
 
 import com.google.inject.Guice;
@@ -43,9 +48,11 @@ import com.google.inject.Injector;
  * 
  */
 public class MainNetInfApplication extends Application {
-
     /** Debugging tag. */
     public static final String TAG = "MainNetInfApplication";
+    
+    /** Properties file. */
+    public static final String PROPERTIES_FILE = "config.properties";
 
     /** Injector for injecting classes. */	
     private static Injector sInjector;
@@ -53,18 +60,36 @@ public class MainNetInfApplication extends Application {
     /** The context for this application. */
     private static Context sContext;
 
+    /**
+     * Initializes netinf application, setting context and injector.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "Initializing the netinf application.");
+        
+        // Create the properties reader
+        AssetManager assets = getApplicationContext().getResources().getAssets();
+        try {
+			InputStream is = assets.open(PROPERTIES_FILE);
+			UProperties.INSTANCE.init(is);
+			is.close();
+		} catch (IOException e) {
+			Log.e(TAG, "Could not initialize properties file.");
+		}
 
+        // Set context
         sContext = getApplicationContext();
+        
+        // Set Injector
         sInjector = Guice.createInjector(new Module());
     }
 
     /**
      * Returns the injector for injecting classes.
-     * @return  the injector
+     * 
+     * @return
+     *      The injector
      */
     public static Injector getInjector() {
         return sInjector;
@@ -74,7 +99,8 @@ public class MainNetInfApplication extends Application {
      * Returns the current application context.
      * This is useful i.e. for registering broadcast receivers.
      * 
-     * @return  The application context.
+     * @return
+     *      The application context.
      */
     public static Context getAppContext() {
         return sContext;

@@ -27,7 +27,7 @@
 package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -47,8 +47,7 @@ import android.preference.PreferenceManager;
  *
  */
 public class SettingsFragment extends PreferenceFragment
-implements OnSharedPreferenceChangeListener {
-
+        implements OnSharedPreferenceChangeListener {
     /** Log Tag. */
     private static final String TAG = "SettingsFragment";
 
@@ -58,19 +57,26 @@ implements OnSharedPreferenceChangeListener {
     /** Key for accessing the NRS Port. */
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
+    /**
+     * Creates settings fragment, initializing global preferences. 
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Get shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        
         // Set default NRS address
         if (!prefs.contains(PREF_KEY_NRS_IP)) {
+            // Edit on the go
             Editor editor = prefs.edit();
             editor.putString(
                     PREF_KEY_NRS_IP,
                     UProperties.INSTANCE.getPropertyWithName("nrs.http.host"));
             editor.commit();
         }
+        
         // Set default NRS port
         if (!prefs.contains(PREF_KEY_NRS_PORT)) {
             Editor editor = prefs.edit();
@@ -83,11 +89,12 @@ implements OnSharedPreferenceChangeListener {
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
+        // Clear database
         findPreference("pref_key_clear_database").setOnPreferenceClickListener(
                 new OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
-
+                        // DB Delete
                         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                         .setTitle("Do you really want to delete the database?")    
                         .setCancelable(false)
@@ -107,19 +114,22 @@ implements OnSharedPreferenceChangeListener {
         // Set default summaries
         findPreference(PREF_KEY_NRS_IP).setSummary(prefs.getString(PREF_KEY_NRS_IP, ""));
         findPreference(PREF_KEY_NRS_PORT).setSummary(prefs.getString(PREF_KEY_NRS_PORT, ""));
-
     }
 
+    /**
+     * Get changes to NRS IP/PORT.
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
             String key) {
         if (key.equals(PREF_KEY_NRS_IP) || key.equals(PREF_KEY_NRS_PORT))  {
             findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-
         }
-
     }
 
+    /**
+     * OnResume handler.
+     */
     @Override
     public void onResume() {
         // TODO Auto-generated method stub
@@ -128,11 +138,13 @@ implements OnSharedPreferenceChangeListener {
         .registerOnSharedPreferenceChangeListener(this);
     }
 
+    /**
+     * OnPause handler.
+     */
     @Override
     public void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences()
         .unregisterOnSharedPreferenceChangeListener(this);
     }
-
 }

@@ -36,7 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import project.cs.lisa.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.util.Log;
 
 /**
@@ -44,9 +44,6 @@ import android.util.Log;
  * @author Linus Sunde
  */
 public class NetInfRetrieveResponse extends NetInfResponse {
-
-    /** Log Tag. */
-    private static final String TAG = "NetInfRetrieveResponse";
 
     /** File path JSON Key used by the RESTful API. */
     private static final String FILE_PATH_KEY =
@@ -77,8 +74,6 @@ public class NetInfRetrieveResponse extends NetInfResponse {
         // TODO Remove duplicate code from NetInfResponse subclasses
 
         int statusCode = response.getStatusLine().getStatusCode();
-
-        Log.d(TAG, "new NetInfRetrieveResponse, statusCode = " + statusCode);
 
         // Request did not succeed
         if (statusCode != HttpStatus.SC_OK) {

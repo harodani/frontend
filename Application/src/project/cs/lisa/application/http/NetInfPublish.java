@@ -35,8 +35,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import project.cs.lisa.util.UProperties;
-import project.cs.lisa.util.metadata.Metadata;
+import project.cs.netinfutilities.metadata.Metadata;
 import android.util.Log;
 
 /**
@@ -68,9 +67,7 @@ public class NetInfPublish extends NetInfRequest {
      *      Set of locators to publish
      */
     public NetInfPublish(String hashAlg, String hash, Set<Locator> locators) {
-
         super("publish", hashAlg, hash);
-        Log.d(TAG, "NetInfPublish()");
         mLocators = locators;
     }
 
@@ -83,7 +80,8 @@ public class NetInfPublish extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-
+    	Log.d(TAG, "Publishing an IO.");
+    	
         // Don't publish without locators
         if (mLocators == null || mLocators.size() == 0) {
             return new NetInfPublishResponse();

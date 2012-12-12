@@ -27,20 +27,15 @@
 
 package project.cs.lisa.networksettings;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import project.cs.lisa.application.MainApplicationActivity;
-import project.cs.lisa.application.dialogs.ListDialog;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -106,8 +101,6 @@ public class WifiHandler {
     }
 
     public void connectToSelectedNetwork(String networkSSID) {
-        Log.d(TAG, "Yeah, let's try to connect to " + networkSSID);
-
         showProgressDialog("Try to connect to " + networkSSID);
 
         currentChosenNetwork = networkSSID;
@@ -121,10 +114,6 @@ public class WifiHandler {
         wifiManager.reconnect();
     }
 
-    public void onDiscoveryDone(Set<String> wifis) {
-        Log.d(TAG, "onDiscoveryDone");
-    }
-
 
     BroadcastReceiver mReceiver;
     /**
@@ -133,8 +122,6 @@ public class WifiHandler {
      * from the variables.
      */
     private void setUpBroadcastReceiver() {
-        Log.d(TAG, "Set up broadcast receiver.");
-
         mReceiver = new BroadcastReceiver() {
 
             private boolean doneScanning = false;
@@ -142,8 +129,6 @@ public class WifiHandler {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-
-                Log.d(TAG, action.toString());
 
                 // this is called when the wifi discovery is done
                 if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
@@ -158,8 +143,6 @@ public class WifiHandler {
 
                     doneScanning = true;
 
-                    Log.d(TAG, "Finished scanning");
-
                     progressBar.dismiss();
 
                     List<ScanResult> scanResults = wifiManager.getScanResults();
@@ -167,8 +150,6 @@ public class WifiHandler {
                     for (ScanResult scanResult : scanResults) {
                         wifis.add(scanResult.SSID);
                     }
-
-                    Log.d(TAG, wifis.toString());
 
                     onDiscoveryDone(wifis);
                 }
@@ -180,7 +161,6 @@ public class WifiHandler {
                     String chosenNetWork = wifiInfo.getSSID();
                     SupplicantState state = wifiInfo.getSupplicantState();
 
-                    Log.d(TAG, "state: " + state);
                     Log.d(TAG, "chosenNetwork: " + chosenNetWork);
 
                     if (chosenNetWork.equals(currentChosenNetwork) && state == SupplicantState.COMPLETED) {
@@ -199,6 +179,12 @@ public class WifiHandler {
                     }
                 }
             }
+
         };
+    }
+    
+    public void onDiscoveryDone(Set<String> wifis) {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="libs/httpmime-4.1.2.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/netinf-utilities.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

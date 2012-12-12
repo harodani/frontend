@@ -26,6 +26,8 @@
  */
 package project.cs.lisa.application;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
@@ -37,7 +39,7 @@ import project.cs.lisa.application.html.NetInfWebViewClient;
 import project.cs.lisa.application.html.transfer.FetchWebPageTask;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.networksettings.WifiHandler;
-import project.cs.lisa.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
@@ -46,9 +48,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -81,6 +81,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.lisa.node.started";
+    
+    /** Properties file. */
+    public static final String PROPERTIES_FILE = "config.properties";
 
     /** The url extra field for the intent for URL updates. */
     public static final String FINISHED_LOADING_PAGE = "finished_loading_page";
@@ -142,6 +145,17 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
+        
+        // sets up property reader
+        AssetManager assets = getApplicationContext().getResources().getAssets();
+        InputStream is = null;
+		try {
+			is = assets.open(PROPERTIES_FILE);
+	        UProperties.INSTANCE.init(is);
+	        is.close();
+		} catch (IOException e) {
+			Log.e(TAG, "Failed initializing the properties reader.");
+		}
 
         // setupWifi();
         setupBluetoothAvailability();
@@ -170,6 +184,15 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
+
+        registerReceiver(mBroadcastReceiver, mIntentFilter);
+
+        // sets up UI stuff
+        setUpEditTextUrl();
+        setUpLoadPageIcon();
+        setUpWebView();
+        setUpSpinningBar();
+        
     }
 
     /**
@@ -435,7 +458,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * @param text      The text to show in the toast.
      */
     public static void showToast(String text) {
-        Log.d(TAG, "showToast()");
         sToast.cancel();
         sToast = Toast.makeText(getActivity(), text, Toast.LENGTH_LONG);
         sToast.show();
@@ -445,7 +467,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * Cancel current toast.
      */
     public static void cancelToast() {
-        Log.d(TAG, "cancelToast()");
         sToast.cancel();
     }
 }

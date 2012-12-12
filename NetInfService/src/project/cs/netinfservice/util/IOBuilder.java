@@ -26,9 +26,6 @@
  */
 package project.cs.netinfservice.util;
 
-import java.util.List;
-import java.util.Set;
-
 import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.DefinedAttributePurpose;
 import netinf.common.datamodel.Identifier;
@@ -37,233 +34,302 @@ import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
 
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
-import project.cs.netinfservice.util.metadata.Metadata;
+import project.cs.netinfutilities.UProperties;
+import project.cs.netinfutilities.metadata.Metadata;
 
 /**
  * A Builder that makes it easier to create information objects.
  *
  * @author Kim-Anh Tran
- *
  */
 public class IOBuilder {
-
     /** All bluetooth locators have the following indicator in their address. */
     public static final String BLUETOOTH_LOCATOR_PREFIX = "nimacbt://";
-    
-	/**
-	 * The label for identifying content types.
-	 */
-	public static final String CONTENT_TYPE_LABEL =
-			SailDefinedLabelName.CONTENT_TYPE.getLabelName();
 
-	/**
-	 * The label for identifying the hash contents.
-	 */
-	public static final String HASH_LABEL =
-			SailDefinedLabelName.HASH_CONTENT.getLabelName();
+    /** The label for identifying content types. */
+    public static final String CONTENT_TYPE_LABEL =
+            SailDefinedLabelName.CONTENT_TYPE.getLabelName();
 
-	/**
-	 * The label for identifying the hash algorithm.
-	 */
-	public static final String HASH_ALG_LABEL = SailDefinedLabelName.HASH_ALG.getLabelName();
+    /** The label for identifying the hash contents. */
+    public static final String HASH_LABEL =
+            SailDefinedLabelName.HASH_CONTENT.getLabelName();
 
-	/**
-	 * The label for identifying the meta data.
-	 */
-	public static final String META_LABEL = SailDefinedLabelName.META_DATA.getLabelName();
-	
-	/** The metadata label for urls. */
-	public static final String URL_LABEL = UProperties.INSTANCE.getPropertyWithName("metadata.url");
+    /** The label for identifying the hash algorithm. */
+    public static final String HASH_ALG_LABEL = SailDefinedLabelName.HASH_ALG.getLabelName();
 
-	/** The datamodel factory that is needed to create information objects. */
-	private DatamodelFactory mFactory;
+    /** The label for identifying the meta data. */
+    public static final String META_LABEL = SailDefinedLabelName.META_DATA.getLabelName();
 
-	/** The identifier of the information object we are creating. */
-	private Identifier mIdentifier;
+    /** The metadata label for urls. */
+    public static final String URL_LABEL =
+            UProperties.INSTANCE.getPropertyWithName("metadata.url");
 
-	/** The meta data. */
-	private Metadata mMetadata;
+    /** The datamodel factory that is needed to create information objects. */
+    private DatamodelFactory mFactory;
 
-	/** The Information Object. **/
-	private InformationObject mIo;
-	
-	/** The url array that contains all urls corresponding to this io. */
-	private JSONArray mUrlArray;
+    /** The identifier of the information object we are creating. */
+    private Identifier mIdentifier;
 
-	/**
-	 * Creates a new Builder.
-	 *
-	 * @param factory	The factory for creating the information object
-	 */
-	public IOBuilder(DatamodelFactory factory) {
-		mFactory = factory;
-		mIdentifier = mFactory.createIdentifier();
-		mMetadata = new Metadata();
-		mIo = mFactory.createInformationObject();
-		mUrlArray = new JSONArray();
+    /** The Metadata. */
+    private Metadata mMetadata;
 
-	}
+    /** The Information Object. */
+    private InformationObject mIo;
 
-	/**
-	 * Creates a new Builder with the given meta data.
-	 * @param factory		The datamodel factory
-	 * @param jsonMetadata	The metadata string encoded in json
-	 */
-	public IOBuilder(DatamodelFactory factory, String jsonMetadata) {
-	    this(factory);
-	    mMetadata = new Metadata(jsonMetadata);
-	}
+    /** The url array that contains all urls corresponding to this IO. */
+    private JSONArray mUrlArray;
 
-	/**
-	 * Sets the hash value.
-	 *
-	 * @param hash	The hash value of the information object.
-	 * @return		Returns this Builder.
-	 */
-	public IOBuilder setHash(String hash) {
-		addIdentifierLabel(mIdentifier, HASH_LABEL, hash);
-		return this;
-	}
+    /**
+     * Creates a new Builder.
+     *
+     * @param factory
+     *     The factory for creating the information object
+     */
+    public IOBuilder(DatamodelFactory factory) {
+        // Datamodel Factory
+        mFactory = factory;
 
-	/**
-	 * Sets the hash algorithm.
-	 *
-	 * @param hashAlgorithm	The hash algorithm of the information object.
-	 * @return		Returns this Builder.
+        // Create the new Identifier
+        mIdentifier = mFactory.createIdentifier();
 
-	 */
-	public IOBuilder setHashAlgorithm(String hashAlgorithm) {
-		addIdentifierLabel(mIdentifier, HASH_ALG_LABEL, hashAlgorithm);
-		return this;
-	}
+        // Metadata helper object
+        mMetadata = new Metadata();
 
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType	The content type of the information object.
-	 * @return		Returns this Builder.
+        // New Information Object
+        mIo = mFactory.createInformationObject();
 
-	 */
-	public IOBuilder setContentType(String contentType) {
-		addIdentifierLabel(mIdentifier, CONTENT_TYPE_LABEL, contentType);
-		return this;
-	}
+        // Create the JSON formatted URL Array
+        mUrlArray = new JSONArray();
+    }
 
-	/**
-	 * Adds a meta data key value pair to the information object.
-	 *
-	 * @param key	The key of the metadata
-	 * @param value	The value of the metadata
-	 * @return		Returns this Builder.
-	 */
-	public IOBuilder addMetaData(String key, String value) {
-		if (key.equals(URL_LABEL)) {
-			mUrlArray.add(value);
-		} else {
-			mMetadata.insert(key, value);			
-		}
-		return this;
-	}
+    /**
+     * Creates a new Builder with the given meta data.
+     * 
+     * @param factory
+     * 		The datamodel factory
+     * @param jsonMetadata
+     *     	The metadata string encoded in json
+     */
+    public IOBuilder(DatamodelFactory factory, String jsonMetadata) {
+        // Builds new factory factory
+        this(factory);
 
-	/**
-	 * Sets the meta data (overwriting any previously added) of the information object.
-	 * @param jsonMetadata
-	 *     the metadata as a json string
-	 * @return
-	 *     the builder
-	 */
-	public IOBuilder setMetaData(String jsonMetadata) {
-	    mMetadata = new Metadata(jsonMetadata);
-	    return this;
-	}
+        // Set the metadata to the jsonMetadata passed as parameter
+        mMetadata = new Metadata(jsonMetadata);
+    }
 
-	/**
-	 * Adds a bluetooth locator to the information object.
-	 * @param bluetoothMac
-	 *     The bluetooth MAC address
-	 * @return
-	 *     The builder
-	 */
-	public IOBuilder addBluetoothLocator(String bluetoothMac) {
-	    addAttribute(
-	            DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString(),
-	            SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI(),
-	            BLUETOOTH_LOCATOR_PREFIX + bluetoothMac);
-	    return this;
-	}
+    /**
+     * Sets the hash value.
+     *
+     * @param hash
+     *     	The hash value of the information object.
+     * @return
+     * 		Returns this Builder.
+     */
+    public IOBuilder setHash(String hash) {
+        // Adds hash to identifier
+        addIdentifierLabel(mIdentifier, HASH_LABEL, hash);
+
+        // Returns self
+        return this;
+    }
+
+    /**
+     * Sets the hash algorithm.
+     *
+     * @param hashAlgorithm
+     *     	The hash algorithm of the information object.
+     * @return
+     * 		Returns this Builder.
+
+     */
+    public IOBuilder setHashAlgorithm(String hashAlgorithm) {
+        // Adds the hash algorithm to private identifier
+        addIdentifierLabel(mIdentifier, HASH_ALG_LABEL, hashAlgorithm);
+
+        // Returns self
+        return this;
+    }
+
+    /**
+     * Sets the content type.
+     *
+     * @param contentType
+     *     	The content type of the information object.
+     * @return
+     *     	Returns this Builder.
+
+     */
+    public IOBuilder setContentType(String contentType) {
+        // Adds content-type to identifier
+        addIdentifierLabel(mIdentifier, CONTENT_TYPE_LABEL, contentType);
+
+        // Returns self
+        return this;
+    }
+
+    /**
+     * Adds a metadata key value pair to the information object.
+     *
+     * @param key
+     *     	The key of the metadata
+     * @param value
+     *     	The value of the metadata
+     * @return
+     * 		Returns this Builder.
+     */
+    @SuppressWarnings("unchecked") // mUrlArray.add(value)
+    public IOBuilder addMetaData(String key, String value) {
+        // Check if we are inserting inside URL
+        if (key.equals(URL_LABEL)) {
+            mUrlArray.add(value);
+        } else {
+            // If not, just add the metadata
+            mMetadata.insert(key, value);			
+        }
+
+        // Returns self
+        return this;
+    }
+
+    /**
+     * Sets the metadata (overwriting any previously added) of the information object.
+     * 
+     * @param jsonMetadata
+     *     the metadata as a json string
+     * @return
+     *     the builder
+     */
+    public IOBuilder setMetaData(String jsonMetadata) {
+        // OVERWRITES metadata
+        mMetadata = new Metadata(jsonMetadata);
+
+        // Returns self
+        return this;
+    }
+
+    /**
+     * Adds a bluetooth locator to the information object.
+     * 
+     * @param bluetoothMac
+     *     The bluetooth MAC address
+     * @return
+     *     The builder
+     */
+    public IOBuilder addBluetoothLocator(String bluetoothMac) {
+        // Adds an attribute to the Information Object
+        addAttribute(
+                DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString(),
+                SailDefinedAttributeIdentification.BLUETOOTH_MAC.getURI(),
+                BLUETOOTH_LOCATOR_PREFIX + bluetoothMac);
+
+        // Returns self
+        return this;
+    }
 
     /**
      * Adds a file path locator to the information object.
+     * 
      * @param bluetoothMac
      *     The file path locator
      * @return
      *     The builder
      */
     public IOBuilder addFilePathLocator(String bluetoothMac) {
+        // Adds filepath locator to the Information Object
         addAttribute(
                 DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString(),
                 SailDefinedAttributeIdentification.FILE_PATH.getURI(),
                 bluetoothMac);
+
+        // Returns self
         return this;
     }
 
-	/**
-	 * Creates an information object based on the Builder object.
-	 *
-	 * @return	The information object that was created.
-	 */
-	public InformationObject build() {
-		mMetadata.insert(URL_LABEL, mUrlArray);
-		
-		String metaString;
-		if (mMetadata.convertToString().contains("meta")) {
-			// The metadata was setted and not created from scratch
-			metaString = mMetadata.convertToString();
-			System.out.println("Metadata string: " + metaString);
-		} else {
-			metaString = mMetadata.convertToMetadataString();
-		}
-		
-		addIdentifierLabel(mIdentifier, META_LABEL, metaString);
-		mIo.setIdentifier(mIdentifier);
-		return mIo;
-	}
+    /**
+     * Creates an information object based on the Builder object.
+     * This is the function that puts the InformationObject all together.
+     *
+     * @return
+     *     	The information object that was created.
+     */
+    public InformationObject build() {
+        // Adds URL Array to Metadata
+        mMetadata.insert(URL_LABEL, mUrlArray);
 
-	/**
-	 * Adds an identifier label for the specified identifier for the passed label properties.
-	 *
-	 * @param identifier	The identifier to modify
-	 * @param labelName		The label name
-	 * @param labelValue	The label value
-	 */
-	private void addIdentifierLabel(Identifier identifier, String labelName, String labelValue) {
-		 IdentifierLabel hashLabel = mFactory.createIdentifierLabel();
-         hashLabel.setLabelName(labelName);
-         hashLabel.setLabelValue(labelValue);
-         identifier.addIdentifierLabel(hashLabel);
-	}
+        String metaString;
 
-	/**
-	 * Adds an an Attribute to the current information object.
-	 * 
-	 * @param attributePurpose			The purpose of the attribute
-	 * @param attributeIdentification	The identification 
-	 * @param attributeValue			The actual attribute
-	 */
-	private void addAttribute(
-	        String attributePurpose,
-	        String attributeIdentification,
-	        String attributeValue) {
+        // Convert metadata to string
+        if (mMetadata.convertToString().contains("meta")) {
+            // The metadata was 'setted' and not created from scratch
+            metaString = mMetadata.convertToString();
+            // TODO: Log function?
+            System.out.println("Metadata string: " + metaString);
+        } else {
+            // Creates a JSON string with the key "meta" set to the JSON string of the metadata.
+            metaString = mMetadata.convertToMetadataString();
+        }
 
+        // Add metadata to Identifier
+        addIdentifierLabel(mIdentifier, META_LABEL, metaString);
+
+        // Set identifier
+        mIo.setIdentifier(mIdentifier);
+
+        // Returns Information Object
+        return mIo;
+    }
+
+    /**
+     * Adds an identifier label for the specified identifier for the passed label properties.
+     *
+     * @param identifier
+     *     	The identifier to modify
+     * @param labelName
+     * 		The label name
+     * @param labelValue
+     *     	The label value
+     */
+    private void addIdentifierLabel(Identifier identifier, String labelName, String labelValue) {
+        // Creates new identifier label
+        IdentifierLabel identifierLabel = mFactory.createIdentifierLabel();
+        
+        // Set label to have name 'labelName' and value 'labelValue'
+        identifierLabel.setLabelName(labelName);
+        identifierLabel.setLabelValue(labelValue);
+        
+        // Add new created label to the identifier
+        identifier.addIdentifierLabel(identifierLabel);
+    }
+
+    /**
+     * Adds an an Attribute to the current information object.
+     * 
+     * @param attributePurpose
+     * 		The purpose of the attribute
+     * @param attributeIdentification
+     *  	The attribute identification 
+     * @param attributeValue
+     * 		The attribute value
+     */
+    private void addAttribute(String attributePurpose, String attributeIdentification,
+            String attributeValue) {
+        // Create a new attribute
         Attribute attribute = mFactory.createAttribute();
+        
+        // Set attribute purpose
         attribute.setAttributePurpose(attributePurpose);
+        
+        // Set attributes ID (name)
         attribute.setIdentification(attributeIdentification);
+        
+        // Set attributes value
         attribute.setValue(attributeValue);
+        
+        // Add attribute to Information Object
         mIo.addAttribute(attribute);
-	}
+    }
 }
