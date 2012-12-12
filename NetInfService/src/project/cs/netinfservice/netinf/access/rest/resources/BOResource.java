@@ -85,10 +85,8 @@ import android.util.Log;
  * @author Kim-Anh Tran
  * @author Linus Sunde
  * @author Thiago Costa Porto
- *
  */
 public class BOResource extends LisaServerResource {
-
 	/** Debugging Tag. */
 	private static final String TAG = "BOResource";
 
@@ -114,14 +112,19 @@ public class BOResource extends LisaServerResource {
 	protected void doInit() {
 		super.doInit();
 
+		// Get global properties from assets
         sFilepath = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
         sContentType = UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.content_type");
 
+        // Grab hash identifiers
 		mHashValue = getQuery().getFirstValue("hash", true);
 		mHashAlgorithm = getQuery().getFirstValue("hashAlg", true);
 
+		// Get where to save information
 		String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
 		mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
+		
+		// Sanity checks the shared folder
 		createSharedFolder();
 	}
 
@@ -129,9 +132,13 @@ public class BOResource extends LisaServerResource {
 	 * Responds to an HTTP get request. Returns a String representing the meta-data
 	 * that describes the retrieved file.
 	 *
-	 * @return The Map that contains the information about the file: First key:
-	 *         the file path Second key: the content type of the file.
-	 *         If the object couldn't be retrieved the function returns null.
+	 * @return
+	 *      The Map that contains the information about the file:
+	 *      <p><i>First</i> key:<br>
+	 *         the file path
+	 *      <p><i>Second</i> key:<br>
+	 *         the content type of the file.
+	 *      <p>If the object couldn't be retrieved the function returns <i>null</i>.
 	 */
 	@Get
 	public String retrieveBO() {
@@ -148,26 +155,39 @@ public class BOResource extends LisaServerResource {
 			return null;
 		}
 
-		// If the NetInf GET got the file data we are done!
+		// If the NetInf GET got the file data we are done
 		Attribute filepathAttribute =
 				io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
+		
+		// If there is a filepath attribute, response had the file
 		if (filepathAttribute != null) {
 			Log.d(TAG, "Response to the NetInf Get contained the file");
+
+			// Get content type
 			String contentType = io.getIdentifier().getIdentifierLabel(
 					SailDefinedLabelName.CONTENT_TYPE.getLabelName())
 					.getLabelValue();
+			
+			// Create Metadata
 			Metadata metadata = new Metadata();
 			metadata.insert(sContentType, contentType);
 
+			// Get Filepath information and insert it into metadata
 			String filePath = filepathAttribute.getValueRaw();
 			filePath = filePath.substring(filePath.indexOf(":") + 1);
 			metadata.insert(sFilepath, filePath);
+			
+			// Return the metadata created
 			return metadata.convertToString();
 		}
-		Log.d(TAG, "Response to the NetInf Get did NOT contain the file");
+		
+		// GET did not respond with the file
+		Log.d(TAG, "Response to the NetInf GET did NOT contain the file");
 
+		// Get transfer dispatcher instance
 		TransferDispatcher tsDispatcher = TransferDispatcher.INSTANCE;
 
+		// Fire off request to get the IO
 		try {
 			fileData = tsDispatcher.getByteArray(io);
 		} catch (IOException e) {
@@ -175,27 +195,29 @@ public class BOResource extends LisaServerResource {
 			return null;
 		}
 
+		// Got the file
 		if (fileData != null) {
+		    // Get the metadata string representation of the file
 			String metaDataString = saveBO(io, fileData);
 			return metaDataString;
-
 		} else {
 			Log.e(TAG, "No file data to write.");
 			return null;
 		}
-
 	}
 
 	/**
 	 * Saves the file data corresponding to the specified io and
 	 * returns a String representation of the related meta-data.
 	 *
-	 * @param io		The Information Object describing the file data
-	 * @param fileData	The file data corresponding to the io
-	 * @return			Returns a String representation of the meta data.
+	 * @param io
+	 * 		The Information Object describing the file data
+	 * @param fileData
+	 *     	The file data corresponding to the io
+	 * @return
+	 * 		Returns a String representation of the meta data.
 	 */
 	private String saveBO(InformationObject io, byte[] fileData) {
-
 		// Store the content type of the requested BO
 		String contentType = io.getIdentifier().getIdentifierLabel(
 				SailDefinedLabelName.CONTENT_TYPE.getLabelName())
@@ -204,17 +226,21 @@ public class BOResource extends LisaServerResource {
 		// Set saving filename to the same filename as in metadata
 		String hash = io.getIdentifier().getIdentifierLabel(
 				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
+		
 		String filePath = Environment.getExternalStorageDirectory() 
 				+ UProperties.INSTANCE.getPropertyWithName("sharing.folder")
 				+ hash;
+		
 		Log.d(TAG, "Filepath is: " + filePath);
 
-		// Write it to file
+		// Write file to file
 		try {
 			FileUtils.writeByteArrayToFile(new File(filePath), fileData);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// Make file visible to user
 		makeFileVisibleToPhone(filePath, contentType);
 
 		// Make a new metadata to pass along the content_type and filepath
@@ -222,21 +248,25 @@ public class BOResource extends LisaServerResource {
 		metadata.insert(sContentType, contentType);
 		metadata.insert(sFilepath, filePath);
 
+		// Return the metadata
 		return metadata.convertToString();
-
 	}
 
 	/**
 	 * Returns an IO (i.e. DO) containing the list of locators that own the
 	 * requested BO.
 	 *
-	 * @return The IO that contains the locator list.
+	 * @return
+	 *      The IO that contains the locator list.
 	 */
 	private InformationObject retrieveDO() {
-
+	    // Create a new identifier with the Hash Algorithm and Hash of the object
 		Identifier identifier = createIdentifier(mHashAlgorithm, mHashValue);
+		
+		// Create a new IO
 		InformationObject io = null;
 
+		// Get the IO using the identifier
 		try {
 			io = getNodeConnection().getIO(identifier);
 		} catch (NetInfCheckedException e) {
@@ -244,20 +274,25 @@ public class BOResource extends LisaServerResource {
 					+ mHashValue);
 		}
 
+		// Returns the Information Object
 		return io;
 	}
 
 	/**
 	 * Creates the folder that contains the files to be shared with other phones.
+	 * If it is unable to create the folder, it sets the shared folder to /DCIM/.
 	 */
 	private void createSharedFolder() {
+	    // Initiates folder check
 		File folder = new File(mSharedFolder);
 
+		// If the folder is not created, create the shared folder
 		if (!folder.exists()) {
 			Log.d(TAG, "Creating shared folder " + mSharedFolder);
 			boolean created = folder.mkdir();
 
 			if (!created) {
+			    // Fail-safe
 				Log.e(TAG, "Failed creating the shared folder. Set shared folder to DCIM/");
 				mSharedFolder = Environment.getExternalStorageDirectory() + "/DCIM/";
 			}
@@ -267,12 +302,17 @@ public class BOResource extends LisaServerResource {
 	/**
 	 * Makes the file specified by file path visible to the user.
 	 *
-	 * @param filePath		The file path pointing to the file.
-	 * @param contentType	The content type of the file.
+	 * @param filePath
+	 * 		The file path pointing to the file.
+	 * @param contentType
+	 *     	The content type of the file.
 	 */
 	private void makeFileVisibleToPhone(String filePath, String contentType) {
-		String[] paths = {filePath};
+	    // Path and CT
+	    String[] paths = {filePath};
 		String[] mediaType = {contentType};
+		
+		// Make it recognizable to the users device
 		MediaScannerConnection.scanFile(
 				MainNetInfApplication.getAppContext(), paths, mediaType, null);
 	}

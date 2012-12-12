@@ -42,57 +42,76 @@ import project.cs.netinfservice.netinf.access.rest.resources.SearchResource;
 
 /**
  * Routes NetInf requests to the appropriate classes.
+ * 
  * @author Linus Sunde
  *
  */
 public class RESTApplication extends Application {
+    /** Node Connection, used to access the local NetInf node. **/
+    private NetInfNodeConnection mNodeConnection;
+    
+    /** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
+    private DatamodelFactory mDatamodelFactory;
 
-        /** Node Connection, used to access the local NetInf node. **/
-		private NetInfNodeConnection mNodeConnection;
-		/** Implementation of DatamodelFactory, used to create and edit InformationObjects etc. **/
-		private DatamodelFactory mDatamodelFactory;
+    /**
+     * Constructs a new RESTful Application for routing NetInf requests.
+     * 
+     * @param connection
+     *      Connection with the local NetInf node
+     * @param factory
+     *      Creates different objects necessary in the NetInf model
+     */
+    public RESTApplication(NetInfNodeConnection connection, DatamodelFactory factory) {
+        // Disable Restlet Logging
+        java.util.logging.Logger rootLogger = LogManager.getLogManager().getLogger("");
+        
+        // Get Handlers
+        Handler[] handlers = rootLogger.getHandlers();
+        rootLogger.removeHandler(handlers[0]);
 
-		/**
-		 * Constructs a new RESTful Application for routing NetInf requests.
-		 * @param connection Connection with the local NetInf node
-		 * @param factory creates different objects necessary in the NetInf model
-		 */
-		public RESTApplication(NetInfNodeConnection connection, DatamodelFactory factory) {
-			// Disable Restlet Logging
-			java.util.logging.Logger rootLogger = LogManager.getLogManager().getLogger("");
-			Handler[] handlers = rootLogger.getHandlers();
-			rootLogger.removeHandler(handlers[0]);
+        // Get data model and node connection
+        mNodeConnection = connection;
+        mDatamodelFactory = factory;
+    }
 
-			mNodeConnection = connection;
-			mDatamodelFactory = factory;
-		}
+    /**
+     * Gets a connection to the local NetInf node.
+     * 
+     * @return
+     *      The node connection
+     */
+    public NetInfNodeConnection getNodeConnection() {
+        return mNodeConnection;
+    }
 
-		/**
-		 * Gets a connection to the local NetInf node.
-		 * @return the node connection
-		 */
-		public NetInfNodeConnection getNodeConnection() {
-			return mNodeConnection;
-		}
+    /**
+     * Gets a data model factory implementation.
+     * 
+     * @return
+     *      The datamodel factory
+     */
+    public DatamodelFactory getDatamodelFactory() {
+        return mDatamodelFactory;
+    }
 
-		/**
-		 * Gets a data model factory implementation.
-		 * @return the datamodel factory
-		 */
-		public DatamodelFactory getDatamodelFactory() {
-			return mDatamodelFactory;
-		}
+    /**
+     * Route where each 'action' -- publish, retrieve and search -- should redirect to.  
+     */
+    @Override
+    public Restlet createInboundRoot() {
+        // Router
+        Router router = new Router(getContext());
 
-		@Override
-		public Restlet createInboundRoot() {
-			Router router = new Router(getContext());
+        // Publish
+        router.attach("/publish", IOResource.class);
 
-			router.attach("/publish", IOResource.class);
+        // Retrieve
+        router.attach("/retrieve", BOResource.class);
 
-			router.attach("/retrieve", BOResource.class);
+        // Search
+        router.attach("/search", SearchResource.class);
 
-			router.attach("/search", SearchResource.class);
-
-			return router;
-		}
+        // Return the router
+        return router;
+    }
 }
