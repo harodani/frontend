@@ -145,7 +145,6 @@ public abstract class AbstractResolutionServiceWithoutId implements ResolutionSe
    }
 
    protected void validateIOForPut(InformationObject informationObject) {
-      LOG.trace(null);
       if (informationObject.getIdentifier().isVersioned()) {
          IdentifierLabel versionLabel = informationObject.getIdentifier().getIdentifierLabel(
                DefinedLabelName.VERSION_NUMBER.getLabelName());

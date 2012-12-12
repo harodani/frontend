@@ -30,7 +30,6 @@ package project.cs.lisa.application;
 import project.cs.lisa.R;
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -42,12 +41,8 @@ import android.view.MenuItem;
  */
 public class BaseMenuActivity extends Activity {
 
-    /** Debugging tag. */
-    private static final String TAG = "BaseMenuActivity";
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu()");
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }

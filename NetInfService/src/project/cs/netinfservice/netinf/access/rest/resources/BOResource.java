@@ -230,8 +230,6 @@ public class BOResource extends LisaServerResource {
 		String filePath = Environment.getExternalStorageDirectory() 
 				+ UProperties.INSTANCE.getPropertyWithName("sharing.folder")
 				+ hash;
-		
-		Log.d(TAG, "Filepath is: " + filePath);
 
 		// Write file to file
 		try {
@@ -288,7 +286,6 @@ public class BOResource extends LisaServerResource {
 
 		// If the folder is not created, create the shared folder
 		if (!folder.exists()) {
-			Log.d(TAG, "Creating shared folder " + mSharedFolder);
 			boolean created = folder.mkdir();
 
 			if (!created) {

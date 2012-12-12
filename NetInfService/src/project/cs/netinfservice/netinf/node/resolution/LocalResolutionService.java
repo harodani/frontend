@@ -99,8 +99,6 @@ extends AbstractResolutionServiceWithoutId {
         String hash = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
 
-        Log.d(TAG, "IO hash to be deleted: " + hash);
-
         // Calls deleteIO function
         mDatabase.deleteIO(hash);
     }
@@ -147,8 +145,6 @@ extends AbstractResolutionServiceWithoutId {
      */
     @Override
     public void put(InformationObject io) {
-        Log.d(TAG, "put()");
-        
         Log.d(TAG, "Trying to put an IO into the database");
         
         // Tries to add IO using the addIO function from the IODatabase class

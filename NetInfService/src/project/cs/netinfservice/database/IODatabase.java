@@ -52,6 +52,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
@@ -232,7 +233,7 @@ public class IODatabase
 	 */
 	@SuppressWarnings("unchecked")
 	public void addIO(InformationObject io) throws DatabaseException  {
-		Log.d(TAG, "Received an add information object call.");
+		Log.d(TAG, "Adding information object into database.");
 
 		// Extract the field values for inserting them into the database tables
 		// Get the Identifier from the Information Object 
@@ -255,9 +256,6 @@ public class IODatabase
 		// Extract the metadata to a map
 		Map<String, Object> metadataMap = extractMetaData(metadata);
 		
-		// TODO: Remove this line?
-		System.out.println("Metadata: adding " + metadata);
-		
 		String filePath = (String) metadataMap.get(mFilepathLabel);
 		String fileSize = (String) metadataMap.get(mFilesizeLabel);
 		
@@ -267,7 +265,11 @@ public class IODatabase
 		// Populate urlList with one or several URLs
 		List<String> urlList;
 		
-		// TODO: Ask Kim for input on what this does.
+		
+		/*
+		 *  If we the json object is an array, we have more than 1 url.
+		 *  Else, we only received one url. Determines the handling.
+		 */
 		if (urlJsonObject instanceof ArrayList) {
 			urlList  = (ArrayList<String>) urlJsonObject;
 		} else {
@@ -282,8 +284,6 @@ public class IODatabase
 			// Insert the IO
 			ContentValues ioEntry = 
 					createIOEntry(hash, hashAlgorithm, contentType, filePath, fileSize);
-			// TODO: Better to use Log.d?
-			System.out.println("New information object: " + urlList.toString());
 			insert(TABLE_IO, ioEntry);
 		} else {
 			Log.d(TAG, "Information object already exists in database.");
@@ -291,13 +291,10 @@ public class IODatabase
 			List<String> storedUrls = getURLs(hash);
 			urlList.removeAll(storedUrls);	
 		}
-				
-		Log.d(TAG, "Inserting the following URLs:");
 		
 		// Insert the URLs
 		for (String url : urlList) {
-		    // Log the URL to be inserted
-			Log.d(TAG, url);
+			
 			// Create a ContentValues object, which is recognized by ContentResolver
 			ContentValues urlEntry = createUrlEntry(hash, url);
 			insert(TABLE_URL, urlEntry);
@@ -311,17 +308,21 @@ public class IODatabase
      *      The table where the values will be inserted
 	 * @param values
 	 *      The values that will be inserted
+	 * @throws
+	 * 		SQLiteException	Thrown, if writing to the database failed.
 	 */
-	private void insert(String table, ContentValues values) {
-	    // TODO: Maybe this should raise an exception? Writing might not be available.
-		// Get database
-	    SQLiteDatabase db = this.getWritableDatabase();
-		
-		// Insert value into table
-		db.insert(table, null, values);	
-		
-		// Close connection
-		db.close();
+	private void insert(String table, ContentValues values) {		
+	    // Insert value into table
+
+	    try {
+	    	SQLiteDatabase db = this.getWritableDatabase();
+	    	
+	    	db.insert(table, null, values);	
+	    	
+	    	db.close();
+	    } catch (SQLiteException e) {
+	    	Log.e(TAG, "Failed writing to database.");
+	    }
 	}
 
 	/**
@@ -369,8 +370,6 @@ public class IODatabase
 		Cursor cursor = query(TABLE_IO, KEY_HASH, hash);
 		
 		Log.d(TAG, "Found information object.");
-		
-        Log.d(TAG, "Sending Intent " + LOCAL_TRANSMISSION);
         
         // Create and send an intent for local transmission
         if (MainNetInfActivity.getActivity() != null) {
@@ -449,14 +448,18 @@ public class IODatabase
 	 *      The hash value identifying the information object.
 	 */
 	public void deleteIO(String hash) {
-	    // TODO: Check what to do when it fails, as getWritableDatabase throws SQLiteException. 
-		Log.d(TAG, "Deleting io corresponding to the following hash: " + hash);
-		SQLiteDatabase db = getWritableDatabase();
-		
-		// Finds and deletes object
-		db.delete(TABLE_IO, KEY_HASH + " = ?", new String[] {hash});
-		
-		db.close();
+		Log.d(TAG, "Deleting an information object from the database.");
+		try {
+			SQLiteDatabase db = getWritableDatabase();
+			
+			// Finds and deletes object
+			db.delete(TABLE_IO, KEY_HASH + " = ?", new String[] {hash});
+			
+			db.close();
+		} catch (SQLiteException e) {
+			Log.e(TAG, "Failed deleting information object. " 
+					+ "Error occured due to an unexpected database problem.");
+		}
 	}
 	
 	/**
@@ -589,8 +592,14 @@ public class IODatabase
 	 *     	Thrown, if no entry was found for the specified key value pair
 	 */
 	private Cursor query(String table, String key, String value) throws DatabaseException {
-	    // TODO: This might throw a SQLiteException, which we must handle!
-		SQLiteDatabase db = this.getReadableDatabase();
+		SQLiteDatabase db = null;
+		
+		try {
+			db = this.getReadableDatabase();
+		} catch (SQLiteException e) {
+			Log.e(TAG, "Querying database failed. Error during reading database.");
+			throw new DatabaseException("Unexpected error while trying to read from database.");
+		}
 
 		// Makes the query for (key,value)
 		Cursor cursor = db.query(table, null, key + "=?", 
@@ -624,6 +633,7 @@ public class IODatabase
 		try {
 			// Check if the IO we want to insert already exists
 			query(TABLE_IO, KEY_HASH, hash);
+			
 		} catch (DatabaseException e) {
 			// This exception is thrown if the query is empty, in that case we say that 
 		    // the IO is not stored

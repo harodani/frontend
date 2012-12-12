@@ -121,8 +121,6 @@ public enum BluetoothDiscovery {
      * for now intercept only Bluetooth discovery.
      */
     private void setUpBroadcastReceiver() {
-    	Log.d(TAG, "Set up broadcast receiver.");
-
         mBroadcastReceiver = new BroadcastReceiver() {
 
             @Override

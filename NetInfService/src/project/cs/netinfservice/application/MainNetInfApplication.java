@@ -66,8 +66,6 @@ public class MainNetInfApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Initializing the netinf application.");
-        
         // Create the properties reader
         AssetManager assets = getApplicationContext().getResources().getAssets();
         try {

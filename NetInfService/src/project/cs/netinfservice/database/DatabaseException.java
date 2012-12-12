@@ -34,6 +34,7 @@ package project.cs.netinfservice.database;
  *
  */
 public class DatabaseException extends Exception {
+	
 	/** Serialization */
 	private static final long serialVersionUID = 1L;
 

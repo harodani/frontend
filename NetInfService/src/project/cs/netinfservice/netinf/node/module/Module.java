@@ -55,7 +55,6 @@ import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.netinf.node.resolution.NameResolutionService;
 import project.cs.netinfservice.netinf.node.search.UrlSearchService;
 import project.cs.netinfutilities.UProperties;
-import android.util.Log;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -69,57 +68,34 @@ import com.google.inject.name.Names;
  */
 public class Module extends AbstractModule  {
 
-	/** Debug tag. */
-    public static final String TAG = "Module";
-
-    /** Constructor */
-    public Module() {
-        Log.d(TAG, "Module()");
-    }
-
-    /**
-     * Configures the whole NetInf architecture, by binding all the components together.
-     */
-     @Override
     protected void configure() {
-        Log.d(TAG, "configure()");
-
-        Log.d(TAG, "bindProperties()");
+    	
+    	// Configure injections.
+    	
         Names.bindProperties(binder(), UProperties.INSTANCE.getProperty());
 
-        Log.d(TAG, "Binding 1");
         bind(MessageEncoder.class).to(MessageEncoderProtobuf.class).in(Singleton.class);
 
-        Log.d(TAG, "Binding 2");
         bind(DatamodelFactory.class).to(DatamodelFactoryImpl.class);
 
-        Log.d(TAG, "Binding 3");
         bind(NetInfNode.class).to(NetInfNodeImpl.class).in(Singleton.class);
 
-        Log.d(TAG, "Binding 4");
         bind(AsyncReceiveHandler.class).to(NetInfNodeReceiveHandler.class);
 
-        Log.d(TAG, "Binding 5");
         bind(ResolutionController.class).to(
                 ResolutionControllerImplWithoutSecurity.class).in(Singleton.class);
 
-        Log.d(TAG, "Binding 6");
         bind(ResolutionServiceSelector.class).to(SimpleResolutionServiceSelector.class);
 
-        Log.d(TAG, "Binding 7");
         bind(TransferController.class).to(TransferControllerImpl.class).in(Singleton.class);
 
-        Log.d(TAG, "Binding 8");
         bind(AccessServer.class).to(RESTAccessServer.class).in(Singleton.class);
 
-        Log.d(TAG, "Binding 9");
         bind(IODatabaseFactory.class)
         .toProvider(FactoryProvider.newFactory(IODatabaseFactory.class, IODatabase.class));
 
-        Log.d(TAG, "Binding 10");
         bind(UrlSearchService.class);
 
-        Log.d(TAG, "Binding 11");
         bind(SearchController.class).to(SearchControllerImpl.class).in(Singleton.class);
     }
 

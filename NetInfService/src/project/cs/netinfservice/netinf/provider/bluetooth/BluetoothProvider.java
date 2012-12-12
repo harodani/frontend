@@ -167,8 +167,6 @@ public class BluetoothProvider implements ByteArrayProvider {
      * @throws  IOException Exception for the stream.
      */
     private void sendRequest(BluetoothSocket socket, String hash) throws IOException {
-        Log.d(TAG, "Write the hash request to the connected locator. ");
-
         DataOutputStream outStream = null;
 
         // Get the output stream for sending the hash
@@ -185,7 +183,6 @@ public class BluetoothProvider implements ByteArrayProvider {
     private byte[] downloadFile(BluetoothSocket socket) throws IOException {
         Log.d(TAG, "Begining downloading the file");
 
-        Log.d(TAG, "Sending Intent " + BLUETOOTH_TRANSMISSION);
         Intent intent = new Intent(BLUETOOTH_TRANSMISSION);
         MainNetInfActivity.getActivity().sendBroadcast(intent);
 
