@@ -66,7 +66,6 @@ import com.google.inject.name.Names;
 /**
  * Bindings.
  * @author Linus Sunde
- *
  */
 public class Module extends AbstractModule  {
 
@@ -78,7 +77,10 @@ public class Module extends AbstractModule  {
         Log.d(TAG, "Module()");
     }
 
-    @Override
+    /**
+     * Configures the whole NetInf architecture, by binding all the components together.
+     */
+     @Override
     protected void configure() {
         Log.d(TAG, "configure()");
 
@@ -123,28 +125,38 @@ public class Module extends AbstractModule  {
 
     /**
      * This method provides all the {@link ResolutionService}s which are automatically
-     * inserted into the node. In order to get an
-     * instance of the according {@link ResolutionService}, add an additional parameter
-     * to this method, since this puts GUICE in
-     * charge of creating the correct instance of the according service.
+     * inserted into the node. In order to get an instance of the according
+     * {@link ResolutionService}, add an additional parameter to this method, since this 
+     * puts GUICE in charge of creating the correct instance of the according service.
      *
-     * @param 	nrs	The name resolution service
-     * @param 	lrs	The local resolution service
-     * @return 	The list of resulution services
+     * @param 	nrs
+     *  	The name resolution service
+     * @param 	lrs	
+     *      The local resolution service
+     * @return
+     *  	The list of resulution services
      */
     @Singleton
     @Provides
     ResolutionService[] provideResolutionServices(NameResolutionService nrs,
             LocalResolutionService lrs) {
-
+        // Indicate the resolution service
         ResolutionService[] localResolutionService  = { lrs };
         ResolutionService[] nameResolutionService = { nrs };
 
+        // Return the services array
         return (ResolutionService[]) ArrayUtils
         		.addAll(nameResolutionService, localResolutionService);
     }
 
-
+    /**
+     * Same as above, but provides the Search Service.
+     * 
+     * @param searchServiceSQLite
+     *      The Search Service.
+     * @return
+     *      Services array with the Search Service integrated to it.
+     */
     @Singleton
     @Provides
     SearchService[] provideSearchServices(UrlSearchService searchServiceSQLite) {
