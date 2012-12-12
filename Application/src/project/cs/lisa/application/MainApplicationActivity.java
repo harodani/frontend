@@ -46,6 +46,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -95,6 +98,13 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** NRS cache transmission used to transfer a resource. */
     public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
 
+    /** Tags for progress bar. */
+    public static final int BLACK_COLOR = 0;
+    public static final int BLUE_COLOR = 1;
+    public static final int GREEN_COLOR = 2;
+    public static final int GREY_COLOR = 3;
+    public static final int RED_COLOR = 4;
+
     /** Activity context. */
     private static MainApplicationActivity sMainNetInfActivity;
 
@@ -128,7 +138,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         Intent LaunchIntent = getPackageManager().
                 getLaunchIntentForPackage("project.cs.netinfservice");
         startActivity(LaunchIntent);
-        */
+         */
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
@@ -216,8 +226,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
      */
     private void setUpSpinningBar() {
         mSpinningBar = (ProgressBar) findViewById(R.id.progressBar);
-        mSpinningBar.setIndeterminateDrawable(getResources().getDrawable(R.drawable.progress_grey));
-        mSpinningBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_grey));
+        mSpinningBar.setTag(GREY_COLOR);
+        updateSpinningBarColor(R.drawable.progress_grey, GREY_COLOR);
         mSpinningBar.setVisibility(View.INVISIBLE);
     }
 
@@ -357,7 +367,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     startFetchingWebPage(newUrl);
 
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
-                    updateSpinningBarColor(R.drawable.progress_grey);
+                    updateSpinningBarColor(R.drawable.progress_grey, GREY_COLOR);
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
@@ -367,33 +377,41 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using Bluetooth");
-                    updateSpinningBarColor(R.drawable.progress_blue);
+                    updateSpinningBarColor(R.drawable.progress_blue, BLUE_COLOR);
 
                 } else if (action.equals(LOCAL_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using local file system");
-                    updateSpinningBarColor(R.drawable.progress_green);
+                    updateSpinningBarColor(R.drawable.progress_green, GREEN_COLOR);
 
                 } else if (action.equals(UPLINK_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using uplink");
-                    updateSpinningBarColor(R.drawable.progress_red);
+                    updateSpinningBarColor(R.drawable.progress_red, RED_COLOR);
 
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Trasferring resource using nrs cache");
-                    updateSpinningBarColor(R.drawable.progress_black);
+                    updateSpinningBarColor(R.drawable.progress_black, BLACK_COLOR);
                 }
             }
         };
     }
-    
+
     /**
-     * Updates the spinning bar with a new drawable. 
-     * @param drawable  The new drawable.
+     * Updates the spinning bar with a new drawable.
+     *  
+     * @param newDrawable
+     *      The new newDrawable.
+     * @param color
+     *      The new color for the drawable.
      */
-    private void updateSpinningBarColor(int drawable) {
-        mSpinningBar.setIndeterminateDrawable(
-                getResources().getDrawable(drawable));
-        mSpinningBar.setProgressDrawable(
-                getResources().getDrawable(drawable));
+    private void updateSpinningBarColor(int newDrawable, int color) {
+        int currentDrawable = (Integer) (mSpinningBar.getTag());
+        if (currentDrawable != newDrawable) {
+            mSpinningBar.setIndeterminateDrawable(
+                    getResources().getDrawable(newDrawable));
+            mSpinningBar.setProgressDrawable(
+                    getResources().getDrawable(newDrawable));
+            mSpinningBar.setTag(color);
+        }
     }
 
     /**
