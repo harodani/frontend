@@ -374,8 +374,10 @@ public class IODatabase
         Log.d(TAG, "Sending Intent " + LOCAL_TRANSMISSION);
         
         // Create and send an intent for local transmission
-        Intent intent = new Intent(LOCAL_TRANSMISSION);        
-        MainNetInfActivity.getActivity().sendBroadcast(intent);
+        if (MainNetInfActivity.getActivity() != null) {
+        	Intent intent = new Intent(LOCAL_TRANSMISSION);        
+        	MainNetInfActivity.getActivity().sendBroadcast(intent);
+        }
 
         // Build a new IO to host the result
 		IOBuilder builder = new IOBuilder(mDatamodelFactory);
