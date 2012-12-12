@@ -171,31 +171,35 @@ public class Metadata {
             return null;
         }
 
+        // Sanity check
         if (mJSONObject == null)
             return null;
 
+        // Returns the key (if it is there)
         return mJSONObject.get(key).toString();
     }
 
     // TODO: Beautify printing of JSON String.
     /**
      * Converts JSON Object to a FORMATTED string
-     * @return Formatted string
+     * 
+     * @return
+     *      JSON Object as a string
      */
     public String convertToString() {
         return mJSONObject.toString();
     }
 
     /**
-     * Creates a JSON string with the key "meta"
-     * set to the JSON string representation of the metadata.
+     * Creates a JSON string with the key "meta" set to the JSON string representation of the
+     * metadata.
      *
-     * @return The JSON string
+     * @return
+     *      The JSON Object as a string
      */
     @SuppressWarnings("unchecked")
     public String convertToMetadataString() {
         JSONObject meta = new JSONObject();
-        // TODO: check if this still works under json.simple
         meta.put("meta", mJSONObject);
 
         return meta.toString();
@@ -208,6 +212,12 @@ public class Metadata {
         mJSONObject.clear();
     }
 
+    /**
+     * Returns the JSON Object.
+     * 
+     * @return
+     *      JSON Object.
+     */
     public JSONObject getJSONObject() {
         return mJSONObject;
     }
