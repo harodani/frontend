@@ -5,6 +5,33 @@
  * added constructors to utilise this label
  */
 
+/**
+ * Copyright 2012 Ericsson, Uppsala University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Uppsala University
+ *
+ * Project CS course, Fall 2012
+ *
+ * Projekt DV/Project CS, is a course in which the students develop software for
+ * distributed systems. The aim of the course is to give insights into how a big
+ * project is run (from planning to realization), how to construct a complex
+ * distributed system and to give hands-on experience on modern construction
+ * principles and programming methods.
+ *
+ */
+
 /*
  * Copyright (C) 2009-2011 University of Paderborn, Computer Networks Group
  * (Full list of owners see http://www.netinf.org/about-2/license)
@@ -36,61 +63,112 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This enumeration type contains all the defined label names. The string of each defined label name is the user-readable
- * labelname within identifiers. The number of each defined label name defines the ordering among the label names. This guarantees
- * uniqueness among the labelnames.
+ * This enumeration type contains all the defined label names. The string of each defined label
+ * name is the user-readable labelname within identifiers. The number of each defined label name
+ * defines the ordering among the label names. This guarantees uniqueness among the labelnames.
  *
  * @author PG Augnet 2, University of Paderborn
  */
 public enum SailDefinedLabelName {
+    /** Authority Label */
+    AUTHORITY ("AUTHORITY", 1),
 
-   AUTHORITY    ("AUTHORITY", 1),
-   HASH_ALG     ("HASH_ALG", 2),
-   HASH_CONTENT ("HASH_CONTENT", 3),
-   FILE_LOCATOR ("FILE_LOCATOR", 4),
-   TTL          ("TTL", 5),
-   CONTENT_TYPE ("CONTENT_TYPE", 6),
-   META_DATA    ("META_DATA", 7);
+    /** Hash algorithm */
+    HASH_ALG ("HASH_ALG", 2),
 
-   private final String labelName;
-   private final int order;
+    /** Object's Hash */
+    HASH_CONTENT ("HASH_CONTENT", 3),
+    
+    /** File locator */
+    FILE_LOCATOR ("FILE_LOCATOR", 4),
+    
+    /** Time to live */
+    TTL ("TTL", 5),
+    
+    /** Mime Content Type */
+    CONTENT_TYPE ("CONTENT_TYPE", 6),
+    
+    /** Metadata */
+    META_DATA ("META_DATA", 7);
 
-   private SailDefinedLabelName(String labelName, int order) {
-      this.labelName = labelName;
-      this.order = order;
-   }
+    /** Name of the label */
+    private final String labelName;
+    
+    /** Ordering */
+    private final int order;
 
-   public String getLabelName() {
-      return this.labelName;
-   }
+    /**
+     * Defines a label name and its placement
+     * 
+     * @param labelName
+     *      The label name
+     * @param order
+     *      The placement
+     */
+    private SailDefinedLabelName(String labelName, int order) {
+        this.labelName = labelName;
+        this.order = order;
+    }
 
-   public int getOrder() {
-      return this.order;
-   }
+    /** Gets the Sail Defined Label Name */
+    public String getLabelName() {
+        return this.labelName;
+    }
 
-   public static SailDefinedLabelName getDefinedLabelNameByString(String labelName) {
-      SailDefinedLabelName result = null;
+    /** Get the order */
+    public int getOrder() {
+        return this.order;
+    }
 
-      for (SailDefinedLabelName definedLabelName : SailDefinedLabelName.values()) {
-         if (definedLabelName.getLabelName().equals(labelName)) {
-            result = definedLabelName;
-            break;
-         }
-      }
+    /**
+     * Get a SAIL defined Label Name by a string.
+     * 
+     * @param labelName
+     *      The name of the label.
+     * @return
+     *      <i>SAIL defined label name</i> if successful,<br>
+     *      <i>null</i> if it fails.
+     */
+    public static SailDefinedLabelName getDefinedLabelNameByString(String labelName) {
+        SailDefinedLabelName result = null;
 
-      return result;
-   }
+        // Iterate through SAIL labels
+        for (SailDefinedLabelName definedLabelName : SailDefinedLabelName.values()) {
+            if (definedLabelName.getLabelName().equals(labelName)) {
+                // found it!
+                result = definedLabelName;
+                break;
+            }
+        }
 
-   public static List<String> valueStrings() {
-      ArrayList<String> list = new ArrayList<String>();
-      for (SailDefinedLabelName defLabel : values()) {
-         list.add(defLabel.getLabelName());
-      }
-      return list;
-   }
+        // Returns label
+        return result;
+    }
 
-   public static boolean isDefined(String string) {
-      return valueStrings().contains(string);
-   }
+    /**
+     * Returns a list with the SAIL labels.
+     * 
+     * @return
+     *      A ArrayList with the SAIL labels.
+     */
+    public static List<String> valueStrings() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SailDefinedLabelName defLabel : values()) {
+            list.add(defLabel.getLabelName());
+        }
+        return list;
+    }
 
+    /**
+     * Checks if <i>string</i> is a SAIL label.
+     * 
+     * @param string
+     *      The label to be checked.
+     * @return
+     *      <b>true</b> if string is a SAIL label, <br>
+     *      <b>false</b> otherwise.
+     */
+    public static boolean isDefined(String string) {
+        return valueStrings().contains(string);
+    }
 }
