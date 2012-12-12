@@ -46,7 +46,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -174,6 +173,8 @@ public class MainApplicationActivity extends BaseMenuActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN)
                         && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    mImg.setImageResource(R.drawable.cancel);
+                    mImg.setTag(R.drawable.cancel);
                     startFetchingWebPage(mEditText.getText().toString());
                     return true;
                 }
@@ -290,7 +291,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * Called when the user opens a web page.
      * @param   newUrl  The url to fetch
      */
-    public final void startFetchingWebPage(String newUrl) {
+    private void startFetchingWebPage(String newUrl) {
 
         // get the web page address
         URL url = null;
@@ -330,7 +331,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * @param url   The url to validate
      * @return      if the given url is valid or not
      */
-    public boolean addressIsValid(String url) {
+    private boolean addressIsValid(String url) {
         return url.matches(
                 "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     }

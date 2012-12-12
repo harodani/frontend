@@ -68,261 +68,274 @@ import android.webkit.WebViewClient;
  */
 public class NetInfWebViewClient extends WebViewClient {
 
-	/** Debugging tag. */
-	private static final String TAG = "NetInfWebViewClient";
+    /** Debugging tag. */
+    private static final String TAG = "NetInfWebViewClient";
 
-	/** Timeout for searching. */
-	private static final int SEARCH_TIMEOUT = 
-			Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfsearch"));
+    /** Timeout for searching. */
+    private static final int SEARCH_TIMEOUT = 
+            Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfsearch"));
 
-	/** Timeout for retrieve. */
-	private static final int RETRIEVE_TIMEOUT = 
-			Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfretrieve"));
-	
-	/** Timeout for downloading a Web Object. */
-	private static final int DOWNLOAD_TIMEOUT = 
-			Integer.parseInt(UProperties.INSTANCE.getPropertyWithName(
-					"timeout.netinfdownload.webobject"));
+    /** Timeout for retrieve. */
+    private static final int RETRIEVE_TIMEOUT = 
+            Integer.parseInt(UProperties.INSTANCE.getPropertyWithName("timeout.netinfretrieve"));
 
-	/** Message indicator for a URL change (i.e. a link was clicked). */
-	public static final String URL_WAS_UPDATED = "new_url";
+    /** Timeout for downloading a Web Object. */
+    private static final int DOWNLOAD_TIMEOUT = 
+            Integer.parseInt(UProperties.INSTANCE.getPropertyWithName(
+                    "timeout.netinfdownload.webobject"));
 
-	/** The url extra field for the intent for URL updates. */
-	public static final String URL = "url";
+    /** Message indicator for a URL change (i.e. a link was clicked). */
+    public static final String URL_WAS_UPDATED = "new_url";
 
-	/** NetInf Restlet Address. */
-	private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
+    /** The url extra field for the intent for URL updates. */
+    public static final String URL = "url";
 
-	/** NetInf Restlet Port. */
-	private static final String PORT = UProperties.INSTANCE.getPropertyWithName("access.http.port");
+    /** NetInf Restlet Address. */
+    private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
 
-	/** Hash Algorithm. */
-	private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
+    /** NetInf Restlet Port. */
+    private static final String PORT = UProperties.INSTANCE.getPropertyWithName("access.http.port");
 
-	@Override
-	public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		super.shouldOverrideUrlLoading(view, url);
-		Log.d(TAG, "Url was updated. Sending intent.");
-		Intent intent = new Intent(URL_WAS_UPDATED);
-		intent.putExtra(URL, url);
-		MainApplicationActivity.getActivity().sendBroadcast(intent);
-		return true;
-	}
+    /** Hash Algorithm. */
+    private static final String HASH_ALG = UProperties.INSTANCE.getPropertyWithName("hash.alg");
 
-	@Override
-	public void onPageFinished(WebView view, String url) {
-		super.onPageFinished(view, url);
-		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
-		MainApplicationActivity.getActivity().sendBroadcast(intent);
-	}
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        super.shouldOverrideUrlLoading(view, url);
+        Log.d(TAG, "Url was updated. Sending intent.");
+        Intent intent = new Intent(URL_WAS_UPDATED);
+        intent.putExtra(URL, url);
+        MainApplicationActivity.getActivity().sendBroadcast(intent);
+        return true;
+    }
 
-	@Override
-	public WebResourceResponse shouldInterceptRequest(WebView view,
-			String url) {
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
+        MainApplicationActivity.getActivity().sendBroadcast(intent);
+    }
 
-		Log.d(TAG, "Intercepting resource.");
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view,
+            String url) {
 
-		if (!URLUtil.isHttpUrl(url)) {
-			Log.d(TAG, "Resource, raw data: " + url);
-			super.shouldInterceptRequest(view, url);
-			return null;
+        Log.d(TAG, "Intercepting resource.");
 
-		} else if (URLUtil.isHttpUrl(url)) {
-			Log.d(TAG, "Try to retrieve resource from url: " + url);
-			WebObject resource = null;
-			File file = null;
-			String contentType = null;
-			String hash = null;
-			// Get and publish resource
-			try {
+        if (!URLUtil.isHttpUrl(url)) {
+            Log.d(TAG, "Resource, raw data: " + url);
+            super.shouldInterceptRequest(view, url);
+            return null;
 
-				// Search for url
-				NetInfSearchResponse searchResponse = search(url);
+        } else if (URLUtil.isHttpUrl(url)) {
+            Log.d(TAG, "Try to retrieve resource from url: " + url);
+            WebObject resource = null;
+            File file = null;
+            String contentType = null;
+            String hash = null;
+            // Get and publish resource
+            try {
 
-				// Get url data
-				hash = selectHash(searchResponse);
+                // Search for url
+                NetInfSearchResponse searchResponse = search(url);
 
-				NetInfRetrieveResponse retrieveResponse = retrieve(hash);
-				file = retrieveResponse.getFile();
-				contentType = retrieveResponse.getContentType();
+                // Get url data
+                hash = selectHash(searchResponse);
 
-			} catch (Exception e1) {
-				Log.e(TAG, "Request for resource failed. Downloading from uplink.");
-				
-				resource = downloadResource(url);
-				if (resource == null) {
-					return null;
-				}
-				
-				file = resource.getFile();
-				contentType = resource.getContentType();
-				hash = resource.getHash();
-			}         
+                NetInfRetrieveResponse retrieveResponse = retrieve(hash);
+                file = retrieveResponse.getFile();
+                contentType = retrieveResponse.getContentType();
+
+            } catch (Exception e1) {
+                Log.e(TAG, "Request for resource failed. Downloading from uplink.");
+
+                resource = downloadResource(url);
+                if (resource == null) {
+                    return null;
+                }
+
+                file = resource.getFile();
+                contentType = resource.getContentType();
+                hash = resource.getHash();
+            }         
 
 
-			// Publish
-			try {
-				publish(file, new URL(url), hash, contentType);
-			} catch (MalformedURLException e1) {
-				Log.e(TAG, "Malformed url. Can't publish file.");
-			}
+            // Publish
+            try {
+                if (shouldPublish()) {
+                    publish(file, new URL(url), hash, contentType);
+                }
+            } catch (MalformedURLException e1) {
+                Log.e(TAG, "Malformed url. Can't publish file.");
+            }
 
-			// Creating the resource that will be used by the webview
-			WebResourceResponse response = null;
-			try {
-				response = new WebResourceResponse(
-						contentType, "base64", FileUtils.openInputStream(file));
-			} catch (IOException e) {
-				Log.e("TAG", "Could not open file");
-			}
+            // Creating the resource that will be used by the webview
+            WebResourceResponse response = null;
+            try {
+                response = new WebResourceResponse(
+                        contentType, "base64", FileUtils.openInputStream(file));
+            } catch (IOException e) {
+                Log.e("TAG", "Could not open file");
+            }
 
-			System.gc();
-			return response;
-		} else {
-			Log.e(TAG, "Unexpected url while intercepting resources.");
-			return super.shouldInterceptRequest(view, url);
-		}
-	}
+            System.gc();
+            return response;
+        } else {
+            Log.e(TAG, "Unexpected url while intercepting resources.");
+            return super.shouldInterceptRequest(view, url);
+        }
+    }
 
-	/**
-	 * Returns the downloaded WebObject specified by the url.
-	 * 
-	 * @param url	The url of the resource to download
-	 * @return		A web object representing the resource
-	 */
-	private WebObject downloadResource(String url) {
-		WebObject resource = null;
-		DownloadWebObject downloadingResource = new DownloadWebObject();
-		try {
-			downloadingResource.execute(new URL(url));
-			resource = downloadingResource.get(DOWNLOAD_TIMEOUT, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			Log.e(TAG, "Failed retrieving resource from uplink.");
-			resource = null;
-		} 
-		
-		return resource;
-	}
+    /**
+     * Returns the downloaded WebObject specified by the url.
+     * 
+     * @param url	The url of the resource to download
+     * @return		A web object representing the resource
+     */
+    private WebObject downloadResource(String url) {
+        WebObject resource = null;
+        DownloadWebObject downloadingResource = new DownloadWebObject();
+        try {
+            downloadingResource.execute(new URL(url));
+            resource = downloadingResource.get(DOWNLOAD_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed retrieving resource from uplink.");
+            resource = null;
+        } 
 
-	/**
-	 * Searches for a URL and returns a selected hash if one was found or null.
-	 * @param url The URL pointing to the resource in a web view.
-	 * @return The hash corresponding to the URL.
-	 * @throws Exception Can throw several exceptions, but all belong to a search problem
-	 */
-	private NetInfSearchResponse search(String url) throws Exception {
-		NetInfSearchResponse response;
-		NetInfSearch search = new NetInfSearch(url.toString(), "empty");
-		search.execute();
-		response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
-		Log.d(TAG, "Search response: " + response.toString());
-		return response;
+        return resource;
+    }
 
-	}
+    /**
+     * Searches for a URL and returns a selected hash if one was found or null.
+     * @param url The URL pointing to the resource in a web view.
+     * @return The hash corresponding to the URL.
+     * @throws Exception Can throw several exceptions, but all belong to a search problem
+     */
+    private NetInfSearchResponse search(String url) throws Exception {
+        NetInfSearchResponse response;
+        NetInfSearch search = new NetInfSearch(url.toString(), "empty");
+        search.execute();
+        response = (NetInfSearchResponse) search.get(SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        Log.d(TAG, "Search response: " + response.toString());
+        return response;
 
-	/**
-	 * Returns the response to a retrieve request that tries to get the
-	 * IO corresponding to the specified hash.
-	 * 
-	 * @param hash			The hash identifying the IO we want to retrieve.
-	 * @return				The response containing the IO
-	 * @throws Exception	Throws an exception that belongs to a retrieve process problem.
-	 */
-	private NetInfRetrieveResponse retrieve(String hash) throws Exception {
+    }
 
-		NetInfRetrieveResponse response = null;
-		NetInfRetrieve retrieve = new NetInfRetrieve(HOST, PORT, HASH_ALG, hash);
-		retrieve.execute();
+    /**
+     * Returns the response to a retrieve request that tries to get the
+     * IO corresponding to the specified hash.
+     * 
+     * @param hash			The hash identifying the IO we want to retrieve.
+     * @return				The response containing the IO
+     * @throws Exception	Throws an exception that belongs to a retrieve process problem.
+     */
+    private NetInfRetrieveResponse retrieve(String hash) throws Exception {
 
-		response = (NetInfRetrieveResponse) retrieve.get(RETRIEVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        NetInfRetrieveResponse response = null;
+        NetInfRetrieve retrieve = new NetInfRetrieve(HOST, PORT, HASH_ALG, hash);
+        retrieve.execute();
 
-		return response;
-	}
+        response = (NetInfRetrieveResponse) retrieve.get(RETRIEVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
-	/**
-	 * Returns a NetInfPublish request object that can be used in order
-	 * to publish an IO.
-	 * 
-	 * @param file			The file corresponding to the IO
-	 * @param url			The url where that file was downloaded from
-	 * @param hash			The hash identifying the file
-	 * @param contentType	The content type of the file
-	 * @return				Returns a publish request object
-	 * @throws IOException	Thrown, if Bluetooth is not available
-	 */
-	private NetInfPublish createPublishRequest(File file, URL url, String hash, String contentType)
-			throws IOException {
+        return response;
+    }
 
-		// Create metadata
-		Metadata metadata = new Metadata();
-		metadata.insert("filesize", String.valueOf(file.length()));
-		metadata.insert("filepath", file.getAbsolutePath());
-		metadata.insert("time", Long.toString(System.currentTimeMillis()));
-		metadata.insert("url", url.toString());
+    /**
+     * Returns a NetInfPublish request object that can be used in order
+     * to publish an IO.
+     * 
+     * @param file			The file corresponding to the IO
+     * @param url			The url where that file was downloaded from
+     * @param hash			The hash identifying the file
+     * @param contentType	The content type of the file
+     * @return				Returns a publish request object
+     * @throws IOException	Thrown, if Bluetooth is not available
+     */
+    private NetInfPublish createPublishRequest(File file, URL url, String hash, String contentType)
+            throws IOException {
 
-		Log.d(TAG, "Trying to publish a new file.");
+        // Create metadata
+        Metadata metadata = new Metadata();
+        metadata.insert("filesize", String.valueOf(file.length()));
+        metadata.insert("filepath", file.getAbsolutePath());
+        metadata.insert("time", Long.toString(System.currentTimeMillis()));
+        metadata.insert("url", url.toString());
 
-		// Try to get the Bluetooth MAC
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (adapter == null) {
-			throw new IOException("Error: Bluetooth not supported");
-		
-		} else if (!adapter.isEnabled()) {
-			throw new IOException("Error: Bluetooth not enabled");
-		
-		} else {
-			// Create Locator set to be used in the publish
-			HashSet<Locator> locators = new HashSet<Locator>();
-			locators.add(new Locator(Locator.Type.BLUETOOTH, adapter.getAddress()));
+        Log.d(TAG, "Trying to publish a new file.");
 
-			// Create the publish, adding locators, content type, and metadata
-			NetInfPublish publishRequest = new NetInfPublish(HASH_ALG, hash, locators);
-			publishRequest.setContentType(contentType);
-			publishRequest.setMetadata(metadata);
+        // Try to get the Bluetooth MAC
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null) {
+            throw new IOException("Error: Bluetooth not supported");
 
-			// Check for full put
+        } else if (!adapter.isEnabled()) {
+            throw new IOException("Error: Bluetooth not enabled");
+
+        } else {
+            // Create Locator set to be used in the publish
+            HashSet<Locator> locators = new HashSet<Locator>();
+            locators.add(new Locator(Locator.Type.BLUETOOTH, adapter.getAddress()));
+
+            // Create the publish, adding locators, content type, and metadata
+            NetInfPublish publishRequest = new NetInfPublish(HASH_ALG, hash, locators);
+            publishRequest.setContentType(contentType);
+            publishRequest.setMetadata(metadata);
+
+            // Check for full put
             SharedPreferences sharedPref = 
-            		PreferenceManager.getDefaultSharedPreferences(
-            				MainApplicationActivity.getActivity().getApplicationContext());
+                    PreferenceManager.getDefaultSharedPreferences(
+                            MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
-			if (isFullPutAvailable) {
-				publishRequest.setFile(file);
-			}
+            if (isFullPutAvailable) {
+                publishRequest.setFile(file);
+            }
 
-			return publishRequest;
-		}
-	}
+            return publishRequest;
+        }
+    }
 
-	/**
-	 * Executes a NetInf publish request.
-	 * 
-	 * @param file			The file that needs to be published
-	 * @param url			The url where the file can be downloaded
-	 * @param hash			The hash identifying the file
-	 * @param contentType	The content type of the file
-	 */
-	private void publish(File file, URL url, String hash, String contentType) {
-		NetInfPublish publish;
-		try {
-			publish = createPublishRequest(file, url, hash, contentType);
-			publish.execute();
-		} catch (IOException e) {
-			Log.e(TAG, "Something went wrong with publish this resource.");
-		}
-	}
+    /**
+     * Executes a NetInf publish request.
+     * 
+     * @param file			The file that needs to be published
+     * @param url			The url where the file can be downloaded
+     * @param hash			The hash identifying the file
+     * @param contentType	The content type of the file
+     */
+    private void publish(File file, URL url, String hash, String contentType) {
+        NetInfPublish publish;
+        try {
+            publish = createPublishRequest(file, url, hash, contentType);
+            publish.execute();
+        } catch (IOException e) {
+            Log.e(TAG, "Something went wrong with publish this resource.");
+        }
+    }
 
-	/**
-	 * Selects an appropriate hash to download from a search result.
-	 * @param search
-	 *      The response to a NetInf search request
-	 * @return
-	 *      The selected hash
-	 * @throws RequestFailedException
-	 *      In case the search failed
-	 */
-	private String selectHash(NetInfSearchResponse search) throws RequestFailedException {
-		JSONObject firstResult = (JSONObject) search.getSearchResults().get(0);
-		String address = (String) firstResult.get("ni");
-		return address.split(";")[1];
-	}
+    /**
+     * Selects an appropriate hash to download from a search result.
+     * @param search
+     *      The response to a NetInf search request
+     * @return
+     *      The selected hash
+     * @throws RequestFailedException
+     *      In case the search failed
+     */
+    private String selectHash(NetInfSearchResponse search) throws RequestFailedException {
+        JSONObject firstResult = (JSONObject) search.getSearchResults().get(0);
+        String address = (String) firstResult.get("ni");
+        return address.split(";")[1];
+    }
+    
+    /**
+     * Returns true if the settings enable publishing.
+     * @return  if we should publish or not.
+     */
+    private boolean shouldPublish() {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(
+                        MainApplicationActivity.getActivity().getApplicationContext());
+        return prefs.getBoolean("pref_key_publish", false);
+    }
 }

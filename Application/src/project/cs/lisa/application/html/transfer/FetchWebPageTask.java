@@ -66,15 +66,15 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
     /** Debugging tag. */
     private static final String TAG = "FetchWebPageTask";
-    
+
     /** ISO encoding indicator. */
     private static final String ISO_ENCODING = "iso-8859-1";
-    
+
     /** UTF encoding indicator. */
     private static final String UTF8_ENCODING = "utf-8";
-    
+
     /** Tags that help to find the encoding within an HTML page. */
-	private static final String[] ENCODING_TAGS = {"encoding=", "charset="};
+    private static final String[] ENCODING_TAGS = {"encoding=", "charset="};
 
     /** NetInf Restlet Address. */
     private static final String HOST = UProperties.INSTANCE.getPropertyWithName("access.http.host");
@@ -87,7 +87,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
     /** Web view to display the web page. */
     private WebView mWebView;
-    
+
     /**
      * Default constructor.
      * 
@@ -118,12 +118,14 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         return null;
     }
 
-    
+    /**
+     * Returns true if the settings enable publishing.
+     * @return  if we should publish or not.
+     */
     private boolean shouldPublish() {
-        // Check for publish
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(
-                		MainApplicationActivity.getActivity().getApplicationContext());
+                        MainApplicationActivity.getActivity().getApplicationContext());
         return prefs.getBoolean("pref_key_publish", false);
     }
 
@@ -181,7 +183,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     try {
                         if (shouldPublish()) {
                             publish(retrieve.getFile(), url, hash, retrieve.getContentType())
-                            	.execute();
+                            .execute();
                         }
                     } catch (IOException e) {
                         MainApplicationActivity.showToast(e.getMessage());
@@ -209,12 +211,12 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 if (webObject == null) {
                     MainApplicationActivity.showToast(
-                    		"Download failed. Check internet connection.");
-            		Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
-            		MainApplicationActivity.getActivity().sendBroadcast(intent);
+                            "Download failed. Check internet connection.");
+                    Intent intent = new Intent(MainApplicationActivity.FINISHED_LOADING_PAGE);
+                    MainApplicationActivity.getActivity().sendBroadcast(intent);
                     return;
                 }
-                
+
                 Log.d(TAG, "Get web object");
 
                 File file = webObject.getFile();
@@ -223,7 +225,9 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
                 displayWebpage(file, url.getHost(), contentType);
                 try {
-                    publish(file, url, hash, contentType).execute();
+                    if (shouldPublish()) {
+                        publish(file, url, hash, contentType).execute();
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "Could not publish file.");
                     e.printStackTrace();
@@ -279,7 +283,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
 
             // Check for fullput
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(
-            		MainApplicationActivity.getActivity().getApplicationContext());
+                    MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
             Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
 
@@ -318,42 +322,42 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             MainApplicationActivity.showToast("Could not download web page.");
             return;
         }
-        
+
         try {
-        	if (!URLUtil.isHttpUrl(baseUrl)) {
-        		baseUrl = "http://" + baseUrl;
-        	}
-  
-        	// Detect encoding
-        	String html;
-        	String encoding;
-        	String encodingIndicator = ";";
-        	if (contentType.contains(encodingIndicator)) { 
-        		int encodingIndicatorIndex = contentType.indexOf(encodingIndicator);
-        		
-        		String encodingStartIndicator = "=";
-        		int startIndex = contentType.indexOf(encodingStartIndicator, encodingIndicatorIndex)
-        				+ encodingIndicator.length();
-        		encoding = contentType.substring(startIndex);        		
+            if (!URLUtil.isHttpUrl(baseUrl)) {
+                baseUrl = "http://" + baseUrl;
+            }
+
+            // Detect encoding
+            String html;
+            String encoding;
+            String encodingIndicator = ";";
+            if (contentType.contains(encodingIndicator)) { 
+                int encodingIndicatorIndex = contentType.indexOf(encodingIndicator);
+
+                String encodingStartIndicator = "=";
+                int startIndex = contentType.indexOf(encodingStartIndicator, encodingIndicatorIndex)
+                        + encodingIndicator.length();
+                encoding = contentType.substring(startIndex);        		
                 html = FileUtils.readFileToString(webPage, encoding);
-        		
-        	} else {
-            	/*
-            	 *  Read in webpage. First assume iso-8859-1 encoding 
-            	 *  and then detect encoding from String
-            	 */
+
+            } else {
+                /*
+                 *  Read in webpage. First assume iso-8859-1 encoding 
+                 *  and then detect encoding from String
+                 */
                 html = FileUtils.readFileToString(webPage, ISO_ENCODING);
 
-        		encoding = getEncoding(html);
-        		if (!encoding.isEmpty() 
-        				&& !encoding.toLowerCase(Locale.ENGLISH).equals(ISO_ENCODING)) {
-        			html = FileUtils.readFileToString(webPage, encoding);
-        		}
+                encoding = getEncoding(html);
+                if (!encoding.isEmpty() 
+                        && !encoding.toLowerCase(Locale.ENGLISH).equals(ISO_ENCODING)) {
+                    html = FileUtils.readFileToString(webPage, encoding);
+                }
 
-        		Log.d(TAG, "From HTML encoding: " + encoding);
+                Log.d(TAG, "From HTML encoding: " + encoding);
 
-        	}
-        	
+            }
+
             /*
              *  Independent on the actual encoding, we need to specify 
              *  utf-8 within the load webpage call.
@@ -371,32 +375,32 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      * @param html	The html String
      * @return		The encoding, if found
      */
-	private String getEncoding(String html) {
-		/* Check for: 
-		 * <?xml version="1.0" encoding="UTF-8"?>
-		 * <meta charset="UTF-8"> 
-		 * <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		 */
-		
-		String encoding = "";
-		char encodingDelimiter = '\"';
-		int startIndex;
-		int endIndex;
-		
-		for (String indicator : ENCODING_TAGS) {
-			if (html.contains(indicator)) {
-				startIndex = html.indexOf(indicator) + indicator.length();
-				
-				if (html.charAt(startIndex) == encodingDelimiter) {
-					++startIndex;
-				}
-				
-				endIndex = html.indexOf(encodingDelimiter, startIndex);
-				encoding = html.substring(startIndex, endIndex);
-			}
-		}
-		
-		return encoding;
+    private String getEncoding(String html) {
+        /* Check for: 
+         * <?xml version="1.0" encoding="UTF-8"?>
+         * <meta charset="UTF-8"> 
+         * <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+         */
 
-	}
+        String encoding = "";
+        char encodingDelimiter = '\"';
+        int startIndex;
+        int endIndex;
+
+        for (String indicator : ENCODING_TAGS) {
+            if (html.contains(indicator)) {
+                startIndex = html.indexOf(indicator) + indicator.length();
+
+                if (html.charAt(startIndex) == encodingDelimiter) {
+                    ++startIndex;
+                }
+
+                endIndex = html.indexOf(encodingDelimiter, startIndex);
+                encoding = html.substring(startIndex, endIndex);
+            }
+        }
+
+        return encoding;
+
+    }
 }
