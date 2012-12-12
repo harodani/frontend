@@ -56,8 +56,6 @@ public class StarterNodeThread extends Thread {
      * Begin all the resolution services.
      */
     private void startResolution() {
-        Log.d(TAG, "startResolution()");
-        Log.d(TAG, "getting resolution controller...");
         ResolutionController resolutionController = mNode.getResolutionController();
 
         if (resolutionController != null) {
@@ -105,7 +103,6 @@ public class StarterNodeThread extends Thread {
      * Enable access to the RESTful services
      */
     private void startAPIAccess() {
-        Log.d(TAG, "startAPIAccess()");
         AccessServer accessServer = MainNetInfApplication.getInjector().getInstance(AccessServer.class);
         accessServer.start();
     }
