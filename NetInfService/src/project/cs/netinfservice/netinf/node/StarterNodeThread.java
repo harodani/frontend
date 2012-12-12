@@ -35,78 +35,107 @@ import netinf.node.search.SearchService;
 import project.cs.netinfservice.application.MainNetInfApplication;
 import android.util.Log;
 
+/**
+ * Node starter for the NetInf Service.
+ * 
+ * @author Thiago Costa Porto
+ *
+ */
 public class StarterNodeThread extends Thread {
 
 	/** Debug TAG. */
     public static final String TAG = "StarterNodeThread";
 
-    /** The NetInf Node that is going to be started. */
+    /** The NetInf Node to be started. */
     private NetInfNode mNode;
 
+    /**
+     * Calls the run() method of the Runnable object the receiver holds.
+     * If no Runnable is set, does nothing.
+     */
     @Override
     public void run() {
+        // Get instance of the NetInf node being called
         mNode = MainNetInfApplication.getInjector().getInstance(NetInfNode.class);
 
-        startResolution();	// Start resolution services
+        // Start Resolution Services
+        startResolution();
+        
+        // Start Search Service
         startSearch();
-        startAPIAccess();	// Start REST API service
+        
+        // Start REST API Service
+        startAPIAccess();
     }
 
     /**
-     * Begin all the resolution services.
+     * Start all the resolution services.
      */
     private void startResolution() {
         Log.d(TAG, "startResolution()");
-        Log.d(TAG, "getting resolution controller...");
+        Log.d(TAG, "Getting resolution controller...");
+        // Gets resolution controller
         ResolutionController resolutionController = mNode.getResolutionController();
 
+        // Check if it went well
         if (resolutionController != null) {
             // Plug in Resolution Services
-            Log.d(TAG, "getting resolution services...");
+            Log.d(TAG, "Getting resolution services...");
             ResolutionService[] resolutionServices = 
             		MainNetInfApplication.getInjector().getInstance(ResolutionService[].class);
 
+            // No services active
             if (resolutionServices.length == 0) {
-                Log.d(TAG, "(NODE ) I have no active resolution services");
+                Log.d(TAG, "(NODE) I have no active resolution services");
             }
 
+            // Iterate through services
             Log.d(TAG, "adding resolution services...");
             for (ResolutionService resolutionService : resolutionServices) {
                 resolutionController.addResolutionService(resolutionService);
                 Log.d(TAG, "Added resolution service '" 
                 		+ resolutionService.getClass().getCanonicalName() + "'");
-                Log.d(TAG, "(NODE ) I can resolve via " + resolutionService.describe());
-            }
-        }
-    }
-
-    private void startSearch() {
-
-        SearchController searchController = mNode.getSearchController();
-
-        if (searchController != null) {
-            // Plug in Search Services
-            SearchService[] searchServices = MainNetInfApplication
-            		.getInjector().getInstance(SearchService[].class);
-
-            if (searchServices.length == 0) {
-                Log.d(TAG, "(NODE ) I have no active search services");
-            }
-
-            for (SearchService searchService : searchServices) {
-                searchController.addSearchService(searchService);
-                Log.d(TAG, "Added search service '" + searchService.getClass().getCanonicalName() + "'");
-                Log.d(TAG, "(NODE ) I can search via " + searchService.describe());
+                Log.d(TAG, "(NODE) I can resolve via " + resolutionService.describe());
             }
         }
     }
 
     /**
-     * Enable access to the RESTful services
+     * Starts Search Service.
+     */
+    private void startSearch() {
+        // Get search controller
+        SearchController searchController = mNode.getSearchController();
+
+        // Check if we got it
+        if (searchController != null) {
+            // Plug in Search Services
+            SearchService[] searchServices = MainNetInfApplication
+            		.getInjector().getInstance(SearchService[].class);
+
+            // Check if service is active
+            if (searchServices.length == 0) {
+                Log.d(TAG, "(NODE) I have no active search services");
+            }
+
+            // Iterate through search services
+            for (SearchService searchService : searchServices) {
+                searchController.addSearchService(searchService);
+                Log.d(TAG, "Added search service '" + searchService.getClass().getCanonicalName() + "'");
+                Log.d(TAG, "(NODE) I can search via " + searchService.describe());
+            }
+        }
+    }
+
+    /**
+     * Enables access to the RESTful services
      */
     private void startAPIAccess() {
         Log.d(TAG, "startAPIAccess()");
+        // Get server
         AccessServer accessServer = MainNetInfApplication.getInjector().getInstance(AccessServer.class);
+        
+        // Start the server
         accessServer.start();
     }
 }

@@ -32,9 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import android.util.Log;
 
@@ -81,19 +80,10 @@ public class MetadataParser {
         String mimetype = null;
 
         // Populate JSON Array with metadata
-        try {
-            // get metadata information
-            mJSONMetadata = json.getJSONObject(TAG_metadata);
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            // If someone knows a good way to inform the user.. maybe a
-            // Toast?
-            Log.d(TAG, "Unable to get JSON Array");
-            Log.d(TAG, "" + e.toString());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
+        // get metadata information
+        
+        mJSONMetadata = (JSONObject) json.get(TAG_metadata);
+        
         try {
             // extract mimetype
            mimetype = mJSONMetadata.getString(TAG_metadata_ct);

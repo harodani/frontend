@@ -46,7 +46,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-
 /**
  * Main activity that acts as a starting point for the application.
  * It provides functions setting up the NetInf services.
@@ -56,7 +55,6 @@ import android.widget.Toast;
  *
  */
 public class MainNetInfActivity extends Activity {
-
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
 
@@ -81,7 +79,6 @@ public class MainNetInfActivity extends Activity {
     /** Handles the Bluetooth discovery interval. */
     private Handler mHandler;
 
-
     /**
      * Creates a Listener for the preference menu.
      */
@@ -99,6 +96,9 @@ public class MainNetInfActivity extends Activity {
         }
     };
 
+    /**
+     * Creates the application, starting bluetooth and listeners.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +106,7 @@ public class MainNetInfActivity extends Activity {
 
         sMainNetInfActivity = this;
 
+        // Load and register listener for the shared preferences
         PreferenceManager.getDefaultSharedPreferences(getActivity())
         .registerOnSharedPreferenceChangeListener(mListener);
 
@@ -118,10 +119,10 @@ public class MainNetInfActivity extends Activity {
         mIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         MainNetInfApplication.getAppContext().registerReceiver(mBroadcastReceiver, mIntentFilter);
 
+        // Setup the node
         setupNode();
 
         // Display the settings fragment as the main content.
-        // setContentView(R.layout.activity_main);
         getFragmentManager().beginTransaction()
         .replace(android.R.id.content, new SettingsFragment())
         .commit();
@@ -129,16 +130,7 @@ public class MainNetInfActivity extends Activity {
         //Initialize a handler
         mHandler = new Handler();
 
-        
-        
-        runBluetoothDiscoveryBackground();
-        
-        /*
-         * Set up some notification depending on the connection: colors.
-         * Ask Paolo, he knows.
-         */
-
-
+        // Run bluetooth discovery
         runBluetoothDiscoveryBackground();
     }
 
@@ -147,34 +139,38 @@ public class MainNetInfActivity extends Activity {
      * that runs the Bluetooth Discovery in background.
      */
     private void runBluetoothDiscoveryBackground() {
+        // Start bluetooth task
+        Runnable bluetoothTask = new Runnable() {
+            // Run BT
+            @Override
+            public void run() {
+                Log.d(TAG, "Discovering bluetooth. ");
 
-    	Runnable bluetoothTask = new Runnable() {
-			
-			@Override
-			public void run() {
-				Log.d(TAG, "Discovering bluetooth. ");
-				
-				BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
-				btDiscovery.startBluetoothDiscovery();
-				int interval = Integer.parseInt(UProperties.INSTANCE
-		        		.getPropertyWithName("bluetooth.interval"));
-		        mHandler.postDelayed(this, interval);
-				
-		        
-			}
-		};
-		if (BluetoothAdapter.getDefaultAdapter() == null) {
-			showToast(""); 
-			Log.w(TAG, "No Bluetooh adapter available. Bluetooth discovery canceled.");
-		}		
-		else new Thread(bluetoothTask).start();
-    		
-		
-	}
+                // Get bluetooth discovery instance
+                BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
+                
+                // Start discovery
+                btDiscovery.startBluetoothDiscovery();
+                
+                // Set discovery interval
+                int interval = Integer.parseInt(UProperties.INSTANCE
+                        .getPropertyWithName("bluetooth.interval"));
+                
+                // Add to handler
+                mHandler.postDelayed(this, interval);
+            }
+        };
+        
+        // Check if Bluetooth Adapter exists
+        if (BluetoothAdapter.getDefaultAdapter() == null) {
+            showToast(""); 
+            Log.w(TAG, "No Bluetooh adapter available. Bluetooth discovery canceled.");
+        } else {
+            new Thread(bluetoothTask).start();
+        }
+    }
 
-
-
-	/**
+    /**
      * Stops the Bluetooth server.
      */
     private void stopBluetoothServer() {
@@ -189,7 +185,11 @@ public class MainNetInfActivity extends Activity {
      */
     private void startBluetoothServer() {
         Log.d(TAG, "Starting Bluetooth server");
+        
+        // Load BT adapter
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        
+        // Sanity check
         if (mBluetoothAdapter == null) {
             showToast("No Bluetooh adapter available.");
             /* TODO: Disable Bluetooth services:
@@ -197,6 +197,7 @@ public class MainNetInfActivity extends Activity {
              * do not add device as locator.
              */
         } else {
+            // Start the server if BT is enabled
             if (mBluetoothAdapter.isEnabled()) {
                 try {
                     mBluetoothServer = new BluetoothServer();
@@ -214,6 +215,7 @@ public class MainNetInfActivity extends Activity {
     private void setupNode() {
         Log.d(TAG, "setupNode()");
 
+        // Starts the node
         mStarterNodeThread = new StarterNodeThread();
         mStarterNodeThread.start();
     }
@@ -223,23 +225,28 @@ public class MainNetInfActivity extends Activity {
      */
     private void setUpBroadcastReceiver() {
         mBroadcastReceiver = new BroadcastReceiver() {
+            /**
+             * Receiver function
+             */
             @Override
             public void onReceive(Context context, Intent intent) {
+                // Get the intent action
                 final String action = intent.getAction();
 
+                // Check the intent raised
                 if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                     final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
                             BluetoothAdapter.ERROR);
                     switch (state) {
-                    case BluetoothAdapter.STATE_ON:
-                        startBluetoothServer();
-                        break;
-                    case BluetoothAdapter.STATE_OFF:
-                        stopBluetoothServer();
-                        break;
-                    default:
-                        // We don't care of any other states.
-                        break;
+                        case BluetoothAdapter.STATE_ON:
+                            startBluetoothServer();
+                            break;
+                        case BluetoothAdapter.STATE_OFF:
+                            stopBluetoothServer();
+                            break;
+                        default:
+                            // We don't care of any other states.
+                            break;
                     }
                 }
             }
@@ -248,7 +255,8 @@ public class MainNetInfActivity extends Activity {
 
     /**
      * Show a toast.
-     * @param text      The text to show in the toast.
+     * @param text
+     *      The text to show in the toast.
      */
     public void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
@@ -256,7 +264,8 @@ public class MainNetInfActivity extends Activity {
 
     /**
      * Return an instance of this activity.
-     * @return the activity
+     * @return
+     *      The activity
      */
     public static MainNetInfActivity getActivity() {
         return sMainNetInfActivity;

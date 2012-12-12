@@ -27,18 +27,14 @@
 package project.cs.netinfservice.database;
 
 /**
- * A database exception is thrown in case a database
- * method fails.
+ * A database exception is thrown in case a database method fails.
  * 
  * @author Harold Martinez
  * @author Kim-Anh Tran
  *
  */
 public class DatabaseException extends Exception {
-
-	/**
-	 * Serialization
-	 */
+	/** Serialization */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -49,11 +45,13 @@ public class DatabaseException extends Exception {
 	}
 
 	/**
-	 * Constructor for raising a DatabaseException with a message
-	 * and raising another, possible SQLite, exception.
+	 * Constructor for raising a DatabaseException with a message and raising another,
+	 * possible SQLite, exception.
 	 * 
-	 * @param detailMessage message describing the exception that occurred
-	 * @param throwable 	another exception raised by the program
+	 * @param detailMessage
+	 *      Message describing the exception that occurred
+	 * @param throwable
+	 *      Another exception raised by the program
 	 */
 	public DatabaseException(String detailMessage, Throwable throwable) {
 		super(detailMessage, throwable);
@@ -62,7 +60,8 @@ public class DatabaseException extends Exception {
 	/**
 	 * Constructor for raising a DatabaseException with a message.
 	 * 
-	 * @param detailMessage message describing the exception that occurred
+	 * @param detailMessage
+	 *      Message describing the exception that occurred
 	 */
 	public DatabaseException(String detailMessage) {
 		super(detailMessage);
@@ -71,12 +70,10 @@ public class DatabaseException extends Exception {
 	/**
 	 * Constructor for raising a DatabaseException with a previous raised exception.
 	 * 
-	 * @param throwable another exception raised by the program
+	 * @param throwable
+	 *      Another exception raised by the program
 	 */
 	public DatabaseException(Throwable throwable) {
 		super(throwable);
 	}
-
-	
-
 }

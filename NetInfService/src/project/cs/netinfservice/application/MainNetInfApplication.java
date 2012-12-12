@@ -48,7 +48,6 @@ import com.google.inject.Injector;
  * 
  */
 public class MainNetInfApplication extends Application {
-
     /** Debugging tag. */
     public static final String TAG = "MainNetInfApplication";
     
@@ -61,6 +60,9 @@ public class MainNetInfApplication extends Application {
     /** The context for this application. */
     private static Context sContext;
 
+    /**
+     * Initializes netinf application, setting context and injector.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -76,13 +78,18 @@ public class MainNetInfApplication extends Application {
 			Log.e(TAG, "Could not initialize properties file.");
 		}
 
+        // Set context
         sContext = getApplicationContext();
+        
+        // Set Injector
         sInjector = Guice.createInjector(new Module());
     }
 
     /**
      * Returns the injector for injecting classes.
-     * @return  the injector
+     * 
+     * @return
+     *      The injector
      */
     public static Injector getInjector() {
         return sInjector;
@@ -92,7 +99,8 @@ public class MainNetInfApplication extends Application {
      * Returns the current application context.
      * This is useful i.e. for registering broadcast receivers.
      * 
-     * @return  The application context.
+     * @return
+     *      The application context.
      */
     public static Context getAppContext() {
         return sContext;
