@@ -45,9 +45,6 @@ import android.util.Log;
  */
 public class NetInfRetrieveResponse extends NetInfResponse {
 
-    /** Log Tag. */
-    private static final String TAG = "NetInfRetrieveResponse";
-
     /** File path JSON Key used by the RESTful API. */
     private static final String FILE_PATH_KEY =
             UProperties.INSTANCE.getPropertyWithName("restlet.retrieve.file_path");
@@ -77,8 +74,6 @@ public class NetInfRetrieveResponse extends NetInfResponse {
         // TODO Remove duplicate code from NetInfResponse subclasses
 
         int statusCode = response.getStatusLine().getStatusCode();
-
-        Log.d(TAG, "new NetInfRetrieveResponse, statusCode = " + statusCode);
 
         // Request did not succeed
         if (statusCode != HttpStatus.SC_OK) {

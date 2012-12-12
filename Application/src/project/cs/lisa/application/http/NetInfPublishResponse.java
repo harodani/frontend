@@ -59,8 +59,6 @@ public class NetInfPublishResponse extends NetInfResponse {
 
         int statusCode = response.getStatusLine().getStatusCode();
 
-        Log.d(TAG, "new NetInfPublishResponse, statusCode = " + statusCode);
-
         // Request did not succeed
         if (statusCode != HttpStatus.SC_OK) {
             setStatus(NetInfStatus.FAILED);

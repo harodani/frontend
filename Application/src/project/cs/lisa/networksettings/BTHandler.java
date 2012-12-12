@@ -27,14 +27,12 @@
 
 package project.cs.lisa.networksettings;
 
-import project.cs.lisa.R;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-import android.widget.ToggleButton;
 
 /**
  * Class for handling general BT connection
@@ -43,7 +41,7 @@ import android.widget.ToggleButton;
  */
 
 public class BTHandler {
-    private final String TAG = "LisaBTHandler";
+    private final String TAG = "BTHandler";
     private BluetoothAdapter mBluetoothAdapter;
     private IntentFilter mIntentFilter;
     
@@ -92,7 +90,6 @@ public class BTHandler {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                Log.d(TAG, "BT Action State Changed!");
                 if (mBluetoothAdapter.isEnabled()) {
                     Log.d(TAG, "BT Enabled");
                     Log.d(TAG, "Checking BT Discoverable");

@@ -34,7 +34,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 
 /**
  * Creates a list dialog.
@@ -44,9 +43,6 @@ import android.util.Log;
  *
  */
 public abstract class ListDialog extends DialogFragment {
-
-    /** The tag. */
-    private static final String TAG = "ListDialog";
 
     /** The list of items to display in the dialog. */
     private Set<String> mItems;
@@ -80,13 +76,11 @@ public abstract class ListDialog extends DialogFragment {
         .setSingleChoiceItems(items, 0,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                Log.d(TAG, whichButton + "");
                 mSelectedItem = items[whichButton].toString();
             }
         })
         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                Log.d(TAG, whichButton + "");
                 onConfirm(mSelectedItem);
             }
         });

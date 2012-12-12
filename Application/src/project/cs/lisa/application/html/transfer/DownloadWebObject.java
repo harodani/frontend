@@ -182,8 +182,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         String result = null;
 
         hash = new Hash(bytes);
-        Log.d(TAG, "The generated hash is: " + hash.encodeResult());
-        result = hash.encodeResult(); // Use 0 for using the whole hash
+        result = hash.encodeResult(); 
 
         return result;
     }
