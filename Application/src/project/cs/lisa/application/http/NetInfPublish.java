@@ -35,8 +35,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import project.cs.lisa.util.UProperties;
-import project.cs.lisa.util.metadata.Metadata;
+import project.cs.netinfutilities.metadata.Metadata;
 import android.util.Log;
 
 /**

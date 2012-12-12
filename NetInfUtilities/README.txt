@@ -24,35 +24,28 @@
  * principles and programming methods.
  *
  */
-package project.cs.netinfservice.netinf.node.search;
 
-import project.cs.netinfutilities.metadata.Metadata;
+/////////////////
+// General
 
-/**
- * Each search result entry is encoded as a SearchResult object.
- * 
- * @author Kim-Anh Tran
- *
- */
-public interface SearchResult {
-	/**
-	 * Returns the meta data of this entity associated with the search result.
-	 * 
-	 * @return	The meta data
-	 */
-	Metadata getMetaData();
-	
-	/**
-	 * Returns the identifier of this entity associated with the search result.
-	 * 
-	 * @return	The identifier
-	 */
-	String getHash();
-	
-	/**
-	 * Returns the hash algorithm used for hashing the content.
-	 * 
-	 * @return The hash algorithm
-	 */
-	String getHashAlgorithm();
-}
+
+The jar file contains the following utility java classes:
+
+- UProperties.java
+- metadata/MetadataParser.java
+- metadata/Metadata.java
+
+The UProperties is used for reading from a properties file
+of an application.
+
+The Metadata classes handle Metadata that are based
+on json simple libraries.
+
+
+/////////////////
+// Dependencies
+
+In order for these classes to work, you need
+to include following jar files:
+
+- json-simple-1.1.1.jar

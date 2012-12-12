@@ -24,16 +24,12 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.util;
+package project.cs.netinfutilities;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import project.cs.lisa.application.MainApplicationActivity;
-
-import android.content.res.AssetManager;
-import android.util.Log;
+import java.util.logging.Logger;
 
 /**
  * Singleton utility class for loading properties and
@@ -47,20 +43,26 @@ public enum UProperties {
     /** The unique reference for this singleton. */
     INSTANCE;
 
-    /** Debugging tag. */
-    public static final String TAG = "UProperties";
-
-    /** Property files that contains the properties for this project. */
-    private static final String PROPERTIES_FILE = "config.properties";
-
+    /** The Logger. */
+    private final static Logger LOGGER = Logger.getLogger(UProperties.class.getName()); 
+    
     /** The property reference. */
     private Properties mProperties;
-
+   
+    
     /**
-     * Initiates the singleton.
+     * Initializes the property reader. 
+     * 
+     * @param propertyInputStream The input stream from which the UProperties can read
+     * 							  the properties file
      */
-    private UProperties() {
-        loadProperties(PROPERTIES_FILE);
+    public void init(InputStream propertyInputStream) {
+        mProperties = new Properties();
+        try {
+            mProperties.load(propertyInputStream);
+        } catch (IOException e) {
+        	LOGGER.severe("Project properties could not be read.");
+        }
     }
 
     /**
@@ -80,19 +82,4 @@ public enum UProperties {
         return mProperties;
     }
 
-    /**
-     * Loads properties from the passed property file.
-     * @param property the property file to be loaded
-     */
-    private void loadProperties(String property) {
-        Log.d(TAG, "loadProperties()");
-        mProperties = new Properties();
-        try {
-            AssetManager assets = MainApplicationActivity.getActivity().getAssets();
-            InputStream is = assets.open(property);
-            mProperties.load(is);
-        } catch (IOException e) {
-            Log.e(TAG, e.toString(), e);
-        }
-    }
 }

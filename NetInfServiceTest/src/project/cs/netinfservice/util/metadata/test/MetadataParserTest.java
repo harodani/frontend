@@ -6,11 +6,11 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
-import project.cs.netinfservice.util.metadata.MetadataParser;
+import project.cs.netinfutilities.metadata.MetadataParser;
 import android.test.AndroidTestCase;
 
 /**
@@ -52,7 +52,7 @@ public class MetadataParserTest extends AndroidTestCase {
 			Map<String, Object> map = null;
 			try {
 				map = MetadataParser.toMap((JSONObject) jsonObject);
-			} catch (JSONException e) {
+			} catch (ParseException e) {
 				Assert.fail("Should not have raised an exception.");
 			}
 

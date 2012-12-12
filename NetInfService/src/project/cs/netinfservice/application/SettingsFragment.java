@@ -27,7 +27,7 @@
 package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;

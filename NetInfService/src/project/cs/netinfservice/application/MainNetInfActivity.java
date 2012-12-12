@@ -31,7 +31,7 @@ import java.io.IOException;
 import project.cs.netinfservice.netinf.node.StarterNodeThread;
 import project.cs.netinfservice.netinf.provider.bluetooth.BluetoothDiscovery;
 import project.cs.netinfservice.netinf.server.bluetooth.BluetoothServer;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -59,9 +59,6 @@ public class MainNetInfActivity extends Activity {
 
     /** Debugging tag. */
     private static final String TAG = "MainNetInfActivity";
-
-    /** Preference file. */
-    private static final String PREF_FILE = "NetInfServicePrefsFile";
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.list.node.started";

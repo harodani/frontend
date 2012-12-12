@@ -35,7 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;

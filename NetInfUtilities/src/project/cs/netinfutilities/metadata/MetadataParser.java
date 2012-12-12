@@ -24,7 +24,7 @@
  * principles and programming methods.
  *
  */
-package project.cs.lisa.util.metadata;
+package project.cs.netinfutilities.metadata;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,11 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import android.util.Log;
+import org.json.simple.parser.ParseException;
 
 /**
  * Class for parsing json metadata.
@@ -55,9 +53,6 @@ public class MetadataParser {
     public static final String TAG_loc = "loc";
     public static final String TAG_meta = "meta";
 
-    // JSON Object
-    private JSONObject mJSONMetadata;
-
     /**
      * Returns a map that represents the meta-data key value pairs
      * contained in the specified meta-data.
@@ -66,16 +61,14 @@ public class MetadataParser {
      * @return                  The map with all meta-data values
      * @throws JSONException    Thrown, if no meta-data could be extracted at all
      */
-    public static Map<String, Object> toMap(JSONObject metadata) throws JSONException {
-        // TODO: Warning: for compability issues, I am still throwing JSONException here. We must
-        //       fix the Database class to stop catching JSONException. If it is of good practice,
-        //       we can create an exception and throw it here.
+    public static Map<String, Object> toMap(JSONObject metadata) throws ParseException {
+
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         metadata = (JSONObject) metadata.get("meta");
         
         if (metadata == null) {
-            throw new JSONException("\"meta\" tag not present in JSON Object");
+            throw new ParseException(ParseException.ERROR_UNEXPECTED_TOKEN, "\"meta\" tag not present in JSON Object");
         }
 
         // We iterate through the metadata by getting a set of keys from the metadata and
@@ -100,7 +93,7 @@ public class MetadataParser {
         }
 
         if (map.size() == 0) {
-            throw new JSONException("No meta-data could be extracted.");
+            throw new ParseException(ParseException.ERROR_UNEXPECTED_EXCEPTION, "No meta-data could be extracted.");
         }
 
         return map;

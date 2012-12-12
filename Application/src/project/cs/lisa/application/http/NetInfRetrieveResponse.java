@@ -36,7 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import project.cs.lisa.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.util.Log;
 
 /**

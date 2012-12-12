@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.netinf.provider.ByteArrayProvider;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;

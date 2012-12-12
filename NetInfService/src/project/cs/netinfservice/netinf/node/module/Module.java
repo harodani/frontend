@@ -54,7 +54,7 @@ import project.cs.netinfservice.netinf.access.rest.RESTAccessServer;
 import project.cs.netinfservice.netinf.node.resolution.LocalResolutionService;
 import project.cs.netinfservice.netinf.node.resolution.NameResolutionService;
 import project.cs.netinfservice.netinf.node.search.UrlSearchService;
-import project.cs.netinfservice.util.UProperties;
+import project.cs.netinfutilities.UProperties;
 import android.util.Log;
 
 import com.google.inject.AbstractModule;

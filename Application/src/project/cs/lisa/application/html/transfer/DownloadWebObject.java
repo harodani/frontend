@@ -28,6 +28,7 @@
 package project.cs.lisa.application.html.transfer;
 
 import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +39,9 @@ import org.apache.commons.io.FileUtils;
 
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.hash.Hash;
-import project.cs.lisa.util.UProperties;
+
+import project.cs.netinfutilities.UProperties;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
