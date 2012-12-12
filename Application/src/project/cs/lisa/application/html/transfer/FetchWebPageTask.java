@@ -151,7 +151,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     retrieveDisplay(url, hash).execute();
                 } catch (RequestFailedException e) {
                     // If the search failed for any reason, use uplink
-                    Log.d(TAG, "Downloading web page because search failed: " + search.getStatus());
+                    Log.d(TAG, "Downloading web page because search failed.");
                     downloadAndDisplay(url).execute(url);
                 }
 
@@ -217,8 +217,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                     return;
                 }
 
-                Log.d(TAG, "Get web object");
-
                 File file = webObject.getFile();
                 String hash = webObject.getHash();
                 String contentType = webObject.getContentType();
@@ -263,8 +261,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
         metadata.insert("time", Long.toString(System.currentTimeMillis()));
         metadata.insert("url", url.toString());
 
-        Log.d(TAG, "Trying to publish a new file.");
-
         // Try to get the Bluetooth MAC
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter == null) {
@@ -285,7 +281,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(
                     MainApplicationActivity.getActivity().getApplicationContext());
             boolean isFullPutAvailable = sharedPref.getBoolean("pref_key_fullput", false);
-            Log.d(TAG, "Full Put preference: " + isFullPutAvailable);
 
             if (isFullPutAvailable) {
                 publishRequest.setFile(file);
@@ -318,7 +313,7 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      */
     private void displayWebpage(File webPage, String baseUrl, String contentType) {
         if (webPage == null) {
-            Log.d(TAG, "webPage == null");
+            Log.e(TAG, "Webpage was null. Can't display webpage.");
             MainApplicationActivity.showToast("Could not download web page.");
             return;
         }
@@ -353,8 +348,6 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
                         && !encoding.toLowerCase(Locale.ENGLISH).equals(ISO_ENCODING)) {
                     html = FileUtils.readFileToString(webPage, encoding);
                 }
-
-                Log.d(TAG, "From HTML encoding: " + encoding);
 
             }
 
