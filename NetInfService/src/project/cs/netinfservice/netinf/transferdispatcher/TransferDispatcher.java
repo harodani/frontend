@@ -156,8 +156,6 @@ public enum TransferDispatcher {
      * 					via bluetooth.
      */
     private List<String> filterBluetoothLocators(List<Attribute> locators, boolean discover) {
-    	Log.d(TAG, "Filter locators.");
-    	
     	BluetoothDiscovery btDiscovery = BluetoothDiscovery.INSTANCE;
     	List<String> availableLocators = null;
     	if (discover) {
@@ -165,10 +163,7 @@ public enum TransferDispatcher {
     	} else {
     		availableLocators = btDiscovery.getAvailableDevices();
     	}
-
-    	
-    	
-               
+      
         // Configure locator identifiers to have the bluetooth locator node prefix. 
         int numberOfLocators = availableLocators.size();
         for (int i = 0; i < numberOfLocators; ++i) {    
@@ -177,23 +172,18 @@ public enum TransferDispatcher {
         	availableLocators.set(i, locator);
         }
         
-        Log.d(TAG, "The first locator: " + availableLocators.get(0));
-        
         /* 
          * Converts the Attribute locators to String locators that represent
          * the MAC address of each locator.
          */
         List<String> stringLocators = new ArrayList<String>(locators.size());
         for (Attribute locator : locators) {
-            Log.d(TAG, "locator: " + locator.getValue(String.class));
         	stringLocators.add(locator.getValue(String.class));
         }
         
         // Keep only those locators that are available right now 
         stringLocators.retainAll(availableLocators);
-        
-        Log.d(TAG, "Filtered locator list: " + stringLocators.toString());
-        
+       
         return stringLocators;
     }
 
