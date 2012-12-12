@@ -118,7 +118,6 @@ public class WifiHandler {
         Log.d(TAG, "onDiscoveryDone");
     }
 
-
     BroadcastReceiver mReceiver;
     /**
      * Broadcast Receiver mReceive that handles with WIFI 'signal' changes.
@@ -185,10 +184,5 @@ public class WifiHandler {
             }
 
         };
-    }
-    
-    public void onDiscoveryDone(Set<String> wifis) {
-        // TODO Auto-generated method stub
-        
     }
 }
