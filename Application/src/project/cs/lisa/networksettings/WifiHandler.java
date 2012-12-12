@@ -119,6 +119,10 @@ public class WifiHandler {
         wifiManager.reconnect();
     }
 
+    public void onDiscoveryDone(Set<String> wifis) {
+        Log.d(TAG, "onDiscoveryDone");
+    }
+
 
     BroadcastReceiver mReceiver;
     /**
