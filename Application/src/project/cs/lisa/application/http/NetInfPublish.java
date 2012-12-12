@@ -67,9 +67,7 @@ public class NetInfPublish extends NetInfRequest {
      *      Set of locators to publish
      */
     public NetInfPublish(String hashAlg, String hash, Set<Locator> locators) {
-
         super("publish", hashAlg, hash);
-        Log.d(TAG, "NetInfPublish()");
         mLocators = locators;
     }
 
@@ -82,7 +80,8 @@ public class NetInfPublish extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-
+    	Log.d(TAG, "Publishing an IO.");
+    	
         // Don't publish without locators
         if (mLocators == null || mLocators.size() == 0) {
             return new NetInfPublishResponse();

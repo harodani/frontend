@@ -42,9 +42,6 @@ import android.view.MenuItem;
  */
 public class BaseMenuActivity extends Activity {
 
-    /** Debugging tag. */
-    private static final String TAG = "BaseMenuActivity";
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu()");

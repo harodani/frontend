@@ -55,7 +55,6 @@ public class NetInfRetrieve extends NetInfRequest {
 	 */
 	public NetInfRetrieve(String host, String port,
 			String hashAlg, String hash) {
-
 		super("retrieve", hashAlg, hash);
 	}
 
@@ -68,7 +67,8 @@ public class NetInfRetrieve extends NetInfRequest {
      */
     @Override
     protected NetInfResponse doInBackground(Void... voids) {
-
+    	Log.d(TAG, "Issuing a GET request.");
+    	
         try {
             HttpGet get = new HttpGet(getUri());
             HttpResponse httpResponse = execute(get);

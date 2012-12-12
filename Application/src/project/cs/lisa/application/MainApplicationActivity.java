@@ -392,7 +392,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     Log.d(TAG, "The NetInf node was started.");
 
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
-                    Log.d(TAG, "Trasferring resource using Bluetooth");
+                    Log.d(TAG, "Transferring resource using Bluetooth");
                     updateSpinningBarColor(R.drawable.progress_blue);
 
                 } else if (action.equals(LOCAL_TRANSMISSION)) {
@@ -443,7 +443,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * @param text      The text to show in the toast.
      */
     public static void showToast(String text) {
-        Log.d(TAG, "showToast()");
         sToast.cancel();
         sToast = Toast.makeText(getActivity(), text, Toast.LENGTH_LONG);
         sToast.show();
@@ -453,7 +452,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * Cancel current toast.
      */
     public static void cancelToast() {
-        Log.d(TAG, "cancelToast()");
         sToast.cancel();
     }
 }
