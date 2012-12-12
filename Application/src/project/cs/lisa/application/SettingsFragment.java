@@ -31,7 +31,7 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
 /**
- * Load the settings to the application 
+ * Load the settings to the application.
  * 
  * @author Harold Martinez
  * @author Linus Sunde

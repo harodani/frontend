@@ -26,11 +26,10 @@
  */
 package project.cs.lisa.application;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 /**
- * Shows the settings
+ * Shows the settings.
  * 
  * @author Harold Martinez
  * @author Linus Sunde

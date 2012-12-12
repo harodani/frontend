@@ -39,7 +39,7 @@ import android.util.Log;
  * Singleton utility class for loading properties and
  * providing methods for getting the property values.
  * 
- * author Paolo Boschini
+ * @author Paolo Boschini
  * 
  */
 public enum UProperties {

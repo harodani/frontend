@@ -55,7 +55,7 @@ import android.util.Log;
  * Handles WiFi connection
  * 
  * @author Paolo Boschini
- * @author Linus
+ * @author Linus Sunde
  */
 public class WifiHandler {
 
