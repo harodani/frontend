@@ -363,7 +363,6 @@ implements ResolutionService {
         // If we were unable to get a JSON Object from the JSON String, throw exception.
         if (json == null) {
             Log.e(TAG, "Unable to parse JSON");
-            Log.e(TAG, "jsonString = " + jsonString);
             throw new InvalidResponseException("Unable to parse JSON.");
         }
 
@@ -474,14 +473,10 @@ implements ResolutionService {
         io.setIdentifier(identifier);
 
         // Reads JSON Object
-        Log.d(TAG, "Reading JSON");
         String jsonString = readJson(response);
-        Log.d(TAG, "JSON read:\n" + jsonString);
 
         // Parses JSON Object
-        Log.d(TAG, "Parsing JSON");
         JSONObject json = parseJson(jsonString);
-        Log.d(TAG, "JSON parsed:\n" + json.toString());
 
         // Add content-type, metadata and locators
         addContentType(identifier, json);
@@ -533,7 +528,6 @@ implements ResolutionService {
             byte[] boundary = (contentType.substring(contentType.indexOf("boundary=") + 9)).getBytes();
 
             // Raises intent
-            Log.d(TAG, "Sending Intent " + NRS_TRANSMISSION);
             Intent intent = new Intent(NRS_TRANSMISSION);
             MainNetInfActivity.getActivity().sendBroadcast(intent);
 
@@ -645,7 +639,7 @@ implements ResolutionService {
      */
     @Override
     public InformationObject get(Identifier identifier) {
-        Log.d(TAG, "get()");
+        Log.d(TAG, "Get information object from NRS.");
         
         try {
             // Create NetInf GET request. Request looks like ni:///hash-alg;hash
@@ -857,12 +851,10 @@ implements ResolutionService {
      *      Rrepresentation of the input stream
      */
     private String streamToString(InputStream input) {
-        Log.d(TAG, "streamToString()");
-
         try {
             return new Scanner(input).useDelimiter("\\A").next();
         } catch (NoSuchElementException e) {
-            Log.d(TAG, "NoSuchElementException found. String returned is \"\"");
+            Log.e(TAG, "NoSuchElementException found. String returned is \"\"");
             return "";
         }
     }
