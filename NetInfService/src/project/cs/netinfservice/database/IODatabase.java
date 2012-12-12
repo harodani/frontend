@@ -26,6 +26,7 @@
  */
 package project.cs.netinfservice.database;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import netinf.common.datamodel.DatamodelFactory;
 import netinf.common.datamodel.Identifier;
 import netinf.common.datamodel.InformationObject;
 
-import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -508,8 +508,7 @@ public class IODatabase
 		// Parse metadata again, this time adding objects to the map to reflect "String" : "Value" 
 		try {
 			metadataMap = MetadataParser.toMap((JSONObject) jsonObject);
-		} catch (JSONException e) {
-		    // TODO: Uses JSON Exception which is deprecated
+		} catch (ParseException e) {
 			Log.e(TAG, "Error extracting metadata");
 			throw new DatabaseException("The IO cannot be inserted into the database. "
 					+ "Because the meta-data could not be extracted.", e);
