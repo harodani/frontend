@@ -37,7 +37,9 @@ import android.os.Bundle;
  *
  */
 public class SettingsActivity extends Activity {
-	
+	/**
+	 * Creates the settings fragment
+	 */
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,4 @@ public class SettingsActivity extends Activity {
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
     }
-	
-
 }

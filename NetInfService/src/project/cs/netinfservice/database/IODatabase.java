@@ -69,7 +69,6 @@ import com.google.inject.assistedinject.Assisted;
 public class IODatabase 
 		extends SQLiteOpenHelper
 		implements IODatabaseFactory {
-
 	/** The current database version. */
 	public static final int DATABASE_VERSION = 1;
 	

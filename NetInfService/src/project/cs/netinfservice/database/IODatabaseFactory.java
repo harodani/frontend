@@ -40,8 +40,10 @@ public interface IODatabaseFactory {
 	/**
 	 * Returns an IODatabase.
 	 * 
-	 * @param context	The Application context
-	 * @return			The IODatabase
+	 * @param context
+	 *      The Application context
+	 * @return
+	 * 		The IODatabase
 	 */
 	IODatabase create(Context context);
 }
