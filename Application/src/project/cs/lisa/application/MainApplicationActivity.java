@@ -399,19 +399,19 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     Log.d(TAG, "The NetInf node was started.");
 
                 } else if (action.equals(BLUETOOTH_TRANSMISSION)) {
-                    Log.d(TAG, "Trasferring resource using Bluetooth");
+                    Log.d(TAG, "Transferring resource using Bluetooth");
                     updateSpinningBarColor(R.drawable.progress_blue, BLUE_COLOR);
 
                 } else if (action.equals(LOCAL_TRANSMISSION)) {
-                    Log.d(TAG, "Trasferring resource using local file system");
+                    Log.d(TAG, "Transferring resource using local file system");
                     updateSpinningBarColor(R.drawable.progress_green, GREEN_COLOR);
 
                 } else if (action.equals(UPLINK_TRANSMISSION)) {
-                    Log.d(TAG, "Trasferring resource using uplink");
+                    Log.d(TAG, "Transferring resource using uplink");
                     updateSpinningBarColor(R.drawable.progress_red, RED_COLOR);
 
                 } else if (action.equals(NRS_TRANSMISSION)) {
-                    Log.d(TAG, "Trasferring resource using nrs cache");
+                    Log.d(TAG, "Transferring resource using nrs cache");
                     updateSpinningBarColor(R.drawable.progress_black, BLACK_COLOR);
                 }
             }
