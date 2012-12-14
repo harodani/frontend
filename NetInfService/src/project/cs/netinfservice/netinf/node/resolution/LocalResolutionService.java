@@ -36,6 +36,8 @@ import project.cs.netinfservice.application.MainNetInfApplication;
 import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
+import project.cs.netinfservice.log.LogEntry;
+import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfutilities.UProperties;
 import android.util.Log;
@@ -87,7 +89,7 @@ extends AbstractResolutionServiceWithoutId {
 
     /**
      * Deletes an identifier from database.
-     * 
+     *
      * @param identifier
      *      Identifier to be deleted.
      */
@@ -102,10 +104,10 @@ extends AbstractResolutionServiceWithoutId {
         // Calls deleteIO function
         mDatabase.deleteIO(hash);
     }
-    
+
     /**
      * Tries to retrieve an IO from the database using an identifier.
-     * 
+     *
      * @param identifier
      *      Identifier with the information about the object to be retrieved.
      * @return
@@ -115,23 +117,29 @@ extends AbstractResolutionServiceWithoutId {
     @Override
     public InformationObject get(Identifier identifier) {
         Log.d(TAG, "Get an IO from the database.");
-        
+
         // Extracts hash from the identifier
         String hash = identifier.getIdentifierLabel(
                 SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
 
         InformationObject io = null;
-        
+
+        LogEntry logEntry = NetInfLog.start(identifier, LogEntry.Type.DATABASE, LogEntry.Action.GET);
+
         // Tries to fetch the IO from the database using the hash
         try {
             io = mDatabase.getIO(hash);
         } catch (DatabaseException e) {
             Log.e(TAG, "Couldn't retrieve the information object associated with the hash = "
                     + hash);
-            
+
+            NetInfLog.failed(logEntry);
+
             // If it fails, return null
             return null;
         }
+
+        NetInfLog.stop(logEntry, io);
 
         // Returns IO
         return io;
@@ -139,19 +147,23 @@ extends AbstractResolutionServiceWithoutId {
 
     /**
      * Adds an Information Object to the IO.
-     * 
+     *
      * @param io
      *      Information Object to be added.
      */
     @Override
     public void put(InformationObject io) {
         Log.d(TAG, "Trying to put an IO into the database");
-        
+
+        LogEntry logEntry = NetInfLog.start(io, LogEntry.Type.DATABASE, LogEntry.Action.PUBLISH);
+
         // Tries to add IO using the addIO function from the IODatabase class
         try {
             mDatabase.addIO(io);
+            NetInfLog.stop(logEntry);
         } catch (DatabaseException e) {
             Log.e(TAG, "Failed adding the information object into the database.");
+            NetInfLog.failed(logEntry);
         }
     }
 
@@ -166,14 +178,14 @@ extends AbstractResolutionServiceWithoutId {
         // Create an Identity Object using the datamodel factory
         ResolutionServiceIdentityObject identity = mDatamodelFactory
                 .createDatamodelObject(ResolutionServiceIdentityObject.class);
-        
+
         // Set attributes
         identity.setName(TAG);
         int priority = Integer.parseInt(UProperties.INSTANCE
                 .getPropertyWithName("lrs.priority"));
         identity.setDefaultPriority(priority);
         identity.setDescription(describe());
-        
+
         // Return the new Identity Object
         return identity;
     }

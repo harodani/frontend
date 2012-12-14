@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
+import project.cs.netinfservice.log.LogEntry;
+import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.netinf.provider.ByteArrayProvider;
 import project.cs.netinfutilities.UProperties;
 import android.bluetooth.BluetoothAdapter;
@@ -91,6 +93,8 @@ public class BluetoothProvider implements ByteArrayProvider {
         byte[] fileArray = null;
         BluetoothSocket socket = null;
 
+        LogEntry logEntry = NetInfLog.start(hash, LogEntry.Type.BLUETOOTH, LogEntry.Action.GET);
+
         try {
             // Connect
             socket = connectToRemoteDevice(locator);
@@ -101,8 +105,13 @@ public class BluetoothProvider implements ByteArrayProvider {
             // Download file
             fileArray = downloadFile(socket);
 
+            NetInfLog.stop(logEntry, fileArray);
+
         } catch (IOException e) {
             Log.e(TAG, "Connection to locator failed.");
+
+            NetInfLog.failed(logEntry);
+
             fileArray = null;
 
             if (socket != null) {

@@ -50,5 +50,7 @@
     <string name="help_nrs_text">The Name Resolution Service (NRS) is required for the application to work. 
         You can change the connection to a new NRS in the settings menu.</string>
         
+    <string name="log_category">Log</string>
+    <string name="clear_log_title">Clear</string>
 
 </resources>

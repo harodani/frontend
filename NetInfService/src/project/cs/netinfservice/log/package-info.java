@@ -27,5 +27,5 @@
 /**
  * @author Thiago Costa Porto
  */
-package project.cs.netinfservice.measurements;
+package project.cs.netinfservice.log;
  

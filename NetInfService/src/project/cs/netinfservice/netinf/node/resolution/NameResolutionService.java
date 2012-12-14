@@ -68,6 +68,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
+import project.cs.netinfservice.log.LogEntry;
+import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
@@ -155,7 +157,7 @@ implements ResolutionService {
 
     /**
      * Get the NRS Address.
-     * 
+     *
      * @return
      *      <p>The IP Address of the NRS.
      */
@@ -174,7 +176,7 @@ implements ResolutionService {
 
     /**
      * Get the NRS port.
-     * 
+     *
      * @return
      *      <p>The port of the NRS
      */
@@ -194,7 +196,7 @@ implements ResolutionService {
 
     /**
      * Gets the hash algorithm from an identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @return
@@ -211,7 +213,7 @@ implements ResolutionService {
 
     /**
      * Gets the hash from an identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @return
@@ -228,7 +230,7 @@ implements ResolutionService {
 
     /**
      * Gets the content-type from an identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @return
@@ -245,7 +247,7 @@ implements ResolutionService {
 
     /**
      * Gets the metadata from an identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @return
@@ -262,7 +264,7 @@ implements ResolutionService {
 
     /**
      * Gets the file path from an InformationObject.
-     * 
+     *
      * @param io
      *      The information object
      * @return
@@ -286,7 +288,7 @@ implements ResolutionService {
 
     /**
      * Gets the <b>first</b> bluetooth locator from an InformationObject.
-     * 
+     *
      * @param io
      *      The information object
      * @return
@@ -311,7 +313,7 @@ implements ResolutionService {
 
     /**
      * Reads the next content stream from a HTTP response, expecting it to be JSON.
-     * 
+     *
      * @param response
      *      The HTTP response
      * @return
@@ -348,7 +350,7 @@ implements ResolutionService {
 
     /**
      * Converts the JSON String returned in the HTTP response into a JSONObject.
-     * 
+     *
      * @param jsonString
      *      The JSON String from the HTTP response
      * @return
@@ -372,7 +374,7 @@ implements ResolutionService {
 
     /**
      * If the JSON contains a content-type, extract it and set the content-type of the identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @param json
@@ -401,7 +403,7 @@ implements ResolutionService {
 
     /**
      * If the JSON contains metadata, extract it and set the metadata of the identifier.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @param json
@@ -429,7 +431,7 @@ implements ResolutionService {
 
     /**
      * If the JSON contains locators, extract them and add them to the InformationObject.
-     * 
+     *
      * @param io
      *      The InformationObject
      * @param json
@@ -454,7 +456,7 @@ implements ResolutionService {
 
     /**
      * Create an IO based in an identifier and a HTTP Response.
-     * 
+     *
      * @param identifier
      *      The IO identifier
      * @param response
@@ -489,7 +491,7 @@ implements ResolutionService {
 
     /**
      * Creates an Information Object and file from a previous HTTP request.
-     * 
+     *
      * @param identifier
      *      The identifier
      * @param response
@@ -538,22 +540,22 @@ implements ResolutionService {
 
             // Skip multipart preamble
             multipartStream.skipPreamble();
-            
+
             // TODO Dependant on order used by NRS
             // Read JSON
             ByteArrayOutputStream jsonStream = new ByteArrayOutputStream();
-            
+
             // Move on multipart stream
             multipartStream.readHeaders();
             multipartStream.readBodyData(jsonStream);
             multipartStream.readBoundary();
-            
+
             // Parse JSON Object
             JSONObject jsonObject = parseJson(jsonStream.toString());
-            
+
             // Close stream used to read JSON
             jsonStream.close();
-            
+
             // Add attributes to the new Information Object
             addContentType(io.getIdentifier(), jsonObject);
             addMetadata(io.getIdentifier(), jsonObject);
@@ -562,14 +564,14 @@ implements ResolutionService {
             // Create the new file
             File file = new File(Environment.getExternalStorageDirectory()
                     + "/DCIM/Shared/" + getHash(io.getIdentifier()));
-            
+
             // Write file in disk
             FileOutputStream fos = new FileOutputStream(file);
-            
+
             // move on Multipart
             multipartStream.readHeaders();
             multipartStream.readBodyData(fos);
-            
+
             // Close file stream
             fos.flush();
             fos.close();
@@ -579,7 +581,7 @@ implements ResolutionService {
             locator.setAttributePurpose(DefinedAttributePurpose.LOCATOR_ATTRIBUTE.toString());
             locator.setIdentification(SailDefinedAttributeIdentification.FILE_PATH.getURI());
             locator.setValue(file.getAbsoluteFile());
-            
+
             // Add atributes
             io.addAttribute(locator);
 
@@ -592,7 +594,7 @@ implements ResolutionService {
 
     /**
      * Create an InformationObject given an identifier and the HTTP response to the NetInf GET.
-     * 
+     *
      * @param identifier
      *     The Identifier used for the NetInf GET
      * @param response
@@ -630,7 +632,7 @@ implements ResolutionService {
 
     /**
      * Performs a NetInf GET request using the HTTP convergence layer.
-     * 
+     *
      * @param identifier
      *      Identifier describing the InformationObject to get
      * @return
@@ -640,7 +642,9 @@ implements ResolutionService {
     @Override
     public InformationObject get(Identifier identifier) {
         Log.d(TAG, "Get information object from NRS.");
-        
+
+        LogEntry logEntry = NetInfLog.start(identifier, LogEntry.Type.NRS, LogEntry.Action.GET);
+
         try {
             // Create NetInf GET request. Request looks like ni:///hash-alg;hash
             String uri = "ni:///" + getHashAlg(identifier) + ";" + getHash(identifier);
@@ -651,7 +655,9 @@ implements ResolutionService {
 
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
-            
+
+            NetInfLog.stop(logEntry, io);
+
             // Returns Information Object found
             return io;
         } catch (InvalidResponseException e) {
@@ -661,9 +667,10 @@ implements ResolutionService {
         } catch (IOException e) {
             Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
-        
+
+        NetInfLog.failed(logEntry);
         Log.e(TAG, "get() failed. Returning null");
-        
+
         // Fails
         return null;
     }
@@ -678,7 +685,7 @@ implements ResolutionService {
 
     /**
      * Publishes an object to the NRS.
-     * 
+     *
      * @param io
      *      The Information Object to be published
      */
@@ -688,16 +695,21 @@ implements ResolutionService {
         try {
             // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
-            
+
+            LogEntry logEntry = NetInfLog.start(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
+
             // Execute HTTP request
             HttpResponse response = mClient.execute(post);
-            
+
             // Get status code
             int status = response.getStatusLine().getStatusCode();
-            
+
             // Check if object was created
             if (status != HttpStatus.SC_CREATED) {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
+                NetInfLog.failed(logEntry);
+            } else {
+                NetInfLog.stop(logEntry);
             }
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);
@@ -708,7 +720,7 @@ implements ResolutionService {
 
     /**
      * Creates an HTTP POST representation of a NetInf PUBLISH message.
-     * 
+     *
      * @param io
      *     The information object to publish
      * @return
@@ -781,7 +793,7 @@ implements ResolutionService {
 
     /**
      * Creates an HTTP Post request to get an IO from the NRS.
-     * 
+     *
      * @param uri
      *      The NetInf format URI for getting IOs
      * @return
@@ -820,7 +832,7 @@ implements ResolutionService {
 
     /**
      * Identity Object creator for this resolution service.
-     * 
+     *
      * @return
      *      The Identity Object for this class.
      */
@@ -844,7 +856,7 @@ implements ResolutionService {
     /**
      * Converts an InputStream into a String.
      * TODO Move to Util class, probably use the better commented version from NetInfRequest
-     * 
+     *
      * @param input
      *      A input stream
      * @return String
@@ -865,7 +877,7 @@ implements ResolutionService {
      * @param str
      *      String to be converted
      *
-     * @return 
+     * @return
      *      A new ByteArrayInputStream with the bytes from the string
      */
     private static InputStream fromString(String str) {

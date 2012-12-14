@@ -17,6 +17,13 @@
             android:summaryOn="@string/fullput_summary_on"
             android:title="@string/fullput_title" />
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/log_category" >
+        <Preference
+            android:key="pref_key_clear_log"
+            android:title="@string/clear_log_title" >
+        </Preference>
+    </PreferenceCategory>
     
     <PreferenceCategory
         android:key="pref_key_nrs"

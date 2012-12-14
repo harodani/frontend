@@ -27,6 +27,7 @@
 package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
+import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfutilities.UProperties;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -55,7 +56,7 @@ implements OnSharedPreferenceChangeListener {
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
     /**
-     * Creates settings fragment, initializing global preferences. 
+     * Creates settings fragment, initializing global preferences.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ implements OnSharedPreferenceChangeListener {
 
         // Get shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        
+
         // Set default NRS address
         if (!prefs.contains(PREF_KEY_NRS_IP)) {
             // Edit on the go
@@ -73,7 +74,7 @@ implements OnSharedPreferenceChangeListener {
                     UProperties.INSTANCE.getPropertyWithName("nrs.http.host"));
             editor.commit();
         }
-        
+
         // Set default NRS port
         if (!prefs.contains(PREF_KEY_NRS_PORT)) {
             Editor editor = prefs.edit();
@@ -93,9 +94,9 @@ implements OnSharedPreferenceChangeListener {
                     public boolean onPreferenceClick(Preference preference) {
                         // DB Delete
                         AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                        .setTitle("Do you really want to delete the database?")    
+                        .setTitle("Do you really want to delete the database?")
                         .setCancelable(false)
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {  
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 getActivity().deleteDatabase("IODatabase");
@@ -111,6 +112,30 @@ implements OnSharedPreferenceChangeListener {
         // Set default summaries
         findPreference(PREF_KEY_NRS_IP).setSummary(prefs.getString(PREF_KEY_NRS_IP, ""));
         findPreference(PREF_KEY_NRS_PORT).setSummary(prefs.getString(PREF_KEY_NRS_PORT, ""));
+
+        // Clear Log
+        findPreference("pref_key_clear_log").setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        // DB Delete
+                        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                        .setTitle("Do you really want to delete the log?")
+                        .setCancelable(false)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                NetInfLog.deleteLog();
+                                NetInfLog.clearLog();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                        dialog.show();
+                        return false;
+                    }
+                });
+
     }
 
     /**

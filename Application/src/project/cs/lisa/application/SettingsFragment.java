@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Uppsala University
  *
  * Project CS course, Fall 2012
@@ -26,26 +26,61 @@
  */
 package project.cs.lisa.application;
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+
 import project.cs.lisa.R;
+import project.cs.netinfutilities.UProperties;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 
 /**
  * Load the settings to the application.
- * 
+ *
  * @author Harold Martinez
  * @author Linus Sunde
  *
  */
 public class SettingsFragment extends PreferenceFragment {
-	
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
-        
+
+        // Clear Log
+        findPreference("pref_key_clear_log").setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        // DB Delete
+                        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                        .setTitle("Do you really want to delete the log?")
+                        .setCancelable(false)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String logFile =
+                                        UProperties.INSTANCE.getPropertyWithName("log.file");
+                                FileUtils.deleteQuietly(
+                                        new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + logFile));
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                        dialog.show();
+                        return false;
+                    }
+                });
+
     }
 
 }

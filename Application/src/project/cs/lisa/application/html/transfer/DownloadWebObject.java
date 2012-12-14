@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Uppsala University
  *
  * Project CS course, Fall 2012
@@ -28,7 +28,6 @@
 package project.cs.lisa.application.html.transfer;
 
 import java.io.ByteArrayOutputStream;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +38,9 @@ import org.apache.commons.io.FileUtils;
 
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.hash.Hash;
-
+import project.cs.lisa.application.log.ApplicationLog;
+import project.cs.lisa.application.log.LogEntry;
 import project.cs.netinfutilities.UProperties;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -125,6 +124,8 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         Intent intent = new Intent(UPLINK_TRANSMISSION);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
 
+        LogEntry logEntry = ApplicationLog.start(LogEntry.Type.UPLINK, LogEntry.Action.GET_WITH_FILE);
+
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String contentType = connection.getContentType();
         if (contentType == null) {
@@ -144,10 +145,14 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         } catch (IOException e) {
         	Log.e(TAG, "Error occured. Could not find the resource.");
         	e.printStackTrace();
+        	ApplicationLog.failed(logEntry);
         	throw new IOException("Error occured. Could not find the resource.");
         }
 
         String hash = hashContent(bytes);
+
+        ApplicationLog.stop(logEntry, hash, bytes);
+
         File file = new File(mSharedFolder + hash);
         FileUtils.writeByteArrayToFile(file, bytes);
 
@@ -182,7 +187,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         String result = null;
 
         hash = new Hash(bytes);
-        result = hash.encodeResult(); 
+        result = hash.encodeResult();
 
         return result;
     }
