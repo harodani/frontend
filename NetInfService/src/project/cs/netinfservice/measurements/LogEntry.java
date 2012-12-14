@@ -9,6 +9,6 @@ public class LogEntry {
     long fileSize;
     
     public LogEntry() {
-        
+         
     }
 }

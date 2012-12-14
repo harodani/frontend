@@ -12,7 +12,7 @@ public class Statistics {
     // Just initializes a counter
     public Statistics() {
         
-    }
+    } 
     /*
     // Specifies which type of Statistics we are going to keep
     public Statistics(String type) {

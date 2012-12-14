@@ -6,7 +6,7 @@ public class SizeMeasurements extends Statistics {
     /** Debug Tag */
     public static final String TAG = "SizeMeasurements";
 
-    public static ArrayList mLog;
+    public static ArrayList mLog; 
     
     public SizeMeasurements() {
         
