@@ -170,6 +170,14 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpLoadPageIcon();
         setUpWebView();
         setUpSpinningBar();
+        
+        // test purposes
+        runAutomatedDownload();
+    }
+
+    private void runAutomatedDownload() {
+        // load first page
+        
     }
 
     /**
@@ -184,15 +192,6 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
-
-        registerReceiver(mBroadcastReceiver, mIntentFilter);
-
-        // sets up UI stuff
-        setUpEditTextUrl();
-        setUpLoadPageIcon();
-        setUpWebView();
-        setUpSpinningBar();
-        
     }
 
     /**
@@ -428,7 +427,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
      */
     private void updateSpinningBarColor(int newDrawable, int color) {
         int currentDrawable = (Integer) (mSpinningBar.getTag());
-        if (currentDrawable != newDrawable) {
+        if (currentDrawable != color) {
             mSpinningBar.setIndeterminateDrawable(
                     getResources().getDrawable(newDrawable));
             mSpinningBar.setProgressDrawable(
