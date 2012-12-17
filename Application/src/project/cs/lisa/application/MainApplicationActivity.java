@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import project.cs.lisa.R;
@@ -81,7 +84,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.lisa.node.started";
-    
+
     /** Properties file. */
     public static final String PROPERTIES_FILE = "config.properties";
 
@@ -132,6 +135,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** Spinning progress bar, shown when loading a page. */
     private ProgressBar mSpinningBar;
 
+    /** Test pages list. */
+    List<String> mPages;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,17 +151,17 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
-        
+
         // sets up property reader
         AssetManager assets = getApplicationContext().getResources().getAssets();
         InputStream is = null;
-		try {
-			is = assets.open(PROPERTIES_FILE);
-	        UProperties.INSTANCE.init(is);
-	        is.close();
-		} catch (IOException e) {
-			Log.e(TAG, "Failed initializing the properties reader.");
-		}
+        try {
+            is = assets.open(PROPERTIES_FILE);
+            UProperties.INSTANCE.init(is);
+            is.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed initializing the properties reader.");
+        }
 
         // setupWifi();
         setupBluetoothAvailability();
@@ -170,7 +176,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpLoadPageIcon();
         setUpWebView();
         setUpSpinningBar();
-        
+
         // test purposes
         runAutomatedDownload();
     }
@@ -181,11 +187,12 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * is broadcasted.
      */
     private void runAutomatedDownload() {
+        // set test pages
+        mPages = Arrays.asList(UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(","));
+
         // load first page
-//        String page = UProperties.INSTANCE.getPropertyWithName("default.webpage");
-//        startFetchingWebPage(page);
-        String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
-        System.out.println(pages);
+        String mPage = UProperties.INSTANCE.getPropertyWithName("default.webpage");
+        startFetchingWebPage(mPage);
     }
 
     /**
@@ -401,6 +408,22 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
+
+                    if (mPages.size() != 0) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            Log.e(TAG, "Error while pausing between loading web pages");
+                            e.printStackTrace();
+                        }
+
+                        // loading next test page
+                        Random random = new Random();
+                        int nextPage = random.nextInt(mPages.size());
+                        String page = mPages.get(nextPage);
+                        mPages.remove(nextPage);
+                        startFetchingWebPage(page);
+                    }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
