@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -178,7 +179,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpSpinningBar();
 
         // test purposes
-        runAutomatedDownload();
+        //runAutomatedDownload();
     }
 
     /**
@@ -188,7 +189,11 @@ public class MainApplicationActivity extends BaseMenuActivity {
      */
     private void runAutomatedDownload() {
         // set test pages
-        mPages = Arrays.asList(UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(","));
+        mPages = new ArrayList<String>();
+        String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
+        for (String url : pages) {
+            mPages.add(url);
+        }
 
         // load first page
         String mPage = UProperties.INSTANCE.getPropertyWithName("default.webpage");
@@ -409,21 +414,14 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
 
-                    if (mPages.size() != 0) {
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            Log.e(TAG, "Error while pausing between loading web pages");
-                            e.printStackTrace();
-                        }
-
-                        // loading next test page
-                        Random random = new Random();
-                        int nextPage = random.nextInt(mPages.size());
-                        String page = mPages.get(nextPage);
-                        mPages.remove(nextPage);
-                        startFetchingWebPage(page);
-                    }
+//                    if (mPages.size() != 0) {
+//                        // loading next test page
+//                        Random random = new Random();
+//                        int nextPage = random.nextInt(mPages.size());
+//                        String page = mPages.get(nextPage);
+//                        mPages.remove(nextPage);
+//                        startFetchingWebPage(page);
+//                    }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");

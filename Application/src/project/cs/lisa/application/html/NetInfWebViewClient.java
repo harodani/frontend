@@ -173,7 +173,6 @@ public class NetInfWebViewClient extends WebViewClient {
                 Log.e("TAG", "Could not open file");
             }
 
-            System.gc();
             return response;
         } else {
             Log.e(TAG, "Unexpected url while intercepting resources.");

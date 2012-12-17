@@ -139,6 +139,9 @@ public class FetchWebPageTask extends AsyncTask<URL, Void, Void> {
      *      The created task
      */
     private NetInfSearch searchRetrieveDisplay(final URL url) {
+        
+        Runtime.getRuntime().gc();
+
         return new NetInfSearch(url.toString(), "empty") {
             @Override
             public void onPostExecute(NetInfResponse response) {

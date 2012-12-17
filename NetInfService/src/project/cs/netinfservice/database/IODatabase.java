@@ -311,7 +311,7 @@ public class IODatabase
 	 * @throws
 	 * 		SQLiteException	Thrown, if writing to the database failed.
 	 */
-	private void insert(String table, ContentValues values) {		
+	private synchronized void insert(String table, ContentValues values) {		
 	    // Insert value into table
 
 	    try {
@@ -591,7 +591,7 @@ public class IODatabase
 	 * @throws DatabaseException
 	 *     	Thrown, if no entry was found for the specified key value pair
 	 */
-	private Cursor query(String table, String key, String value) throws DatabaseException {
+	private synchronized Cursor query(String table, String key, String value) throws DatabaseException {
 		SQLiteDatabase db = null;
 		
 		try {
