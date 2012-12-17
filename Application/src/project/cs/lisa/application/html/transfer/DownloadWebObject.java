@@ -38,7 +38,6 @@ import org.apache.commons.io.FileUtils;
 
 import project.cs.lisa.application.MainApplicationActivity;
 import project.cs.lisa.application.hash.Hash;
-import project.cs.lisa.application.log.ApplicationLog;
 import project.cs.lisa.application.log.LogEntry;
 import project.cs.netinfutilities.UProperties;
 import android.content.Context;
@@ -124,7 +123,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         Intent intent = new Intent(UPLINK_TRANSMISSION);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
 
-        LogEntry logEntry = ApplicationLog.start(LogEntry.Type.UPLINK, LogEntry.Action.GET_WITH_FILE);
+        LogEntry logEntry = new LogEntry(LogEntry.Type.UPLINK, LogEntry.Action.GET_WITH_FILE);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String contentType = connection.getContentType();
@@ -145,13 +144,13 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         } catch (IOException e) {
         	Log.e(TAG, "Error occured. Could not find the resource.");
         	e.printStackTrace();
-        	ApplicationLog.failed(logEntry);
+        	logEntry.failed();
         	throw new IOException("Error occured. Could not find the resource.");
         }
 
         String hash = hashContent(bytes);
 
-        ApplicationLog.stop(logEntry, hash, bytes);
+        logEntry.done(bytes);
 
         File file = new File(mSharedFolder + hash);
         FileUtils.writeByteArrayToFile(file, bytes);

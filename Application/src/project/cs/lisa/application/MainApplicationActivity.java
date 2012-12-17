@@ -210,7 +210,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Sets up the edit text for the url. 
+     * Sets up the edit text for the url.
      */
     private void setUpEditTextUrl() {
         // Get the input address
@@ -285,7 +285,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Listener for connecting to a Wifi network. 
+     * Listener for connecting to a Wifi network.
      */
     private class WifiDialogListener implements DialogInterface.OnClickListener {
         @Override
@@ -386,10 +386,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /**
      * Receives messages from different transmissions
      * to update the progress bar color.
-     * 
+     *
      * Receives messages from web view to start downloading
      * new web content.
-     * 
+     *
      * Receives messages from the NRS node to notify it was
      * started.
      */
@@ -450,7 +450,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /**
      * Updates the spinning bar with a new drawable.
-     *  
+     *
      * @param newDrawable
      *      The new newDrawable.
      * @param color

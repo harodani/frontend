@@ -138,7 +138,7 @@ extends AbstractResolutionServiceWithoutId {
             return null;
         }
 
-        logEntry.stop(io);
+        logEntry.done(io);
 
         // Returns IO
         return io;
@@ -159,7 +159,7 @@ extends AbstractResolutionServiceWithoutId {
         // Tries to add IO using the addIO function from the IODatabase class
         try {
             mDatabase.addIO(io);
-            logEntry.stop();
+            logEntry.done();
         } catch (DatabaseException e) {
             Log.e(TAG, "Failed adding the information object into the database.");
             logEntry.failed();

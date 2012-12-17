@@ -655,7 +655,7 @@ implements ResolutionService {
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
 
-            logEntry.stop(io);
+            logEntry.done(io);
 
             // Returns Information Object found
             return io;
@@ -708,7 +708,7 @@ implements ResolutionService {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
                 logEntry.failed();
             } else {
-                logEntry.stop();
+                logEntry.done();
             }
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);
