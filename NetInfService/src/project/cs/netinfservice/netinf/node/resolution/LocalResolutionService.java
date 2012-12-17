@@ -37,7 +37,6 @@ import project.cs.netinfservice.database.DatabaseException;
 import project.cs.netinfservice.database.IODatabase;
 import project.cs.netinfservice.database.IODatabaseFactory;
 import project.cs.netinfservice.log.LogEntry;
-import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfutilities.UProperties;
 import android.util.Log;
@@ -124,7 +123,7 @@ extends AbstractResolutionServiceWithoutId {
 
         InformationObject io = null;
 
-        LogEntry logEntry = NetInfLog.start(identifier, LogEntry.Type.DATABASE, LogEntry.Action.GET);
+        LogEntry logEntry = new LogEntry(LogEntry.Type.DATABASE, LogEntry.Action.GET);
 
         // Tries to fetch the IO from the database using the hash
         try {
@@ -133,13 +132,13 @@ extends AbstractResolutionServiceWithoutId {
             Log.e(TAG, "Couldn't retrieve the information object associated with the hash = "
                     + hash);
 
-            NetInfLog.failed(logEntry);
+            logEntry.failed();
 
             // If it fails, return null
             return null;
         }
 
-        NetInfLog.stop(logEntry, io);
+        logEntry.stop(io);
 
         // Returns IO
         return io;
@@ -155,15 +154,15 @@ extends AbstractResolutionServiceWithoutId {
     public void put(InformationObject io) {
         Log.d(TAG, "Trying to put an IO into the database");
 
-        LogEntry logEntry = NetInfLog.start(io, LogEntry.Type.DATABASE, LogEntry.Action.PUBLISH);
+        LogEntry logEntry = new LogEntry(io, LogEntry.Type.DATABASE, LogEntry.Action.PUBLISH);
 
         // Tries to add IO using the addIO function from the IODatabase class
         try {
             mDatabase.addIO(io);
-            NetInfLog.stop(logEntry);
+            logEntry.stop();
         } catch (DatabaseException e) {
             Log.e(TAG, "Failed adding the information object into the database.");
-            NetInfLog.failed(logEntry);
+            logEntry.failed();
         }
     }
 

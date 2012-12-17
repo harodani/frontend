@@ -63,8 +63,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
-import project.cs.netinfservice.log.LogEntry;
-import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.util.IOBuilder;
 import android.util.Log;
 

@@ -69,7 +69,6 @@ import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
 import project.cs.netinfservice.log.LogEntry;
-import project.cs.netinfservice.log.NetInfLog;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
@@ -643,7 +642,7 @@ implements ResolutionService {
     public InformationObject get(Identifier identifier) {
         Log.d(TAG, "Get information object from NRS.");
 
-        LogEntry logEntry = NetInfLog.start(identifier, LogEntry.Type.NRS, LogEntry.Action.GET);
+        LogEntry logEntry = new LogEntry(LogEntry.Type.NRS, LogEntry.Action.GET);
 
         try {
             // Create NetInf GET request. Request looks like ni:///hash-alg;hash
@@ -656,7 +655,7 @@ implements ResolutionService {
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
 
-            NetInfLog.stop(logEntry, io);
+            logEntry.stop(io);
 
             // Returns Information Object found
             return io;
@@ -668,7 +667,7 @@ implements ResolutionService {
             Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
 
-        NetInfLog.failed(logEntry);
+        logEntry.failed();
         Log.e(TAG, "get() failed. Returning null");
 
         // Fails
@@ -696,7 +695,7 @@ implements ResolutionService {
             // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
 
-            LogEntry logEntry = NetInfLog.start(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
+            LogEntry logEntry = new LogEntry(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
 
             // Execute HTTP request
             HttpResponse response = mClient.execute(post);
@@ -707,9 +706,9 @@ implements ResolutionService {
             // Check if object was created
             if (status != HttpStatus.SC_CREATED) {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
-                NetInfLog.failed(logEntry);
+                logEntry.failed();
             } else {
-                NetInfLog.stop(logEntry);
+                logEntry.stop();
             }
         } catch (UnsupportedEncodingException e) {
             throw new NetInfResolutionException("Encoding not supported", e);

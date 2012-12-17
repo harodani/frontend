@@ -27,7 +27,7 @@
 package project.cs.netinfservice.application;
 
 import project.cs.netinfservice.R;
-import project.cs.netinfservice.log.NetInfLog;
+import project.cs.netinfservice.log.LogEntry;
 import project.cs.netinfutilities.UProperties;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -125,8 +125,7 @@ implements OnSharedPreferenceChangeListener {
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                NetInfLog.deleteLog();
-                                NetInfLog.clearLog();
+                                LogEntry.deleteLogFile();
                             }
                         })
                         .setNegativeButton("Cancel", null)
