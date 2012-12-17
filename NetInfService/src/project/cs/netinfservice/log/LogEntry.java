@@ -2,6 +2,8 @@ package project.cs.netinfservice.log;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import netinf.common.datamodel.InformationObject;
 import netinf.common.datamodel.attribute.Attribute;
@@ -20,9 +22,12 @@ public class LogEntry {
             UProperties.INSTANCE.getPropertyWithName("log.file");
     public static final String EXTERNAL_STORAGE =
             Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final SimpleDateFormat DATE_FORMAT =
+            new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-    private Type mType; // NRS, Bluetooth, Database
-    private Action mAction; // Sending file, retrieving file
+    private String mTimestamp;
+    private Type mType;
+    private Action mAction;
     private long mStartTime;
     private long mStopTime;
     private long mTransferredBytes = 0;
@@ -42,6 +47,7 @@ public class LogEntry {
     }
 
     public LogEntry(Type type, Action action) {
+        mTimestamp = DATE_FORMAT.format(Calendar.getInstance().getTime());
         mType = type;
         mAction = action;
         mStartTime = System.currentTimeMillis();
@@ -66,7 +72,7 @@ public class LogEntry {
 
     private void writeToFile() {
         try {
-            FileUtils.write(new File(EXTERNAL_STORAGE + LOG_FILE), toString(), true);
+            FileUtils.write(new File(EXTERNAL_STORAGE + LOG_FILE), toString() + "\n", true);
         } catch (IOException e) {
             Log.e(TAG, "Failed to write log entry to file");
         }
@@ -97,6 +103,8 @@ public class LogEntry {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
+        builder.append(mTimestamp);
+        builder.append("\t");
         builder.append(mType);
         builder.append("\t");
         builder.append(mAction);

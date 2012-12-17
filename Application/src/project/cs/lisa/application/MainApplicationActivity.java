@@ -81,7 +81,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.lisa.node.started";
-    
+
     /** Properties file. */
     public static final String PROPERTIES_FILE = "config.properties";
 
@@ -145,7 +145,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
-        
+
         // sets up property reader
         AssetManager assets = getApplicationContext().getResources().getAssets();
         InputStream is = null;
@@ -184,19 +184,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
-
-        registerReceiver(mBroadcastReceiver, mIntentFilter);
-
-        // sets up UI stuff
-        setUpEditTextUrl();
-        setUpLoadPageIcon();
-        setUpWebView();
-        setUpSpinningBar();
-        
     }
 
     /**
-     * Sets up the edit text for the url. 
+     * Sets up the edit text for the url.
      */
     private void setUpEditTextUrl() {
         // Get the input address
@@ -271,7 +262,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Listener for connecting to a Wifi network. 
+     * Listener for connecting to a Wifi network.
      */
     private class WifiDialogListener implements DialogInterface.OnClickListener {
         @Override
@@ -372,10 +363,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /**
      * Receives messages from different transmissions
      * to update the progress bar color.
-     * 
+     *
      * Receives messages from web view to start downloading
      * new web content.
-     * 
+     *
      * Receives messages from the NRS node to notify it was
      * started.
      */
@@ -420,7 +411,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /**
      * Updates the spinning bar with a new drawable.
-     *  
+     *
      * @param newDrawable
      *      The new newDrawable.
      * @param color
