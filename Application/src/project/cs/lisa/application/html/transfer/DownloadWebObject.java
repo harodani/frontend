@@ -150,7 +150,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
 
         String hash = hashContent(bytes);
 
-        logEntry.stop(bytes);
+        logEntry.done(bytes);
 
         File file = new File(mSharedFolder + hash);
         FileUtils.writeByteArrayToFile(file, bytes);

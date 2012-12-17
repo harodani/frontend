@@ -104,7 +104,7 @@ public class BluetoothProvider implements ByteArrayProvider {
             // Download file
             fileArray = downloadFile(socket);
 
-            logEntry.stop(fileArray);
+            logEntry.done(fileArray);
 
         } catch (IOException e) {
             Log.e(TAG, "Connection to locator failed.");

@@ -15,37 +15,78 @@ import project.cs.netinfutilities.UProperties;
 import android.os.Environment;
 import android.util.Log;
 
+/**
+ * Represents an entry in the log file.
+ * @author Linus Sunde
+ * @author Thiago Costa Porto
+ */
 public class LogEntry {
+
+    /** Log Tag. */
     public static final String TAG = "LogEntry";
 
+    /** Log File. */
     public static final String LOG_FILE =
             UProperties.INSTANCE.getPropertyWithName("log.file");
+
+    /** External Storage. */
     public static final String EXTERNAL_STORAGE =
             Environment.getExternalStorageDirectory().getAbsolutePath();
+
+    /** Timestamp Format. */
     public static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
+    /** Timestamp. */
     private String mTimestamp;
+
+    /** Type. */
     private Type mType;
+
+    /** Action. */
     private Action mAction;
+
+    /** Start. */
     private long mStartTime;
+
+    /** Stop. */
     private long mStopTime;
+
+    /** Data transfered. */
     private long mTransferredBytes = 0;
+
+    /** Failed flag. */
     private boolean mFailed = false;
 
+    /** Different types of actions. */
     public enum Type {
+        /** Bluetooth. */
         BLUETOOTH,
+        /** NRS. */
         NRS,
-        DATABASE,
+        /** Local DB. */
+        DATABASE;
     }
 
+    /** Different types of actions. */
     public enum Action {
+        /** Publish. */
         PUBLISH,
+        /** Publish with file. */
         PUBLISH_WITH_FILE,
+        /** Get request without file. */
         GET,
-        GET_WITH_FILE,
+        /** Get request where response contained a file. */
+        GET_WITH_FILE;
     }
 
+    /**
+     * Creates a new LogEntry.
+     * @param type
+     *      The type of the LogEntry.
+     * @param action
+     *      The action of the LogEntry.
+     */
     public LogEntry(Type type, Action action) {
         mTimestamp = DATE_FORMAT.format(Calendar.getInstance().getTime());
         mType = type;
@@ -53,7 +94,15 @@ public class LogEntry {
         mStartTime = System.currentTimeMillis();
     }
 
-    // TODO disc reading slow? do before getting time?
+    /**
+     * Creates a new LogEntry for a publish that could have a file.
+     * @param io
+     *      The published InformationObject.
+     * @param type
+     *      The type of the LogEntry.
+     * @param action
+     *      The action of the LogEntry.
+     */
     public LogEntry(InformationObject io, Type type, Action action) {
         this(type, action);
         if (action == Action.PUBLISH && getFilePath(io) != null) {
@@ -62,6 +111,13 @@ public class LogEntry {
         }
     }
 
+    /**
+     * Gets the size of a transferred file.
+     * @param io
+     *      The InformationObject containing the transferred file
+     * @return
+     *      The size in bytes
+     */
     private long calculateTransferredBytes(InformationObject io) {
         File file = new File(getFilePath(io));
         if (file.exists()) {
@@ -70,6 +126,9 @@ public class LogEntry {
         return -1;
     }
 
+    /**
+     * Writes the LogEntry to the log file.
+     */
     private void writeToFile() {
         try {
             FileUtils.write(new File(EXTERNAL_STORAGE + LOG_FILE), toString() + "\n", true);
@@ -78,29 +137,48 @@ public class LogEntry {
         }
     }
 
-    public void stop() {
+    /**
+     * Signals that the action is done and logs the entry to file.
+     */
+    public void done() {
         mStopTime = System.currentTimeMillis();
         writeToFile();
     }
 
-    public void stop(InformationObject io) {
+    /**
+     * Signals that the action is done and logs the entry to file.
+     * @param io
+     *      The InformationObject downloaded by the action
+     */
+    public void done(InformationObject io) {
         if (getFilePath(io) != null) {
             mAction = Action.GET_WITH_FILE;
             mTransferredBytes = calculateTransferredBytes(io);
         }
-        stop();
+        done();
     }
 
-    public void stop(byte[] bytes) {
+    /**
+     * Signals that the action is done and logs the entry to file.
+     * @param bytes
+     *      The bytes downloaded by the action
+     */
+    public void done(byte[] bytes) {
         mTransferredBytes = bytes.length;
-        stop();
+        done();
     }
 
+    /**
+     * Signals that the action failed and logs the entry to file.
+     */
     public void failed() {
         mFailed = true;
-        stop();
+        done();
     }
 
+    /**
+     * Create a string representation of a LogEntry.
+     */
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(mTimestamp);
@@ -127,6 +205,13 @@ public class LogEntry {
 //        return hash;
 //    }
 
+    /**
+     * Get the local file from an InfromationObject.
+     * @param io
+     *      The InfromationObject
+     * @return
+     *      The path if a local file exists, otherwise false
+     */
     private String getFilePath(InformationObject io) {
         // Created a new attribute (as defined on datamodel factory)
         Attribute filepathAttribute =
@@ -143,6 +228,11 @@ public class LogEntry {
         return filepath;
     }
 
+    /**
+     * Deletes the log file.
+     * @return
+     *      true if the log file was deleted, otherwise false
+     */
     public static boolean deleteLogFile() {
         return FileUtils.deleteQuietly(new File(EXTERNAL_STORAGE + LOG_FILE));
     }
