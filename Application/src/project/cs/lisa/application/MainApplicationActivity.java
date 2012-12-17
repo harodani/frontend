@@ -175,9 +175,17 @@ public class MainApplicationActivity extends BaseMenuActivity {
         runAutomatedDownload();
     }
 
+    /**
+     * Load first web page for evaluation purpose.
+     * The other ones will be loaded when FINISHED_LOADING_PAGE
+     * is broadcasted.
+     */
     private void runAutomatedDownload() {
         // load first page
-        
+//        String page = UProperties.INSTANCE.getPropertyWithName("default.webpage");
+//        startFetchingWebPage(page);
+        String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
+        System.out.println(pages);
     }
 
     /**
