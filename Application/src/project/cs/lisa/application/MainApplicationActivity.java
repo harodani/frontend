@@ -104,6 +104,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** NRS cache transmission used to transfer a resource. */
     public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
 
+    /** NRS search. */
+    public static final String SEARCH_TRANSMISSION = "project.cs.netinfservice.SEARCH_TRANSMISSION";
+
     /** Tags for progress bar. */
     public static final int BLACK_COLOR = 0;
     public static final int BLUE_COLOR = 1;
@@ -178,7 +181,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpSpinningBar();
 
         // test purposes
-//        runAutomatedDownload();
+        runAutomatedDownload();
     }
 
     /**
@@ -211,6 +214,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
+        mIntentFilter.addAction(SEARCH_TRANSMISSION);
     }
 
     /**
@@ -413,14 +417,14 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
 
-//                    if (mPages.size() != 0) {
-//                        // loading next test page
-//                        Random random = new Random();
-//                        int nextPage = random.nextInt(mPages.size());
-//                        String page = mPages.get(nextPage);
-//                        mPages.remove(nextPage);
-//                        startFetchingWebPage(page);
-//                    }
+                    if (mPages.size() != 0) {
+                        // loading next test page
+                        Random random = new Random();
+                        int nextPage = random.nextInt(mPages.size());
+                        String page = mPages.get(nextPage);
+                        mPages.remove(nextPage);
+                        startFetchingWebPage(page);
+                    }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
@@ -440,6 +444,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Transferring resource using nrs cache");
                     updateSpinningBarColor(R.drawable.progress_black, BLACK_COLOR);
+                
+                } else if (action.equals(SEARCH_TRANSMISSION)) {
+                    Log.d(TAG, "Searching resource");
+                    updateSpinningBarColor(R.drawable.progress_black, GREY_COLOR);
                 }
             }
         };

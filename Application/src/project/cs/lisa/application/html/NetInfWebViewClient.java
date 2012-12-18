@@ -121,8 +121,8 @@ public class NetInfWebViewClient extends WebViewClient {
 
         // Log the current URL
         Log.e(TAG, "+++Getting url now: " + url);
-        MainApplicationActivity.cancelToast();
-        MainApplicationActivity.showToast(url);
+        Intent intent = new Intent(MainApplicationActivity.SEARCH_TRANSMISSION);
+        MainApplicationActivity.getActivity().sendBroadcast(intent);
         
         if (!URLUtil.isHttpUrl(url)) {
             super.shouldInterceptRequest(view, url);
