@@ -26,6 +26,11 @@
  */
 package project.cs.netinfservice.application;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+
 import project.cs.netinfservice.R;
 import project.cs.netinfservice.log.LogEntry;
 import project.cs.netinfutilities.UProperties;
@@ -35,6 +40,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
@@ -100,6 +106,14 @@ implements OnSharedPreferenceChangeListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 getActivity().deleteDatabase("IODatabase");
+                                
+                                // Delete files from the local file system
+                                File dir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/DCIM/Shared/");
+                                try {
+                                    FileUtils.cleanDirectory(dir);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton("Cancel", null)

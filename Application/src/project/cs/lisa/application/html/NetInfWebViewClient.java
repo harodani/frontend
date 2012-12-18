@@ -119,11 +119,18 @@ public class NetInfWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view,
             String url) {
 
+        // Log the current URL
+        Log.e(TAG, "+++Getting url now: " + url);
+        MainApplicationActivity.cancelToast();
+        MainApplicationActivity.showToast(url);
+        
         if (!URLUtil.isHttpUrl(url)) {
             super.shouldInterceptRequest(view, url);
+            Log.e(TAG, "Request was not an HttpUrl. Downloading from uplink.");
             return null;
 
         } else if (URLUtil.isHttpUrl(url)) {
+            
             WebObject resource = null;
             File file = null;
             String contentType = null;

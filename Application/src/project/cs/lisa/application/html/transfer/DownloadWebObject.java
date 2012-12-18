@@ -121,6 +121,7 @@ public class DownloadWebObject extends AsyncTask<URL, Void, WebObject> {
         }
 
         Intent intent = new Intent(UPLINK_TRANSMISSION);
+        intent.putExtra("url", url);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
 
         LogEntry logEntry = new LogEntry(LogEntry.Type.UPLINK, LogEntry.Action.GET_WITH_FILE);
