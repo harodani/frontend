@@ -101,6 +101,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** NRS cache transmission used to transfer a resource. */
     public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
 
+    /** NRS search. */
+    public static final String SEARCH_TRANSMISSION = "project.cs.netinfservice.SEARCH_TRANSMISSION";
+
     /** Tags for progress bar. */
     public static final int BLACK_COLOR = 0;
     public static final int BLUE_COLOR = 1;
@@ -184,6 +187,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         mIntentFilter.addAction(LOCAL_TRANSMISSION);
         mIntentFilter.addAction(UPLINK_TRANSMISSION);
         mIntentFilter.addAction(NRS_TRANSMISSION);
+        mIntentFilter.addAction(SEARCH_TRANSMISSION);
     }
 
     /**
@@ -404,6 +408,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 } else if (action.equals(NRS_TRANSMISSION)) {
                     Log.d(TAG, "Transferring resource using nrs cache");
                     updateSpinningBarColor(R.drawable.progress_black, BLACK_COLOR);
+                
+                } else if (action.equals(SEARCH_TRANSMISSION)) {
+                    Log.d(TAG, "Searching resource");
+                    updateSpinningBarColor(R.drawable.progress_black, GREY_COLOR);
                 }
             }
         };

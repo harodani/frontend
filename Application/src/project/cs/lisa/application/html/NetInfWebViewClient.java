@@ -119,6 +119,9 @@ public class NetInfWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view,
             String url) {
 
+        Intent intent = new Intent(MainApplicationActivity.SEARCH_TRANSMISSION);
+        MainApplicationActivity.getActivity().sendBroadcast(intent);
+        
         if (!URLUtil.isHttpUrl(url)) {
             super.shouldInterceptRequest(view, url);
             return null;
