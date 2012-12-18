@@ -136,7 +136,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     private ProgressBar mSpinningBar;
 
     /** Test pages list. */
-    List<String> mPages;
+    private List<String> mPages;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
