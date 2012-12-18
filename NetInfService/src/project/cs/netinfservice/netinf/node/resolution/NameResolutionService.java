@@ -692,6 +692,7 @@ implements ResolutionService {
     public void put(InformationObject io) {
         // Try to publish to the NRS
         try {
+
             // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
 
@@ -708,6 +709,7 @@ implements ResolutionService {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
                 logEntry.failed();
             } else {
+                Log.d(TAG, "Published to NRS");
                 logEntry.done();
             }
         } catch (UnsupportedEncodingException e) {
