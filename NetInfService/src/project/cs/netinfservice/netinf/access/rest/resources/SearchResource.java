@@ -101,10 +101,11 @@ public class SearchResource extends LisaServerResource {
 
             // TODO: Lets return a proper JSONObject.toString instead of a hardcoded string!
             if (results.isEmpty()) {
+                Log.e(TAG, "Search didn't find anything, RESTful API returning empty set");
                 return "{\"results\":[]}";
             }
             
-            // Only use the first identifier (we are insterested in the first response)
+            // Only use the first identifier (we are interested in the first response)
             Identifier identifier = results.get(0);
 
             // Create a JSON Object from the results

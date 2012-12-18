@@ -119,15 +119,12 @@ implements ResolutionService {
     /** NRS cache transmission used to transfer a resource. */
     public static final String NRS_TRANSMISSION = "project.cs.netinfservice.NRS_TRANSMISSION";
 
-    /** HTTP Client. **/
-    private HttpClient mClient;
-
     /** Key for accessing the NRS IP. */
     private static final String PREF_KEY_NRS_IP = "pref_key_nrs_ip";
 
     /** Key for accessing the NRS Port. */
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
-
+    
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
      * @param host
@@ -142,11 +139,6 @@ implements ResolutionService {
             @Named("nrs.http.host") String host,
             @Named("nrs.http.port") int port,
             DatamodelFactory datamodelFactory) {
-        // Setup HTTP client
-        HttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
-        HttpConnectionParams.setSoTimeout(params, TIMEOUT);
-        mClient = new DefaultHttpClient(params);
 
         // Setup other private variables
         mHost = host;
@@ -475,6 +467,7 @@ implements ResolutionService {
 
         // Reads JSON Object
         String jsonString = readJson(response);
+        Log.d(TAG, "Get response from NRS: " + jsonString);
 
         // Parses JSON Object
         JSONObject json = parseJson(jsonString);
@@ -649,8 +642,15 @@ implements ResolutionService {
             String uri = "ni:///" + getHashAlg(identifier) + ";" + getHash(identifier);
             HttpPost getRequest = createGet(uri);
 
+            // Setup HTTP client
+            HttpParams params = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
+            HttpConnectionParams.setSoTimeout(params, TIMEOUT);
+            
+            HttpClient client = new DefaultHttpClient(params);
+            
             // Execute NetInf GET request
-            HttpResponse response = mClient.execute(getRequest);
+            HttpResponse response = client.execute(getRequest);
 
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
@@ -668,6 +668,7 @@ implements ResolutionService {
         }
 
         logEntry.failed();
+
         Log.e(TAG, "get() failed. Returning null");
 
         // Fails
@@ -698,8 +699,15 @@ implements ResolutionService {
 
             LogEntry logEntry = new LogEntry(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
 
+            // Setup HTTP client
+            HttpParams params = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
+            HttpConnectionParams.setSoTimeout(params, TIMEOUT);
+            
+            HttpClient client = new DefaultHttpClient(params);
+            
             // Execute HTTP request
-            HttpResponse response = mClient.execute(post);
+            HttpResponse response = client.execute(post);
 
             // Get status code
             int status = response.getStatusLine().getStatusCode();
