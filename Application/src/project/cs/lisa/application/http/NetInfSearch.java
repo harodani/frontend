@@ -74,7 +74,7 @@ public class NetInfSearch extends NetInfRequest {
             HttpResponse httpResponse = execute(search);
             return new NetInfSearchResponse(httpResponse);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP search request to local node failed");
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : "Execution of HTTP search request to local node failed: " + e.getClass());
             return new NetInfSearchResponse();
         }
     }

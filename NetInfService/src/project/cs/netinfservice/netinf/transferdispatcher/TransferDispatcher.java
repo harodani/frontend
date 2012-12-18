@@ -123,11 +123,11 @@ public enum TransferDispatcher {
         List<String> availableFilteredBluetoothLocators = filterBluetoothLocators(locators, false);
         
         //If the device was not discover it will try to discover again
-        if (availableFilteredBluetoothLocators == null 
-        		|| availableFilteredBluetoothLocators.isEmpty()) {
-        	Log.d(TAG, "The device was not in the previous discovery. Discovering again.");
-        	availableFilteredBluetoothLocators = filterBluetoothLocators(locators, true);
-        }
+//        if (availableFilteredBluetoothLocators == null 
+//        		|| availableFilteredBluetoothLocators.isEmpty()) {
+//        	Log.d(TAG, "The device was not in the previous discovery. Discovering again.");
+//        	availableFilteredBluetoothLocators = filterBluetoothLocators(locators, true);
+//        }
         
         byte[] resultArray;
         String hash = io.getIdentifier().getIdentifierLabel(
