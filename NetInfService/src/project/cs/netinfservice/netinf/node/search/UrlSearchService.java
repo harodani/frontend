@@ -108,9 +108,9 @@ public class UrlSearchService implements SearchService {
 
     /** Random number generator used to create message IDs. */
     private final Random mRandomGenerator = new Random();
-
-    /** HTTP Client. **/
-    private HttpClient mClient;
+    
+    /** Linus does not play instruments. But he TIMES OUT. */
+    private int mTimeout;
 
     /**
      * Creates a new instance of this class.
@@ -140,16 +140,7 @@ public class UrlSearchService implements SearchService {
 
         // Grabs Android's SQLite database
         mDatabase = databaseFactory.create(MainNetInfApplication.getAppContext());
-
-        // HTTP Params
-        HttpParams params = new BasicHttpParams();
-        
-        // Sets timeout accordingly
-        HttpConnectionParams.setConnectionTimeout(params, timeout);
-        HttpConnectionParams.setSoTimeout(params, timeout);
-        
-        // Create a new HTTP Client 
-        mClient = new DefaultHttpClient(params);
+        mTimeout = timeout;
     }
 
     /**
@@ -172,11 +163,13 @@ public class UrlSearchService implements SearchService {
         // Loads url from list of urls with exactly one url
         String url = urls.get(0);
 
+        Log.e(TAG, "Searching for url: " + url);
+        
         // Search in the database
         try {
             // Do database search
             Set<Identifier> results = searchDatabase(url);
-            Log.d(TAG, "Search found the url in database (" + url + ")");
+            Log.d(TAG, "Search found the url in database");
 
             // Send search results to search controller 
             searchController.handleSearchEvent(new SearchServiceResultEvent(
@@ -188,25 +181,38 @@ public class UrlSearchService implements SearchService {
             // If we found something, don't ask the NRS.
             return;
         } catch (DatabaseException e) {
-            Log.e(TAG, "Search in local db didn't find anything or failed");
+            Log.e(TAG, "Search in local db didn't find anything or failed: " + e.getClass());
         }
 
         // Search in the NRS
         Set<Identifier> results = new HashSet<Identifier>();
 
         try {
+            // HTTP Params
+            HttpParams params = new BasicHttpParams();
+            
+            // Sets timeout accordingly
+            HttpConnectionParams.setConnectionTimeout(params, mTimeout);
+            HttpConnectionParams.setSoTimeout(params, mTimeout);
+            
+            // Create a new HTTP Client
+            HttpClient client = new DefaultHttpClient(params);
+            
             // Creates a HTTP post for search
+            Log.e(TAG, "x");
             HttpPost search = createSearch(url);
 
+            Log.e(TAG, "y");
             // Executes HTTP post
-            HttpResponse response = mClient.execute(search);
+            HttpResponse response = client.execute(search);
 
+            Log.e(TAG, "z");
             // Handles HTTP response
             results = handleResponse(response);
 
-            Log.d(TAG, "Search found the url in the NRS (" + url + ")");
+            Log.d(TAG, "Search found the url in the NRS");
         } catch (Exception e) {
-            Log.e(TAG, "Search in NRS didn't find anything or failed");
+            Log.e(TAG, "Search in NRS didn't find anything or failed: " + e.getClass());
         }
 
         // This sends the search results to the search controller, covering two scenarios:
