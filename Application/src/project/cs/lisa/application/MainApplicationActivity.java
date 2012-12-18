@@ -137,7 +137,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     private ProgressBar mSpinningBar;
 
     /** Test pages list. */
-    List<String> mPages;
+    private List<String> mPages;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -179,7 +179,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpSpinningBar();
 
         // test purposes
-        //runAutomatedDownload();
+        runAutomatedDownload();
     }
 
     /**
@@ -414,14 +414,14 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
 
-//                    if (mPages.size() != 0) {
-//                        // loading next test page
-//                        Random random = new Random();
-//                        int nextPage = random.nextInt(mPages.size());
-//                        String page = mPages.get(nextPage);
-//                        mPages.remove(nextPage);
-//                        startFetchingWebPage(page);
-//                    }
+                    if (mPages.size() != 0) {
+                        // loading next test page
+                        Random random = new Random();
+                        int nextPage = random.nextInt(mPages.size());
+                        String page = mPages.get(nextPage);
+                        mPages.remove(nextPage);
+                        startFetchingWebPage(page);
+                    }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
