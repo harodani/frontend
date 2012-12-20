@@ -447,7 +447,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 
                 } else if (action.equals(SEARCH_TRANSMISSION)) {
                     Log.d(TAG, "Searching resource");
-                    updateSpinningBarColor(R.drawable.progress_black, GREY_COLOR);
+                    updateSpinningBarColor(R.drawable.progress_grey, GREY_COLOR);
                 }
             }
         };

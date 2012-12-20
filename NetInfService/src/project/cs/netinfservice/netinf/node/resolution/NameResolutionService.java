@@ -646,7 +646,7 @@ implements ResolutionService {
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
             HttpConnectionParams.setSoTimeout(params, TIMEOUT);
-            
+
             HttpClient client = new DefaultHttpClient(params);
             
             // Execute NetInf GET request
@@ -703,7 +703,7 @@ implements ResolutionService {
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
             HttpConnectionParams.setSoTimeout(params, TIMEOUT);
-            
+
             HttpClient client = new DefaultHttpClient(params);
             
             // Execute HTTP request

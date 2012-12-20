@@ -121,6 +121,7 @@ public class NetInfWebViewClient extends WebViewClient {
 
         // Log the current URL
         Log.e(TAG, "+++Getting url now: " + url);
+
         Intent intent = new Intent(MainApplicationActivity.SEARCH_TRANSMISSION);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
         
