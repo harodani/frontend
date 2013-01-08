@@ -691,13 +691,14 @@ implements ResolutionService {
      */
     @Override
     public void put(InformationObject io) {
+
+        LogEntry logEntry = new LogEntry(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
+
         // Try to publish to the NRS
         try {
 
             // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
-
-            LogEntry logEntry = new LogEntry(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
 
             // Setup HTTP client
             HttpParams params = new BasicHttpParams();
@@ -721,8 +722,10 @@ implements ResolutionService {
                 logEntry.done();
             }
         } catch (UnsupportedEncodingException e) {
+            logEntry.failed();
             throw new NetInfResolutionException("Encoding not supported", e);
         } catch (IOException e) {
+            logEntry.failed();
             throw new NetInfResolutionException("Unable to connect to NRS", e);
         }
     }

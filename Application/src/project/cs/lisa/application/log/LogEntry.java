@@ -90,6 +90,7 @@ public class LogEntry {
                     toString() + "\n",
                     true);
         } catch (IOException e) {
+            e.printStackTrace();
             Log.e(TAG, "Failed to write log entry to file");
         }
     }

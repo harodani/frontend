@@ -133,6 +133,7 @@ public class LogEntry {
         try {
             FileUtils.write(new File(EXTERNAL_STORAGE + LOG_FILE), toString() + "\n", true);
         } catch (IOException e) {
+            e.printStackTrace();
             Log.e(TAG, "Failed to write log entry to file");
         }
     }

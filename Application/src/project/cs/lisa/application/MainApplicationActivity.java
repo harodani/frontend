@@ -181,7 +181,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpSpinningBar();
 
         // test purposes
-        runAutomatedDownload();
+//        runAutomatedDownload();
     }
 
     /**
@@ -198,10 +198,18 @@ public class MainApplicationActivity extends BaseMenuActivity {
         }
 
         // load first page
-        String mPage = UProperties.INSTANCE.getPropertyWithName("default.webpage");
-        startFetchingWebPage(mPage);
+//        String mPage = UProperties.INSTANCE.getPropertyWithName("default.webpage");
+//        startFetchingWebPage(mPage);
+        
+        startFetchingWebPage(getNextRandomPage());
     }
 
+    private String getNextRandomPage() {
+        Random random = new Random();
+        int nextPage = random.nextInt(mPages.size());
+        return mPages.remove(nextPage);
+    }
+    
     /**
      * Sets up filters to intercept by the broadcast receiver.
      */
@@ -252,7 +260,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 case R.drawable.refresh:
                     mImg.setImageResource(R.drawable.cancel);
                     mImg.setTag(R.drawable.cancel);
-                    startFetchingWebPage(mEditText.getText().toString());
+                    
+                    runAutomatedDownload();
+                    
+//                    startFetchingWebPage(mEditText.getText().toString());
                     break;
                 case R.drawable.cancel:
                     mImg.setImageResource(R.drawable.refresh);
@@ -418,12 +429,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mImg.setTag(R.drawable.refresh);
 
                     if (mPages.size() != 0) {
-                        // loading next test page
-                        Random random = new Random();
-                        int nextPage = random.nextInt(mPages.size());
-                        String page = mPages.get(nextPage);
-                        mPages.remove(nextPage);
-                        startFetchingWebPage(page);
+                        startFetchingWebPage(getNextRandomPage());
                     }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {

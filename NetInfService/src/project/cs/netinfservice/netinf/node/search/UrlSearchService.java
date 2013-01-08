@@ -199,14 +199,11 @@ public class UrlSearchService implements SearchService {
             HttpClient client = new DefaultHttpClient(params);
             
             // Creates a HTTP post for search
-            Log.e(TAG, "x");
             HttpPost search = createSearch(url);
 
-            Log.e(TAG, "y");
             // Executes HTTP post
             HttpResponse response = client.execute(search);
 
-            Log.e(TAG, "z");
             // Handles HTTP response
             results = handleResponse(response);
 
