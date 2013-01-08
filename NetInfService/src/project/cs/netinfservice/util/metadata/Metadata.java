@@ -94,42 +94,6 @@ public class Metadata {
     }
 
     /**
-     * Constructor for string arrays. It is the developer responsibility to
-     * pass arrays with the correct sizes. They are corresponding, meaning
-     * key[0] goes with value[0].
-     * 
-     * Read it as: metadata[key(i)] = value(i)
-     *
-     * @param key
-     *      Array of keys
-     * @param value
-     *      Array of values
-     */
-    public Metadata(String[] key, String[] value) {
-        // New SimpleJson object
-        mJSONObject = new JSONObject();
-
-        // Check if both arrays have the same size
-        if (key.length != value.length) {
-            // Different size arrays
-            Log.d(TAG, "The JSON Object was created, but you gave me two arrays of "
-                    + "different sizes!");
-
-            // TODO: HANDLE this. Urgently.
-            // Null or lost values
-            if (key.length > value.length) 
-                Log.d(TAG, "The JSON Object created has null values.");
-            else 
-                Log.d(TAG, "The JSON Object created has lost values.");
-        }
-
-        // Add keys
-        for (int i = 0; i < key.length; i++) {
-            insert(key[i], value[i]);
-        }
-    }
-
-    /**
      * Inserts a (key,value) to the JSON Object.
      *
      * @param key
