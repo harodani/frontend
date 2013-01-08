@@ -31,15 +31,15 @@
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  *     * Redistributions of source code must retain the above copyright notice,
  *       this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice,
- *       this list of conditions and the following disclaimer in the documentation 
+ *       this list of conditions and the following disclaimer in the documentation
  *       and/or other materials provided with the distribution.
- *     	 Neither the name of the University of Paderborn nor the names of 
+ *     	 Neither the name of the University of Paderborn nor the names of
  *       its contributors may be used to endorse
  *       or promote products derived from this software without specific prior written permission.
  *
@@ -123,7 +123,7 @@ public class BOResource extends LisaServerResource {
 		// Get where to save information
 		String relativeFolderPath = UProperties.INSTANCE.getPropertyWithName("sharing.folder");
 		mSharedFolder = Environment.getExternalStorageDirectory() + relativeFolderPath;
-		
+
 		// Sanity checks the shared folder
 		createSharedFolder();
 	}
@@ -158,7 +158,7 @@ public class BOResource extends LisaServerResource {
 		// If the NetInf GET got the file data we are done
 		Attribute filepathAttribute =
 				io.getSingleAttribute(SailDefinedAttributeIdentification.FILE_PATH.getURI());
-		
+
 		// If there is a filepath attribute, response had the file
 		if (filepathAttribute != null) {
 			Log.d(TAG, "Response to the NetInf Get contained the file");
@@ -167,7 +167,7 @@ public class BOResource extends LisaServerResource {
 			String contentType = io.getIdentifier().getIdentifierLabel(
 					SailDefinedLabelName.CONTENT_TYPE.getLabelName())
 					.getLabelValue();
-			
+
 			// Create Metadata
 			Metadata metadata = new Metadata();
 			metadata.insert(sContentType, contentType);
@@ -176,11 +176,11 @@ public class BOResource extends LisaServerResource {
 			String filePath = filepathAttribute.getValueRaw();
 			filePath = filePath.substring(filePath.indexOf(":") + 1);
 			metadata.insert(sFilepath, filePath);
-			
+
 			// Return the metadata created
 			return metadata.convertToString();
 		}
-		
+
 		// GET did not respond with the file
 		Log.d(TAG, "Response to the NetInf GET did NOT contain the file");
 
@@ -226,8 +226,8 @@ public class BOResource extends LisaServerResource {
 		// Set saving filename to the same filename as in metadata
 		String hash = io.getIdentifier().getIdentifierLabel(
 				SailDefinedLabelName.HASH_CONTENT.getLabelName()).getLabelValue();
-		
-		String filePath = Environment.getExternalStorageDirectory() 
+
+		String filePath = Environment.getExternalStorageDirectory()
 				+ UProperties.INSTANCE.getPropertyWithName("sharing.folder")
 				+ hash;
 
@@ -237,7 +237,7 @@ public class BOResource extends LisaServerResource {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Make file visible to user
 		makeFileVisibleToPhone(filePath, contentType);
 
@@ -260,7 +260,7 @@ public class BOResource extends LisaServerResource {
 	private InformationObject retrieveDO() {
 	    // Create a new identifier with the Hash Algorithm and Hash of the object
 		Identifier identifier = createIdentifier(mHashAlgorithm, mHashValue);
-		
+
 		// Create a new IO
 		InformationObject io = null;
 
@@ -308,7 +308,7 @@ public class BOResource extends LisaServerResource {
 	    // Path and CT
 	    String[] paths = {filePath};
 		String[] mediaType = {contentType};
-		
+
 		// Make it recognizable to the users device
 		MediaScannerConnection.scanFile(
 				MainNetInfApplication.getAppContext(), paths, mediaType, null);

@@ -26,7 +26,13 @@
  */
 package project.cs.netinfservice.application;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+
 import project.cs.netinfservice.R;
+import project.cs.netinfservice.log.LogEntry;
 import project.cs.netinfutilities.UProperties;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,6 +40,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
@@ -55,7 +62,7 @@ implements OnSharedPreferenceChangeListener {
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
 
     /**
-     * Creates settings fragment, initializing global preferences. 
+     * Creates settings fragment, initializing global preferences.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +70,7 @@ implements OnSharedPreferenceChangeListener {
 
         // Get shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        
+
         // Set default NRS address
         if (!prefs.contains(PREF_KEY_NRS_IP)) {
             // Edit on the go
@@ -73,7 +80,7 @@ implements OnSharedPreferenceChangeListener {
                     UProperties.INSTANCE.getPropertyWithName("nrs.http.host"));
             editor.commit();
         }
-        
+
         // Set default NRS port
         if (!prefs.contains(PREF_KEY_NRS_PORT)) {
             Editor editor = prefs.edit();
@@ -93,12 +100,20 @@ implements OnSharedPreferenceChangeListener {
                     public boolean onPreferenceClick(Preference preference) {
                         // DB Delete
                         AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                        .setTitle("Do you really want to delete the database?")    
+                        .setTitle("Do you really want to delete the database?")
                         .setCancelable(false)
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {  
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 getActivity().deleteDatabase("IODatabase");
+                                
+                                // Delete files from the local file system
+                                File dir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/DCIM/Shared/");
+                                try {
+                                    FileUtils.cleanDirectory(dir);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -111,6 +126,29 @@ implements OnSharedPreferenceChangeListener {
         // Set default summaries
         findPreference(PREF_KEY_NRS_IP).setSummary(prefs.getString(PREF_KEY_NRS_IP, ""));
         findPreference(PREF_KEY_NRS_PORT).setSummary(prefs.getString(PREF_KEY_NRS_PORT, ""));
+
+        // Clear Log
+        findPreference("pref_key_clear_log").setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        // DB Delete
+                        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                        .setTitle("Do you really want to delete the log?")
+                        .setCancelable(false)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                LogEntry.deleteLogFile();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                        dialog.show();
+                        return false;
+                    }
+                });
+
     }
 
     /**

@@ -119,14 +119,19 @@ public class NetInfWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view,
             String url) {
 
+        // Log the current URL
+        Log.e(TAG, "+++Getting url now: " + url);
+
         Intent intent = new Intent(MainApplicationActivity.SEARCH_TRANSMISSION);
         MainApplicationActivity.getActivity().sendBroadcast(intent);
         
         if (!URLUtil.isHttpUrl(url)) {
             super.shouldInterceptRequest(view, url);
+            Log.e(TAG, "Request was not an HttpUrl. Downloading from uplink.");
             return null;
 
         } else if (URLUtil.isHttpUrl(url)) {
+            
             WebObject resource = null;
             File file = null;
             String contentType = null;
@@ -176,7 +181,6 @@ public class NetInfWebViewClient extends WebViewClient {
                 Log.e("TAG", "Could not open file");
             }
 
-            System.gc();
             return response;
         } else {
             Log.e(TAG, "Unexpected url while intercepting resources.");

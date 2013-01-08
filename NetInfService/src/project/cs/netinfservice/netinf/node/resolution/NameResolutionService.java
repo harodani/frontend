@@ -68,6 +68,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import project.cs.netinfservice.application.MainNetInfActivity;
+import project.cs.netinfservice.log.LogEntry;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedAttributeIdentification;
 import project.cs.netinfservice.netinf.common.datamodel.SailDefinedLabelName;
 import project.cs.netinfservice.netinf.node.exceptions.InvalidResponseException;
@@ -123,7 +124,7 @@ implements ResolutionService {
 
     /** Key for accessing the NRS Port. */
     private static final String PREF_KEY_NRS_PORT = "pref_key_nrs_port";
-
+    
     /**
      * Creates a new Name Resolution Service that communicates with a specific NRS.
      * @param host
@@ -634,6 +635,8 @@ implements ResolutionService {
     public InformationObject get(Identifier identifier) {
         Log.d(TAG, "Get information object from NRS.");
 
+        LogEntry logEntry = new LogEntry(LogEntry.Type.NRS, LogEntry.Action.GET);
+
         try {
             // Create NetInf GET request. Request looks like ni:///hash-alg;hash
             String uri = "ni:///" + getHashAlg(identifier) + ";" + getHash(identifier);
@@ -643,6 +646,7 @@ implements ResolutionService {
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
             HttpConnectionParams.setSoTimeout(params, TIMEOUT);
+
             HttpClient client = new DefaultHttpClient(params);
             
             // Execute NetInf GET request
@@ -650,6 +654,8 @@ implements ResolutionService {
 
             // Handle the response
             InformationObject io = handleResponse(identifier, response);
+
+            logEntry.done(io);
 
             // Returns Information Object found
             return io;
@@ -660,6 +666,8 @@ implements ResolutionService {
         } catch (IOException e) {
             Log.e(TAG, "IOException: " + (e.getMessage() != null ? e.getMessage() : ""));
         }
+
+        logEntry.failed();
 
         Log.e(TAG, "get() failed. Returning null");
 
@@ -683,8 +691,12 @@ implements ResolutionService {
      */
     @Override
     public void put(InformationObject io) {
+
+        LogEntry logEntry = new LogEntry(io, LogEntry.Type.NRS, LogEntry.Action.PUBLISH);
+
         // Try to publish to the NRS
         try {
+
             // Create a new HTTP Post to publish
             HttpPost post = createPublish(io);
 
@@ -692,6 +704,7 @@ implements ResolutionService {
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, TIMEOUT);
             HttpConnectionParams.setSoTimeout(params, TIMEOUT);
+
             HttpClient client = new DefaultHttpClient(params);
             
             // Execute HTTP request
@@ -703,10 +716,16 @@ implements ResolutionService {
             // Check if object was created
             if (status != HttpStatus.SC_CREATED) {
                 Log.e(TAG, "Publish to NRS failed, status code: " + status);
+                logEntry.failed();
+            } else {
+                Log.d(TAG, "Published to NRS");
+                logEntry.done();
             }
         } catch (UnsupportedEncodingException e) {
+            logEntry.failed();
             throw new NetInfResolutionException("Encoding not supported", e);
         } catch (IOException e) {
+            logEntry.failed();
             throw new NetInfResolutionException("Unable to connect to NRS", e);
         }
     }

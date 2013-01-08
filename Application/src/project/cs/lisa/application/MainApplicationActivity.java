@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import project.cs.lisa.R;
@@ -81,7 +84,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Message communicating if the node were started successfully. */
     public static final String NODE_STARTED_MESSAGE = "project.cs.lisa.node.started";
-    
+
     /** Properties file. */
     public static final String PROPERTIES_FILE = "config.properties";
 
@@ -135,6 +138,9 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /** Spinning progress bar, shown when loading a page. */
     private ProgressBar mSpinningBar;
 
+    /** Test pages list. */
+    private List<String> mPages;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,17 +154,17 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
         sMainNetInfActivity = this;
         sToast = new Toast(this);
-        
+
         // sets up property reader
         AssetManager assets = getApplicationContext().getResources().getAssets();
         InputStream is = null;
-		try {
-			is = assets.open(PROPERTIES_FILE);
-	        UProperties.INSTANCE.init(is);
-	        is.close();
-		} catch (IOException e) {
-			Log.e(TAG, "Failed initializing the properties reader.");
-		}
+        try {
+            is = assets.open(PROPERTIES_FILE);
+            UProperties.INSTANCE.init(is);
+            is.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed initializing the properties reader.");
+        }
 
         // setupWifi();
         setupBluetoothAvailability();
@@ -173,8 +179,37 @@ public class MainApplicationActivity extends BaseMenuActivity {
         setUpLoadPageIcon();
         setUpWebView();
         setUpSpinningBar();
+
+        // test purposes
+//        runAutomatedDownload();
     }
 
+    /**
+     * Load first web page for evaluation purpose.
+     * The other ones will be loaded when FINISHED_LOADING_PAGE
+     * is broadcasted.
+     */
+    private void runAutomatedDownload() {
+        // set test pages
+        mPages = new ArrayList<String>();
+        String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
+        for (String url : pages) {
+            mPages.add(url);
+        }
+
+        // load first page
+//        String mPage = UProperties.INSTANCE.getPropertyWithName("default.webpage");
+//        startFetchingWebPage(mPage);
+        
+        startFetchingWebPage(getNextRandomPage());
+    }
+
+    private String getNextRandomPage() {
+        Random random = new Random();
+        int nextPage = random.nextInt(mPages.size());
+        return mPages.remove(nextPage);
+    }
+    
     /**
      * Sets up filters to intercept by the broadcast receiver.
      */
@@ -191,7 +226,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Sets up the edit text for the url. 
+     * Sets up the edit text for the url.
      */
     private void setUpEditTextUrl() {
         // Get the input address
@@ -225,7 +260,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 case R.drawable.refresh:
                     mImg.setImageResource(R.drawable.cancel);
                     mImg.setTag(R.drawable.cancel);
-                    startFetchingWebPage(mEditText.getText().toString());
+                    
+                    runAutomatedDownload();
+                    
+//                    startFetchingWebPage(mEditText.getText().toString());
                     break;
                 case R.drawable.cancel:
                     mImg.setImageResource(R.drawable.refresh);
@@ -266,7 +304,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
     }
 
     /**
-     * Listener for connecting to a Wifi network. 
+     * Listener for connecting to a Wifi network.
      */
     private class WifiDialogListener implements DialogInterface.OnClickListener {
         @Override
@@ -367,10 +405,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
     /**
      * Receives messages from different transmissions
      * to update the progress bar color.
-     * 
+     *
      * Receives messages from web view to start downloading
      * new web content.
-     * 
+     *
      * Receives messages from the NRS node to notify it was
      * started.
      */
@@ -389,6 +427,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mImg.setImageResource(R.drawable.refresh);
                     mImg.setTag(R.drawable.refresh);
+
+                    if (mPages.size() != 0) {
+                        startFetchingWebPage(getNextRandomPage());
+                    }
 
                 } else if (action.equals(NODE_STARTED_MESSAGE)) {
                     Log.d(TAG, "The NetInf node was started.");
@@ -419,7 +461,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /**
      * Updates the spinning bar with a new drawable.
-     *  
+     *
      * @param newDrawable
      *      The new newDrawable.
      * @param color

@@ -4,9 +4,11 @@
     <PreferenceCategory
         android:key="pref_key_nrs"
         android:title="@string/nrs_category" >
+    
         <EditTextPreference
             android:key="pref_key_nrs_ip"
             android:title="@string/nrs_ip_setting" />
+        
         <EditTextPreference
             android:key="pref_key_nrs_port"
             android:title="@string/nrs_port_setting" />
@@ -20,7 +22,7 @@
             android:summaryOn="@string/bluetooth_summary_on"
             android:title="@string/bluetooth_title" />
     </PreferenceCategory>
-
+    
     <PreferenceCategory android:title="@string/database_category" >
         <Preference
             android:key="pref_key_clear_database"
@@ -28,4 +30,11 @@
         </Preference>
     </PreferenceCategory>
     
+    <PreferenceCategory android:title="@string/log_category" >
+        <Preference
+            android:key="pref_key_clear_log"
+            android:title="@string/clear_log_title" >
+        </Preference>
+    </PreferenceCategory>
+
 </PreferenceScreen>

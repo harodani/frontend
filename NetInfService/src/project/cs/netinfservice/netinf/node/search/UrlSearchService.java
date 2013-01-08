@@ -109,7 +109,7 @@ public class UrlSearchService implements SearchService {
     /** Random number generator used to create message IDs. */
     private final Random mRandomGenerator = new Random();
     
-    /** Linus does not play instruments. But he TIMES OUT. */
+    /** NetInf HTTP timeout */
     private int mTimeout;
 
     /**
@@ -199,14 +199,11 @@ public class UrlSearchService implements SearchService {
             HttpClient client = new DefaultHttpClient(params);
             
             // Creates a HTTP post for search
-            Log.e(TAG, "x");
             HttpPost search = createSearch(url);
 
-            Log.e(TAG, "y");
             // Executes HTTP post
             HttpResponse response = client.execute(search);
 
-            Log.e(TAG, "z");
             // Handles HTTP response
             results = handleResponse(response);
 

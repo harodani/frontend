@@ -30,15 +30,15 @@
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  *     * Redistributions of source code must retain the above copyright notice,
  *       this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice,
- *       this list of conditions and the following disclaimer in the documentation 
+ *       this list of conditions and the following disclaimer in the documentation
  *       and/or other materials provided with the distribution.
- *     	 Neither the name of the University of Paderborn nor the names of 
+ *     	 Neither the name of the University of Paderborn nor the names of
  *       its contributors may be used to endorse
  *       or promote products derived from this software without specific prior written permission.
  *
@@ -68,7 +68,7 @@ import android.util.Log;
 
 /**
  * Handles NetInf Publish and Get requests.
- * 
+ *
  * @author Linus Sunde
  *
  */
@@ -114,7 +114,7 @@ public class IOResource extends LisaServerResource {
         mBluetoothMac = getQuery().getFirstValue("btmac", true);
         mMeta = getQuery().getFirstValue("meta", true);
         mFilePath = getQuery().getFirstValue("filePath", true);
-        
+
         // Get data model and node information
         mDatamodelFactory = getDatamodelFactory();
         mNodeConnection   = getNodeConnection();
@@ -122,7 +122,7 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Debug.
-     * 
+     *
      * @throws NetInfCheckedException
      *      Thrown when publish fails
      */
@@ -172,7 +172,7 @@ public class IOResource extends LisaServerResource {
 
     /**
      * Publish an IO.
-     * 
+     *
      * @param builder
      *  	An IOBuilder
      * @throws NetInfCheckedException
@@ -197,7 +197,7 @@ public class IOResource extends LisaServerResource {
             // Create empty meta data
             mMeta = "{\"meta\":{}}";
         }
-        
+
         builder.setMetaData(mMeta);
 
         // Build IO and put it up for publishing
