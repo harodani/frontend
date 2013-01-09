@@ -54,14 +54,19 @@ public class LogEntry {
     /** Failed flag. */
     private boolean mFailed = false;
 
+    private String mUrl;
+    
     /** Different types of entries. */
     public enum Type {
+        WEBSITE,
         /** Uplink, usually Internet. */
         UPLINK;
     }
 
     /** Different types of actions. */
     public enum Action {
+        /** Verbose */
+        WEBSITE_VISITED,
         /** Get request where response contained a file. */
         GET_WITH_FILE;
     }
@@ -80,6 +85,20 @@ public class LogEntry {
         mStartTime = System.currentTimeMillis();
     }
 
+    /**
+     * Creates a new LogEntry.
+     * @param type
+     *      The type of the LogEntry.
+     * @param action
+     *      The action of the LogEntry.
+     * @param url
+     *      The website url that we visited.
+     */
+    public LogEntry(final Type type, final Action action, String url) {
+        this(type, action);
+        mUrl = url;
+    }
+    
     /**
      * Writes the LogEntry to the log file.
      */
@@ -140,6 +159,10 @@ public class LogEntry {
         if (mFailed) {
             builder.append("\t");
             builder.append("FAILED");
+        }
+        if (mType == Type.WEBSITE) {
+            builder.append("\t");
+            builder.append(mUrl);
         }
         return builder.toString();
     }

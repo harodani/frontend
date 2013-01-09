@@ -26,6 +26,9 @@
  */
 package project.cs.lisa.application;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -33,6 +36,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 import project.cs.lisa.R;
@@ -40,6 +44,7 @@ import project.cs.lisa.application.dialogs.ListDialog;
 import project.cs.lisa.application.dialogs.OkButtonDialog;
 import project.cs.lisa.application.html.NetInfWebViewClient;
 import project.cs.lisa.application.html.transfer.FetchWebPageTask;
+import project.cs.lisa.application.log.LogEntry;
 import project.cs.lisa.networksettings.BTHandler;
 import project.cs.lisa.networksettings.WifiHandler;
 import project.cs.netinfutilities.UProperties;
@@ -53,6 +58,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -140,7 +146,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
 
     /** Test pages list. */
     private List<String> mPages;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -188,12 +194,34 @@ public class MainApplicationActivity extends BaseMenuActivity {
      * Load first web page for evaluation purpose.
      * The other ones will be loaded when FINISHED_LOADING_PAGE
      * is broadcasted.
+     * @throws FileNotFoundException 
      */
     private void runAutomatedDownload() {
         // set test pages
         mPages = new ArrayList<String>();
-        String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
+        List<String> pages = new ArrayList<String>();
+        // Changing this to read webistes from file.
+        //String[] pages = UProperties.INSTANCE.getPropertyWithName("test.web.pages").split(",");
+        String fFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + 
+                UProperties.INSTANCE.getPropertyWithName("test.file.web.pages");
+        Log.d(TAG, fFileName);
+        Scanner scanner = null;
+        
+        try {
+            scanner = new Scanner(new FileInputStream(fFileName));
+            while (scanner.hasNextLine()) {
+                pages.add(scanner.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+        
+        int i = 0;
         for (String url : pages) {
+            Log.d(TAG, "#" + i++ + ": " + url);
             mPages.add(url);
         }
 
@@ -207,7 +235,10 @@ public class MainApplicationActivity extends BaseMenuActivity {
     private String getNextRandomPage() {
         Random random = new Random();
         int nextPage = random.nextInt(mPages.size());
-        return mPages.remove(nextPage);
+        String website = mPages.remove(nextPage);
+        LogEntry log = new LogEntry(LogEntry.Type.WEBSITE, LogEntry.Action.WEBSITE_VISITED, website);
+        log.done();
+        return website;
     }
     
     /**
@@ -418,9 +449,12 @@ public class MainApplicationActivity extends BaseMenuActivity {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
 
+                // TODO: Remove this for proper evaluation. Here, changes to the url (php redirect
+                //       for example) could invoke this action and this call, which corrupts the
+                //       logging efforts.
                 if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
                     String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
-                    startFetchingWebPage(newUrl);
+                    //startFetchingWebPage(newUrl);
 
                 } else if (action.equals(FINISHED_LOADING_PAGE)) {
                     updateSpinningBarColor(R.drawable.progress_grey, GREY_COLOR);
@@ -429,6 +463,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
                     mImg.setTag(R.drawable.refresh);
 
                     if (mPages.size() != 0) {
+                        Log.d(TAG, "Current pages = " + mPages.toString());
                         startFetchingWebPage(getNextRandomPage());
                     }
 
