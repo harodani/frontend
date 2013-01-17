@@ -396,6 +396,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
             url = new URL(URLUtil.guessUrl(newUrl));
             mEditText.setText(url.toString());
         } catch (MalformedURLException e) {
+            Log.e(TAG, "ERROR LOADING URL");
             e.printStackTrace();
             showToast("Malformed url!");
             return;
@@ -419,6 +420,7 @@ public class MainApplicationActivity extends BaseMenuActivity {
             // start downloading the web page
             mSpinningBar.setVisibility(View.VISIBLE);
             FetchWebPageTask task = new FetchWebPageTask(mWebView);
+            Log.d(TAG, "Trying to execute url");
             task.execute(url);
         }
     }
@@ -452,11 +454,13 @@ public class MainApplicationActivity extends BaseMenuActivity {
                 // TODO: Remove this for proper evaluation. Here, changes to the url (php redirect
                 //       for example) could invoke this action and this call, which corrupts the
                 //       logging efforts.
-                if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
-                    String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
+                //if (action.equals(NetInfWebViewClient.URL_WAS_UPDATED)) {
+                //    String newUrl = (String) intent.getExtras().get(NetInfWebViewClient.URL);
                     //startFetchingWebPage(newUrl);
+                //    Log.d(TAG, "GOT THIS");
 
-                } else if (action.equals(FINISHED_LOADING_PAGE)) {
+                //} else
+                if (action.equals(FINISHED_LOADING_PAGE)) {
                     updateSpinningBarColor(R.drawable.progress_grey, GREY_COLOR);
                     mSpinningBar.setVisibility(View.INVISIBLE);
                     mImg.setImageResource(R.drawable.refresh);
