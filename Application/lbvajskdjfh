@@ -1,0 +1,25 @@
+1. Get top 15 and load them on four phones
+2. Random order in top 15
+2.5 Get them again (count dynamic content)
+3. Do it again for top 30
+4. Do it again in Random for top 100, 250, 500 (choose 15 sites)
+
+Test bluetooth:
+We disable full-put and do as above
+
+Test NRS + Bluetooth:
++ Ideal: We disable full-put with a certain probability and do as above
++ Workaround: Disabled full-put on 2 of the phones (0, 25, 50 or 75)
+
+Run  --    Sites
+ 1   --  (15) random top 15
+ 2   --  (15) random top 25
+ 3   --  (15) random top 50
+ 4   --  (15) random top 75
+ 5   --  (15) random top 100
+ 6   --  (15) random top 250
+ 7   --  (15) random top 500
+
+0, 2, or all with fullput
+
+21 runs
